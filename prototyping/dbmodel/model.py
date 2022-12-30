@@ -53,6 +53,10 @@ class Line(Base):
     means_of_transport_id = Column("MEANS_OF_TRANSPORT_ID", Integer, ForeignKey("MEANS_OF_TRANSPORT.ID"), nullable=False)
     label = Column("LABEL", String, nullable=False)
     means_of_transport = relationship("MeansOfTransport", foreign_keys="Line.means_of_transport_id")
+    itinerary_start_direction_one_id = Column("ITINERARY_START_DIRECTION_ONE_ID", Integer, ForeignKey("LINE_ITINERARY_ENTRIES.ID"), nullable=False)
+    itinerary_start_direction_two_id = Column("ITINERARY_START_DIRECTION_TWO_ID", Integer, ForeignKey("LINE_ITINERARY_ENTRIES.ID"), nullable=False)
+    itinerary_start_direction_one = relationship("LineItineraryEntry", foreign_keys="Line.itinerary_start_direction_one_id")
+    itinerary_start_direction_two = relationship("LineItineraryEntry", foreign_keys="Line.itinerary_start_direction_two_id")
 
 
 def main() -> None:
