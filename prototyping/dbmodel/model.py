@@ -29,14 +29,22 @@ class Node(Base):
 
 class Edge(Base):
     __tablename__ = "EDGES"
-    id = Column("ID", Integer, primary_key=True, index=True)
+    id = Column("ID", Integer, primary_key=True)
     distance_min = Column("DISTANCE_MIN", Integer, nullable=False)
     start_node_id = Column("START_NODE_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
     end_node_id = Column("END_NODE_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
     means_of_transport_id = Column("MEANS_OF_TRANSPORT_ID", Integer, ForeignKey("MEANS_OF_TRANSPORT.ID"), nullable=False)
     start_node = relationship("Node", foreign_keys="Edge.start_node_id")
     end_node = relationship("Node", foreign_keys="Edge.end_node_id")
-    means_of_transport = relationship("MeansOfTransport", foreign_keys="Line.means_of_transport_id")
+    means_of_transport = relationship("MeansOfTransport", foreign_keys="Edge.means_of_transport_id")
+
+
+class LineItineraryEntry(Base):
+    __tablename__ = "LINE_ITINERARY_ENTRIES"
+    id = Column("ID", Integer, primary_key=True)
+    edge_id = Column("EDGE_ID", Integer, ForeignKey("EDGES.ID"), nullable=True)
+    next_entry_id = Column("NEXT_ENTRY_ID", Integer, ForeignKey("LINE_ITINERARY_ENTRIES.ID"), nullable=False)
+    next_entry = relationship("LineItineraryEntry", foreign_keys="LineItineraryEntry.next_entry_id")
 
 
 class Line(Base):
@@ -44,11 +52,7 @@ class Line(Base):
     id = Column("ID", Integer, primary_key=True, index=True)
     means_of_transport_id = Column("MEANS_OF_TRANSPORT_ID", Integer, ForeignKey("MEANS_OF_TRANSPORT.ID"), nullable=False)
     label = Column("LABEL", String, nullable=False)
-    terminal_stop_one_id = Column("TERMINAL_STOP_ONE_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
-    terminal_stop_two_id = Column("TERMINAL_STOP_TWO_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
     means_of_transport = relationship("MeansOfTransport", foreign_keys="Line.means_of_transport_id")
-    terminal_stop_one = relationship("Node", foreign_keys="Line.terminal_stop_one_id")
-    terminal_stop_two = relationship("Node", foreign_keys="Line.terminal_stop_two_id")
 
 
 def main() -> None:
