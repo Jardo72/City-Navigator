@@ -27,6 +27,8 @@ class Node(Base):
     name = Column("NAME", String(length=50), nullable=False)
 
 
+# TODO
+# for the query service model, consider back-reference so that a node has a list of outbound edges
 class Edge(Base):
     __tablename__ = "EDGES"
     id = Column("ID", Integer, primary_key=True)
