@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./prototyping/dbmodel/city-navigator-prototype.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./city-navigator-prototype.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -53,10 +53,10 @@ class Line(Base):
     label = Column("LABEL", String, nullable=False)
     means_of_transport_id = Column("MEANS_OF_TRANSPORT_ID", Integer, ForeignKey("MEANS_OF_TRANSPORT.ID"), nullable=False)
     means_of_transport = relationship("MeansOfTransport", foreign_keys="Line.means_of_transport_id")
-    itinerary_start_direction_one_id = Column("ITINERARY_START_DIRECTION_ONE_ID", Integer, ForeignKey("LINE_ITINERARY_ENTRIES.ID"), nullable=False)
-    itinerary_start_direction_two_id = Column("ITINERARY_START_DIRECTION_TWO_ID", Integer, ForeignKey("LINE_ITINERARY_ENTRIES.ID"), nullable=False)
-    itinerary_start_direction_one = relationship("LineItineraryEntry", foreign_keys="Line.itinerary_start_direction_one_id")
-    itinerary_start_direction_two = relationship("LineItineraryEntry", foreign_keys="Line.itinerary_start_direction_two_id")
+    terminal_stop_one_id = Column("TERMINAL_STOP_ONE_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
+    terminal_stop_two_id = Column("TERMINAL_STOP_TWO_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
+    terminal_stop_one = relationship("Node", foreign_keys="Line.terminal_stop_one_id")
+    terminal_stop_two = relationship("Node", foreign_keys="Line.terminal_stop_two_id")
 
 
 def main() -> None:
