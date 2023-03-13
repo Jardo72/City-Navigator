@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./city-navigator-prototype.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./prototyping/dbmodel/city-navigator-prototype.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -64,14 +64,28 @@ def main() -> None:
         db = SessionLocal()
 
         print()
+        print("Nodes")
         nodes = db.query(Node).all()
         for single_node in nodes:
             print(f"id={single_node.id} name={single_node.name}")
 
         print()
+        print("Node by name")
+        node = db.query(Node).filter(Node.name == "Simmering").first()
+        print(f"id={node.id} name={node.name}")
+
+
+        print()
+        print("Edges")
         edges = db.query(Edge).all()
         for single_edge in edges:
             print(f"{single_edge.start_node.name} -> {single_edge.end_node.name} ({single_edge.distance_min} min)")
+
+        print()
+        print("Lines")
+        lines = db.query(Line).all()
+        for single_line in lines:
+            print(f"label={single_line.label} means of transport={single_line.means_of_transport.identifier}")
     finally:
         db.close()
 
