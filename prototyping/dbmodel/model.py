@@ -33,10 +33,10 @@ class Edge(Base):
     distance_min = Column("DISTANCE_MIN", Integer, nullable=False)
     start_node_id = Column("START_NODE_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
     end_node_id = Column("END_NODE_ID", Integer, ForeignKey("NODES.ID"), nullable=False)
-    means_of_transport_id = Column("MEANS_OF_TRANSPORT_ID", Integer, ForeignKey("MEANS_OF_TRANSPORT.ID"), nullable=False)
+    line_id = Column("LINE_ID", Integer, ForeignKey("LINES.ID"), nullable=False)
     start_node = relationship("Node", foreign_keys="Edge.start_node_id")
     end_node = relationship("Node", foreign_keys="Edge.end_node_id")
-    means_of_transport = relationship("MeansOfTransport", foreign_keys="Edge.means_of_transport_id")
+    line = relationship("Line", foreign_keys="Edge.line_id")
 
 
 class LineItineraryEntry(Base):
@@ -50,8 +50,8 @@ class LineItineraryEntry(Base):
 class Line(Base):
     __tablename__ = "LINES"
     id = Column("ID", Integer, primary_key=True, index=True)
-    means_of_transport_id = Column("MEANS_OF_TRANSPORT_ID", Integer, ForeignKey("MEANS_OF_TRANSPORT.ID"), nullable=False)
     label = Column("LABEL", String, nullable=False)
+    means_of_transport_id = Column("MEANS_OF_TRANSPORT_ID", Integer, ForeignKey("MEANS_OF_TRANSPORT.ID"), nullable=False)
     means_of_transport = relationship("MeansOfTransport", foreign_keys="Line.means_of_transport_id")
     itinerary_start_direction_one_id = Column("ITINERARY_START_DIRECTION_ONE_ID", Integer, ForeignKey("LINE_ITINERARY_ENTRIES.ID"), nullable=False)
     itinerary_start_direction_two_id = Column("ITINERARY_START_DIRECTION_TWO_ID", Integer, ForeignKey("LINE_ITINERARY_ENTRIES.ID"), nullable=False)

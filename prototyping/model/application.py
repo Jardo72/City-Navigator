@@ -101,12 +101,12 @@ async def get_line_list(means_of_transport: str = None):
 
 
 @app.get("/line", response_model=LineDetails)
-async def get_line_details(identifier: str):
+async def get_line_details(label: str):
     """
-    Provides the details of the line with the given identifier.
+    Provides the details of the line with the given label.
     """
     return LineDetails(
-        identifier="U3",
+        label="U3",
         means_of_transport="U-Bahn",
         direction_one_itinerary=LineItinerary(
             start="",

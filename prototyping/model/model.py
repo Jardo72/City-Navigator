@@ -2,6 +2,9 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+#############################################################
+# Query Service - REST Model
+#############################################################
 class JourneyLeg(BaseModel):
     start: str = None
     destination: str = None
@@ -29,7 +32,7 @@ class LineItinerary(BaseModel):
 
 
 class LineDetails(BaseModel):
-    identifier: str = None
+    label: str = None
     means_of_transport: str = None
     direction_one_itinerary: LineItinerary = None
     direction_two_itinerary: LineItinerary = None
@@ -48,3 +51,8 @@ class StationDetails(BaseModel):
 class LineListEntry(BaseModel):
     identifier: str = None
     means_of_transport: str = None
+
+
+#############################################################
+# Master Data Service - REST Model
+#############################################################
