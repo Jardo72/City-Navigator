@@ -76,7 +76,6 @@ def main() -> None:
         node = db.query(Node).filter(Node.name == "Simmering").first()
         print(f"id={node.id} name={node.name}")
 
-
         print()
         print("Edges")
         edges = db.query(Edge).all()

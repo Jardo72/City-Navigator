@@ -1,8 +1,54 @@
 from typing import List
 
 from fastapi import FastAPI
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 from model import JourneyPlan, LineDetails, LineItinerary, LineListEntry, MeansOfTransport, StationDetails
+
+
+# see https://fastapi.tiangolo.com/advanced/events/
+
+
+# see https://stackoverflow.com/questions/62333314/python-sqlalchemy-in-memory-database-connect
+SQLALCHEMY_DATABASE_URL = "sqlite://"
+
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    echo=True,
+    future=True,
+    connect_args={"check_same_thread": False}
+)
+print("DB engine created")
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+def get_db() -> SessionLocal:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+conn = engine.connect()
+conn.execute(text(
+"""
+CREATE TABLE MEANS_OF_TRANSPORT (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    IDENTIFIER VARCHAR(20) NOT NULL UNIQUE
+);
+"""
+))
+conn.execute(text(
+"""
+CREATE TABLE NODES (
+    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+    NAME VARCHAR(50) NOT NULL UNIQUE
+);
+"""
+))
 
 
 app = FastAPI()
