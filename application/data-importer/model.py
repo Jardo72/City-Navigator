@@ -10,7 +10,7 @@ class LineItineraryItem:
 
 @dataclass(frozen=True, slots=True)
 class Line:
-    identifier: str
+    label: str
     means_of_transport: str
     itinerary: Tuple[LineItineraryItem, ...]
 

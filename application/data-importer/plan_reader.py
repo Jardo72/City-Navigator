@@ -14,10 +14,10 @@ def _read_single_itinerary(json_data: Dict[str, Any]) -> Tuple[LineItineraryItem
 
 
 def _read_single_line(json_data: Dict[str, Any]) -> Line:
-    identifier = json_data['identifier']
+    label = json_data['label']
     means_of_transport = json_data['meansOfTransport']
     itinerary = _read_single_itinerary(json_data['itinerary'])
-    return Line(identifier, means_of_transport, itinerary)
+    return Line(label, means_of_transport, itinerary)
 
 
 def _read_from_dict(json_data: Dict[str, Any]) -> CityPlan:

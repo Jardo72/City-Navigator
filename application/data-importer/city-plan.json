@@ -2,7 +2,7 @@
     "version": "1.0",
     "lines": [
         {
-            "identifier": "U1",
+            "label": "U1",
             "meansOfTransport": "U-Bahn",
             "itinerary": [
                 {
@@ -80,7 +80,7 @@
                 }
             ]
         }, {
-            "identifier": "U2",
+            "label": "U2",
             "meansOfTransport": "U-Bahn",
             "itinerary": [
                 {
@@ -146,7 +146,7 @@
                 }
             ]
         }, {
-            "identifier": "U3",
+            "label": "U3",
             "meansOfTransport": "U-Bahn",
             "itinerary": [
                 {
@@ -215,7 +215,7 @@
                 }
             ]
         }, {
-            "identifier": "U4",
+            "label": "U4",
             "meansOfTransport": "U-Bahn",
             "itinerary": [
                 {
@@ -281,7 +281,7 @@
                 }
             ]
         }, {
-            "identifier": "U6",
+            "label": "U6",
             "meansOfTransport": "U-Bahn",
             "itinerary": [
                 {
@@ -359,7 +359,7 @@
                 }
             ]
         }, {
-            "identifier": "S1",
+            "label": "S1",
             "meansOfTransport": "S-Bahn",
             "itinerary": [
                 {
@@ -416,7 +416,7 @@
                 }
             ]
         }, {
-            "identifier": "18",
+            "label": "18",
             "meansOfTransport": "Tram",
             "itinerary": [
                 {
@@ -501,7 +501,7 @@
                 }
             ]
         }, {
-            "identifier": "30",
+            "label": "30",
             "meansOfTransport": "Tram",
             "itinerary": [
                 {
@@ -554,7 +554,7 @@
                 }
             ]
         }, {
-            "identifier": "2A",
+            "label": "2A",
             "meansOfTransport": "Bus",
             "itinerary": [
                 {
@@ -599,7 +599,7 @@
                 }
             ]
         }, {
-            "identifier": "7A",
+            "label": "7A",
             "meansOfTransport": "Bus",
             "itinerary": [
                 {

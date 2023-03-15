@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Dict
 from uuid import uuid4
 
@@ -6,12 +7,21 @@ from sqlalchemy import create_engine, text
 from model import CityPlan, Line
 
 
+@dataclass(frozen=True, slots=True)
+class ImportSummary:
+    means_of_transport_count: int
+    station_count: int
+    line_count: int
+    edge_count: int
+
+
 class _Importer:
 
     def __init__(self, city_plan: CityPlan) -> None:
         self._city_plan = city_plan
         self._means_of_transport: Dict[str, str] = {}
         self._stations: Dict[str, str] = {}
+        self._line_count = 0
         engine = create_engine(
             url="sqlite:///./test.db",
             echo=True,
@@ -25,35 +35,73 @@ class _Importer:
             for line in self._city_plan.lines:
                 self._import_line(line)
             self._connection.commit()
+            return ImportSummary(
+                means_of_transport_count=len(self._means_of_transport),
+                station_count=len(self._stations),
+                line_count=self._line_count,
+                edge_count=0
+            )
         finally:
             self._connection.close()
 
     def _import_line(self, line: Line) -> None:
         if line.means_of_transport not in self._means_of_transport:
-            self._import_means_of_transport(line.means_of_transport)
+            self._insert_means_of_transport(line.means_of_transport)
         for itinerary_item in line.itinerary:
             if itinerary_item.station not in self._stations:
-                self._import_station(itinerary_item.station)
+                self._insert_station(itinerary_item.station)
+        self._insert_line(line)
 
-    def _import_station(self, name: str) -> None:
-        uuid = str(uuid4())
-        self._stations[name] = uuid
-        print(f"{uuid} -> {name}")
-        self._connection.execute(
-            text("insert into STATIONS (UUID, NAME) values(:uuid, :name)"),
-            {"uuid": uuid, "name": name}
-        )
-
-    def _import_means_of_transport(self, identifier: str) -> None:
+    def _insert_means_of_transport(self, identifier: str) -> None:
         uuid = str(uuid4())
         self._means_of_transport[identifier] = uuid
-        print(f"{uuid} -> {identifier}")
         self._connection.execute(
             text("insert into MEANS_OF_TRANSPORT (UUID, IDENTIFIER) values (:uuid, :identifier)"),
             {"uuid": uuid, "identifier": identifier}
         )
 
+    def _insert_station(self, name: str) -> None:
+        uuid = str(uuid4())
+        self._stations[name] = uuid
+        self._connection.execute(
+            text("insert into STATIONS (UUID, NAME) values(:uuid, :name)"),
+            {"uuid": uuid, "name": name}
+        )
+
+    def _insert_line(self, line: Line) -> None:
+        uuid = str(uuid4())
+        terminal_station_one = line.itinerary[0].station
+        terminal_station_two = line.itinerary[-1].station
+        self._connection.execute(
+            text(
+                """
+                insert into LINES (UUID, LABEL, MEANS_OF_TRANSPORT_UUID, TERMINAL_STOP_ONE_UUID, TERMINAL_STOP_TWO_UUID)
+                values (:uuid, :label, :means_of_transport, :terminal_stop_one, :terminal_stop_two)
+                """
+            ),
+            {
+                "uuid": uuid,
+                "label": line.label,
+                "means_of_transport": self._means_of_transport[line.means_of_transport],
+                "terminal_stop_one": self._stations[terminal_station_one],
+                "terminal_stop_two": self._stations[terminal_station_two]
+            }
+        )
+        self._line_count += 1
+
+    def _insert_edge(self) -> None:
+        uuid = str(uuid4())
+        self._connection.execute(
+            text(
+                """
+                insert into EDGES (UUID, START_STATION_UUID, END_STATION_UUID, LINE_UUID, DURATION_MIN)
+                values (:uuid, :start_station, :end_station, :duration)"
+                """
+            ),
+            {"uuid": uuid, "start_station": "", "end_station": "", "duration": ""}
+        )
+
 
 def import_to_database(city_plan: CityPlan) -> None:
     importer = _Importer(city_plan)
-    importer.import_city_plan()
+    return importer.import_city_plan()
