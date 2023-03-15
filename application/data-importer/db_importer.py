@@ -21,7 +21,8 @@ class _Importer:
         self._city_plan = city_plan
         self._means_of_transport: Dict[str, str] = {}
         self._stations: Dict[str, str] = {}
-        self._line_count = 0
+        self._lines: Dict[str, str] = {}
+        self._edge_count = 0
         engine = create_engine(
             url="sqlite:///./test.db",
             echo=True,
@@ -51,6 +52,7 @@ class _Importer:
             if itinerary_item.station not in self._stations:
                 self._insert_station(itinerary_item.station)
         self._insert_line(line)
+        self._insert_edges(line)
 
     def _insert_means_of_transport(self, identifier: str) -> None:
         uuid = str(uuid4())
@@ -70,6 +72,7 @@ class _Importer:
 
     def _insert_line(self, line: Line) -> None:
         uuid = str(uuid4())
+        self._lines[line.label] = uuid
         terminal_station_one = line.itinerary[0].station
         terminal_station_two = line.itinerary[-1].station
         self._connection.execute(
@@ -87,19 +90,36 @@ class _Importer:
                 "terminal_stop_two": self._stations[terminal_station_two]
             }
         )
-        self._line_count += 1
 
-    def _insert_edge(self) -> None:
+    def _insert_edges(self, line: Line) -> None:
+        station_one = line.itinerary[0].station
+        start_point_in_time = line.itinerary[0].point_in_time
+        for itinerary_item in line.itinerary[1:]:
+            station_two = itinerary_item.station
+            distance_min = itinerary_item.point_in_time - start_point_in_time
+            self._insert_edge(station_one, station_two, line.label, distance_min)
+            self._insert_edge(station_two, station_one, line.label, distance_min)
+            station_one = itinerary_item.station
+            start_point_in_time = itinerary_item.point_in_time
+
+    def _insert_edge(self, start_station: str, end_station: str, line: str, distance_min: int) -> None:
         uuid = str(uuid4())
         self._connection.execute(
             text(
                 """
-                insert into EDGES (UUID, START_STATION_UUID, END_STATION_UUID, LINE_UUID, DURATION_MIN)
-                values (:uuid, :start_station, :end_station, :duration)"
+                insert into EDGES (UUID, START_STATION_UUID, END_STATION_UUID, LINE_UUID, DISTANCE_MIN)
+                values (:uuid, :start_station, :end_station, :line, :distance)
                 """
             ),
-            {"uuid": uuid, "start_station": "", "end_station": "", "duration": ""}
+            {
+                "uuid": uuid,
+                "start_station": self._stations[start_station],
+                "end_station": self._stations[end_station],
+                "line": self._lines[line],
+                "distance": distance_min
+            }
         )
+        self._edge_count += 1
 
 
 def import_to_database(city_plan: CityPlan) -> None:
