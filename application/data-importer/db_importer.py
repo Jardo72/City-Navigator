@@ -25,7 +25,7 @@ class _Importer:
         self._edge_count = 0
         engine = create_engine(
             url="sqlite:///./test.db",
-            echo=True,
+            echo=False,
             future=True,
             connect_args={"check_same_thread": False}
         )
@@ -39,8 +39,8 @@ class _Importer:
             return ImportSummary(
                 means_of_transport_count=len(self._means_of_transport),
                 station_count=len(self._stations),
-                line_count=self._line_count,
-                edge_count=0
+                line_count=len(self._lines),
+                edge_count=self._edge_count
             )
         finally:
             self._connection.close()
@@ -97,9 +97,10 @@ class _Importer:
         for itinerary_item in line.itinerary[1:]:
             station_two = itinerary_item.station
             distance_min = itinerary_item.point_in_time - start_point_in_time
+            print(f"{line.label}: {station_one} <-> {station_two} ({distance_min} min)")
             self._insert_edge(station_one, station_two, line.label, distance_min)
             self._insert_edge(station_two, station_one, line.label, distance_min)
-            station_one = itinerary_item.station
+            station_one = station_two
             start_point_in_time = itinerary_item.point_in_time
 
     def _insert_edge(self, start_station: str, end_station: str, line: str, distance_min: int) -> None:
