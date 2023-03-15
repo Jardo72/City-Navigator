@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import FastAPI
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from model import JourneyPlan, LineDetails, LineItinerary, LineListEntry, MeansOfTransport, StationDetails
