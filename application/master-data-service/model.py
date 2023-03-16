@@ -19,3 +19,11 @@ class StationDetails(BaseModel):
 
 class StationRequest(BaseModel):
     name: str = None
+
+
+class LineDetails(BaseModel):
+    uuid: str = None
+    label: str = None
+    means_of_transport: str = None
+    terminal_stop_one: str = None
+    terminal_stop_two: str = None

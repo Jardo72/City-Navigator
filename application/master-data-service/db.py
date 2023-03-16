@@ -93,7 +93,7 @@ def main() -> None:
         print("Lines")
         lines = db.query(Line).all()
         for single_line in lines:
-            print(f"label={single_line.label}, means of transport={single_line.means_of_transport.identifier}")
+            print(f"label={single_line.label} ({single_line.means_of_transport.identifier}) {single_line.terminal_stop_one.name} - {single_line.terminal_stop_two.name} ")
 
         print()
         print("Edges")
