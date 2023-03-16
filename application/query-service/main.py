@@ -6,7 +6,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from model import JourneyLeg, JourneyPlan, LineDetails, LineItinerary, LineListEntry, MeansOfTransport, StationDetails
+from model import JourneyLeg, JourneyPlan
+from model import ItineraryEntry, LineDetails, LineItinerary, LineListEntry
+from model import MeansOfTransport, StationDetails
 
 
 # see https://fastapi.tiangolo.com/advanced/events/
@@ -156,14 +158,20 @@ async def get_line_details(label: str, db: Session = Depends(get_db)):
         label="U3",
         means_of_transport="U-Bahn",
         direction_one_itinerary=LineItinerary(
-            start="",
-            destination="",
-            entries=[]
+            start="Simmering",
+            destination="Ottakring",
+            entries=[
+                ItineraryEntry(station="Simmering", point_in_time_minutes=None),
+                ItineraryEntry(station="Enkplatz", point_in_time_minutes=1),
+                ItineraryEntry(station="Zippererstrasse", point_in_time_minutes=2),
+            ]
         ),
         direction_two_itinerary=LineItinerary(
-            start="",
-            destination="",
-            entries=[]
+            start="Ottakring",
+            destination="Simmering",
+            entries=[
+
+            ]
         )
     )
 
