@@ -79,8 +79,10 @@ def main() -> None:
 
         print()
         print("Station by name")
-        station = db.query(Station).filter(Station.name == "Simmering").first()
+        station = db.query(Station).filter(Station.name == "Praterstern").first()
         print(f"uuid={station.uuid}, name={station.name}")
+        for edge in station.outbound_edges:
+            print(f"{edge.line.label} -> {edge.end_station.name} ({edge.distance_min} min)")
 
         print()
         print("Station with filter")
@@ -104,8 +106,6 @@ def main() -> None:
         print("Line itinerary")
         line = db.query(Line).filter(Line.label == "U3").first()
         print(f"{line.label}: {line.terminal_stop_one.name} - {line.terminal_stop_two.name}")
-        while True:
-            ...
     finally:
         db.close()
 

@@ -1,11 +1,12 @@
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from model import JourneyPlan, LineDetails, LineItinerary, LineListEntry, MeansOfTransport, StationDetails
+from model import JourneyLeg, JourneyPlan, LineDetails, LineItinerary, LineListEntry, MeansOfTransport, StationDetails
 
 
 # see https://fastapi.tiangolo.com/advanced/events/
@@ -55,7 +56,7 @@ app = FastAPI()
 
 
 @app.get("/means-of-transport", response_model=List[MeansOfTransport])
-async def get_means_of_transport():
+async def get_means_of_transport(db: Session = Depends(get_db)):
     """
     Provides a list of all means of transport.
     """
@@ -81,7 +82,7 @@ async def get_means_of_transport():
 
 
 @app.get("/stations", response_model=List[str])
-async def get_station_list(filter: str = None):
+async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     """
     Provides a list of stations matching with the given filter. If no filter is specified,
     all stations are returned. Asterisk can be used as wildcard in the filter. For instance,
@@ -98,7 +99,7 @@ async def get_station_list(filter: str = None):
 
 
 @app.get("/station", response_model=StationDetails)
-async def get_station_details(name: str):
+async def get_station_details(name: str, db: Session = Depends(get_db)):
     """
     Provides the details of the station with the given name.
     """
@@ -109,7 +110,7 @@ async def get_station_details(name: str):
 
 
 @app.get("/lines", response_model=List[LineListEntry])
-async def get_line_list(means_of_transport: str = None):
+async def get_line_list(means_of_transport: str = None, db: Session = Depends(get_db)):
     """
     Provides a list of lines with the given means of transport. If no filter is specified
     (i.e. if the parameter is omitted), all lines are returned.
@@ -147,7 +148,7 @@ async def get_line_list(means_of_transport: str = None):
 
 
 @app.get("/line", response_model=LineDetails)
-async def get_line_details(label: str):
+async def get_line_details(label: str, db: Session = Depends(get_db)):
     """
     Provides the details of the line with the given label.
     """
@@ -168,12 +169,29 @@ async def get_line_details(label: str):
 
 
 @app.get("/journey-plan", response_model=JourneyPlan)
-async def search_journey_plan(start: str, destination: str):
+async def search_journey_plan(start: str, destination: str, db: Session = Depends(get_db)):
     """
     Finds and returns a journey plan with the given start and destination.
     """
     return JourneyPlan(
-        start="",
-        destination="",
-        legs=[]
+        start="Simmering",
+        destination="Praterstern",
+        legs=[
+            JourneyLeg(
+                start="Simmering",
+                destination="Landstrasse",
+                means_of_transport="U-Bahn",
+                line="U3",
+                stop_count=7,
+                duration_minutes=13
+            ),
+            JourneyLeg(
+                start="Landstrasse",
+                destination="Praterstern",
+                means_of_transport="S-Bahn",
+                line="S1",
+                stop_count=2,
+                duration_minutes=3
+            )
+        ]
     )
