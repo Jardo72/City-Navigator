@@ -34,6 +34,7 @@ class Station(Base):
     __tablename__ = "STATIONS"
     uuid = Column("UUID", String, primary_key=True)
     name = Column("NAME", String(length=50), nullable=False)
+    outbound_edges = relationship("Edge", foreign_keys="Edge.start_station_uuid", back_populates="start_station")
 
 
 class Line(Base):
@@ -48,8 +49,6 @@ class Line(Base):
     terminal_stop_two = relationship("Station", foreign_keys="Line.terminal_stop_two_uuid")
 
 
-# TODO
-# for the query service model, consider back-reference so that a node has a list of outbound edges
 class Edge(Base):
     __tablename__ = "EDGES"
     uuid = Column("UUID", String, primary_key=True)
@@ -57,7 +56,7 @@ class Edge(Base):
     start_station_uuid = Column("START_STATION_UUID", String, ForeignKey("STATIONS.UUID"), nullable=False)
     end_station_uuid = Column("END_STATION_UUID", String, ForeignKey("STATIONS.UUID"), nullable=False)
     line_uuid = Column("LINE_UUID", String, ForeignKey("LINES.UUID"), nullable=False)
-    start_station = relationship("Station", foreign_keys="Edge.start_station_uuid")
+    start_station = relationship("Station", foreign_keys="Edge.start_station_uuid", back_populates="outbound_edges")
     end_station = relationship("Station", foreign_keys="Edge.end_station_uuid")
     line = relationship("Line", foreign_keys="Edge.line_uuid")
 
@@ -100,6 +99,13 @@ def main() -> None:
         edges = db.query(Edge).limit(10).all()
         for single_edge in edges:
             print(f"{single_edge.line.label}: {single_edge.start_station.name} -> {single_edge.end_station.name} ({single_edge.distance_min} min)")
+    
+        print()
+        print("Line itinerary")
+        line = db.query(Line).filter(Line.label == "U3").first()
+        print(f"{line.label}: {line.terminal_stop_one.name} - {line.terminal_stop_two.name}")
+        while True:
+            ...
     finally:
         db.close()
 
