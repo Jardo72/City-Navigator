@@ -35,7 +35,7 @@ class LineDetails(BaseModel):
     direction_two_itinerary: LineItinerary = None
 
 
-class MeansOfTransport(BaseModel):
+class MeansOfTransportDetails(BaseModel):
     identifier: str = None
     lines: List[str] = None
 

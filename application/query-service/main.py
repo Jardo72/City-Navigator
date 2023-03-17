@@ -1,86 +1,33 @@
 from typing import List
 
 from fastapi import Depends, FastAPI
-from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
 
+from db import MeansOfTransport
+from db import get_db
 from model import JourneyLeg, JourneyPlan
 from model import ItineraryEntry, LineDetails, LineItinerary, LineListEntry
-from model import MeansOfTransport, StationDetails
-
-
-# see https://fastapi.tiangolo.com/advanced/events/
-
-
-# see https://stackoverflow.com/questions/62333314/python-sqlalchemy-in-memory-database-connect
-SQLALCHEMY_DATABASE_URL = "sqlite://"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    echo=True,
-    future=True,
-    connect_args={"check_same_thread": False}
-)
-print("DB engine created")
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-def get_db() -> SessionLocal:
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-conn = engine.connect()
-conn.execute(text(
-"""
-CREATE TABLE MEANS_OF_TRANSPORT (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    IDENTIFIER VARCHAR(20) NOT NULL UNIQUE
-);
-"""
-))
-conn.execute(text(
-"""
-CREATE TABLE NODES (
-    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-    NAME VARCHAR(50) NOT NULL UNIQUE
-);
-"""
-))
+from model import MeansOfTransportDetails, StationDetails
 
 
 app = FastAPI()
 
 
-@app.get("/means-of-transport", response_model=List[MeansOfTransport])
+@app.get("/means-of-transport", response_model=List[MeansOfTransportDetails])
 async def get_means_of_transport(db: Session = Depends(get_db)):
     """
     Provides a list of all means of transport.
     """
-    return [
-        MeansOfTransport(
-            identifier="S-Bahn",
-            lines=[
-                "S1",
-                "S3"
-            ]
-        ),
-        MeansOfTransport(
-            identifier="U-Bahn",
-            lines=[
-                "U1",
-                "U2",
-                "U3",
-                "U4",
-                "U6"
-            ]
-        )
-    ]
+    means_of_transport = db.query(MeansOfTransport).all()
+    result = []
+    for single_means_of_transport in means_of_transport:
+        line_names=[line.label for line in single_means_of_transport.lines]
+        line_names.sort()
+        result.append(MeansOfTransportDetails(
+            identifier=single_means_of_transport.identifier,
+            lines=line_names
+        ))
+    return result
 
 
 @app.get("/stations", response_model=List[str])
