@@ -85,13 +85,6 @@ class Edge(Base):
 def main() -> None:
     try:
         db = SessionLocal()
-
-        means_of_transport = db.query(MeansOfTransport).all()
-        for single_means_of_transport in means_of_transport:
-            print(f"uuid={single_means_of_transport.uuid}, name={single_means_of_transport.identifier}")
-            for single_line in single_means_of_transport.lines:
-                print(f"  - {single_line.label}")
-            print()
     finally:
         db.close()
 

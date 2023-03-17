@@ -1,12 +1,12 @@
 from typing import List
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy.orm import Session
 
-from db import MeansOfTransport
+from db import Line, MeansOfTransport, Station
 from db import get_db
 from model import JourneyLeg, JourneyPlan
-from model import ItineraryEntry, LineDetails, LineItinerary, LineListEntry
+from model import ItineraryEntry, LineDetails, LineInfo, LineItinerary, LineListEntry
 from model import MeansOfTransportDetails, StationDetails
 
 
@@ -30,7 +30,32 @@ async def get_means_of_transport(db: Session = Depends(get_db)):
     return result
 
 
-@app.get("/stations", response_model=List[str])
+# TODO: think about the source code organization for the mapper functions
+def as_line_info(line: Line) -> LineInfo:
+    return LineInfo(
+        label=line.label,
+        means_of_transport=line.means_of_transport.identifier
+    )
+
+
+# TODO: think about the source code organization for the mapper functions
+def as_station_details(station: Station) -> StationDetails:
+    unique_lines = set()
+    lines = []
+    for single_edge in station.outbound_edges:
+        if single_edge.line.label not in unique_lines:
+            unique_lines.add(single_edge.line.label)
+            lines.append(LineInfo(
+                label=single_edge.line.label,
+                means_of_transport=single_edge.line.means_of_transport.identifier
+            ))
+    return StationDetails(
+        name=station.name,
+        lines=lines
+    )
+
+
+@app.get("/stations", response_model=List[StationDetails])
 async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     """
     Provides a list of stations matching with the given filter. If no filter is specified,
@@ -38,13 +63,8 @@ async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     if the value 'S*' is specified as filter, all stations whose names start with the letter S
     will be returned.
     """
-    return [
-        "Alte Donau",
-        "Kagran",
-        "Meidling",
-        "Simmering",
-        "Zippererstrasse"
-    ]
+    stations = db.query(Station).filter(Station.name.like("Sch" + "%")).order_by(Station.name).all()
+    return [as_station_details(single_station) for single_station in stations]
 
 
 @app.get("/station", response_model=StationDetails)
@@ -52,10 +72,13 @@ async def get_station_details(name: str, db: Session = Depends(get_db)):
     """
     Provides the details of the station with the given name.
     """
-    return StationDetails(
-        name="Wien Mitte",
-        lines=[]
-    )
+    station = db.query(Station).filter(Station.name == name).first()
+    if station is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No station with the name {name} found."
+        )
+    return as_station_details(station)
 
 
 @app.get("/lines", response_model=List[LineListEntry])
