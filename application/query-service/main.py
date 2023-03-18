@@ -61,7 +61,6 @@ def as_itinerary(line: Line, direction: ItineraryDirection) -> LineItinerary:
         previous_station = current_station
         current_station = edge.end_station
         point_in_time_minutes += edge.distance_min
-        print(f"Station = {current_station.name}, point in time = {point_in_time_minutes}")
         entries.append(ItineraryEntry(
             station=current_station.name,
             point_in_time_minutes=point_in_time_minutes
@@ -132,7 +131,7 @@ async def get_station_details(name: str, db: Session = Depends(get_db)):
     if station is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No station with the name {name} found."
+            detail=f"Station with the name '{name}' not found."
         )
     return as_station_details(station)
 
@@ -160,7 +159,7 @@ async def get_line_details(label: str, db: Session = Depends(get_db)):
     if not line:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="TODO"
+            detail=f"Line with the label '{label}' not found."
         )
     return as_line_details(line)
 
