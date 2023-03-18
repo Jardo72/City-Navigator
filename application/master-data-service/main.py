@@ -13,7 +13,7 @@ from dto import MeansOfTransportDetails, MeansOfTransportRequest
 from dto import StationDetails, StationRequest
 
 
-app = FastAPI()
+app = FastAPI(title="City Navigator - Master Data Service")
 Instrumentator().instrument(app).expose(app)
 
 

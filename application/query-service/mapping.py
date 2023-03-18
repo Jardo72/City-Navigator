@@ -1,14 +1,17 @@
 from enum import Enum, unique
 
-from db import Line, Station
+from db import Line, MeansOfTransport, Station
 from dto import ItineraryEntry, LineDetails, LineInfo, LineItinerary
 from dto import MeansOfTransportDetails, StationDetails
 
 
-@unique
-class ItineraryDirection(Enum):
-    ONE = 1
-    TWO = 2
+def as_means_of_transport_details(means_of_transport: MeansOfTransport) -> MeansOfTransportDetails:
+    line_names=[line.label for line in means_of_transport.lines]
+    line_names.sort()
+    return MeansOfTransportDetails(
+        identifier=means_of_transport.identifier,
+        lines=line_names
+    )
 
 
 def as_line_info(line: Line) -> LineInfo:
@@ -18,9 +21,15 @@ def as_line_info(line: Line) -> LineInfo:
     )
 
 
-def as_itinerary(line: Line, direction: ItineraryDirection) -> LineItinerary:
+@unique
+class _ItineraryDirection(Enum):
+    ONE = 1
+    TWO = 2
+
+
+def _as_itinerary(line: Line, direction: _ItineraryDirection) -> LineItinerary:
     entries = []
-    if direction is ItineraryDirection.ONE:
+    if direction is _ItineraryDirection.ONE:
         current_station = line.terminal_stop_one
         terminal_stop = line.terminal_stop_two
     else:
@@ -41,7 +50,7 @@ def as_itinerary(line: Line, direction: ItineraryDirection) -> LineItinerary:
             station=current_station.name,
             point_in_time_minutes=point_in_time_minutes
         ))
-    if direction is ItineraryDirection.ONE:
+    if direction is _ItineraryDirection.ONE:
         return LineItinerary(
             start=line.terminal_stop_one.name,
             destination=line.terminal_stop_two.name,
@@ -59,8 +68,8 @@ def as_line_details(line: Line) -> LineDetails:
     return LineDetails(
         label=line.label,
         means_of_transport=line.means_of_transport.identifier,
-        direction_one_itinerary=as_itinerary(line, ItineraryDirection.ONE),
-        direction_two_itinerary=as_itinerary(line, ItineraryDirection.TWO)
+        direction_one_itinerary=_as_itinerary(line, _ItineraryDirection.ONE),
+        direction_two_itinerary=_as_itinerary(line, _ItineraryDirection.TWO)
     )
 
 

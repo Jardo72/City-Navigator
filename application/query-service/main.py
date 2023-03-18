@@ -9,11 +9,11 @@ from db import get_db
 from dto import JourneyLeg, JourneyPlan
 from dto import LineDetails, LineInfo
 from dto import MeansOfTransportDetails, StationDetails
-from mapping import as_line_details, as_line_info, as_station_details
+from mapping import as_line_details, as_line_info, as_means_of_transport_details, as_station_details
 from util import line_not_found_exception, station_not_found_exception
 
 
-app = FastAPI()
+app = FastAPI(title="City Navigator - Query Service")
 Instrumentator().instrument(app).expose(app)
 
 
@@ -23,15 +23,7 @@ async def get_means_of_transport(db: Session = Depends(get_db)):
     Provides a list of all means of transport.
     """
     means_of_transport = db.query(MeansOfTransport).all()
-    result = []
-    for single_means_of_transport in means_of_transport:
-        line_names=[line.label for line in single_means_of_transport.lines]
-        line_names.sort()
-        result.append(MeansOfTransportDetails(
-            identifier=single_means_of_transport.identifier,
-            lines=line_names
-        ))
-    return result
+    return [as_means_of_transport_details(single_means_of_transport) for single_means_of_transport in means_of_transport]
 
 
 @app.get("/stations", response_model=List[StationDetails])
