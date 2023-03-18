@@ -461,6 +461,103 @@
                 }
             ]
         }, {
+            "label": "5",
+            "meansOfTransport": "Tram",
+            "itinerary": [
+                {
+                    "station": "Praterstern",
+                    "pointInTime": 0
+                },
+                {
+                    "station": "Nordbahnstrasse",
+                    "pointInTime": 3
+                },
+                {
+                    "station": "Am Tabor",
+                    "pointInTime": 4
+                },
+                {
+                    "station": "Nordwestbahnstrasse",
+                    "pointInTime": 5
+                },
+                {
+                    "station": "Rauscherstrasse",
+                    "pointInTime": 6
+                },
+                {
+                    "station": "Wallensteinplatz",
+                    "pointInTime": 8
+                },
+                {
+                    "station": "Klosterneuburger Strasse/Wallensteinstrasse",
+                    "pointInTime": 9
+                },
+                {
+                    "station": "Friedensbruecke",
+                    "pointInTime": 11
+                },
+                {
+                    "station": "Franz-Josefs-Bahnhof",
+                    "pointInTime": 12
+                },
+                {
+                    "station": "Nussdorfer Strasse/Alserbachstrasse",
+                    "pointInTime": 14
+                },
+                {
+                    "station": "Spitalgasse",
+                    "pointInTime": 16
+                },
+                {
+                    "station": "Lazarettgasse",
+                    "pointInTime": 18
+                },
+                {
+                    "station": "Lange Gasse",
+                    "pointInTime": 20
+                },
+                {
+                    "station": "Laudongasse",
+                    "pointInTime": 21
+                },
+                {
+                    "station": "Florianigasse",
+                    "pointInTime": 22
+                },
+                {
+                    "station": "Albertgasse",
+                    "pointInTime": 24
+                },
+                {
+                    "station": "Blindengasse",
+                    "pointInTime": 25
+                },
+                {
+                    "station": "Lerchenfelder Strasse",
+                    "pointInTime": 27
+                },
+                {
+                    "station": "Kaiserstrasse/Neustiftgasse",
+                    "pointInTime": 28
+                },
+                {
+                    "station": "Burggasse/Kaiserstrasse",
+                    "pointInTime": 29
+                },
+                {
+                    "station": "Westbahnstrasse/Kaiserstrasse",
+                    "pointInTime": 30
+                },
+                {
+                    "station": "Stollgasse",
+                    "pointInTime": 32
+                },
+                {
+                    "station": "Westbahnhof",
+                    "pointInTime": 33
+                }
+            ]
+        }, {
             "label": "18",
             "meansOfTransport": "Tram",
             "itinerary": [
