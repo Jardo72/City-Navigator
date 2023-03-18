@@ -1,7 +1,6 @@
-from enum import Enum, unique
 from typing import List
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
@@ -10,6 +9,7 @@ from dto import JourneyLeg, JourneyPlan
 from dto import LineDetails, LineInfo
 from dto import MeansOfTransportDetails, StationDetails
 from mapping import as_line_details, as_line_info, as_station_details
+from util import line_not_found_exception, station_not_found_exception
 
 
 app = FastAPI()
@@ -55,10 +55,7 @@ async def get_station_details(name: str, db: Session = Depends(get_db)):
     """
     station = db.query(Station).filter(Station.name == name).first()
     if station is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Station with the name '{name}' not found."
-        )
+        raise station_not_found_exception(name)
     return as_station_details(station)
 
 
@@ -83,10 +80,7 @@ async def get_line_details(label: str, db: Session = Depends(get_db)):
     """
     line = db.query(Line).filter(Line.label == label).first()
     if not line:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Line with the label '{label}' not found."
-        )
+        raise line_not_found_exception(label)
     return as_line_details(line)
 
 
@@ -95,6 +89,12 @@ async def search_journey_plan(start: str, destination: str, db: Session = Depend
     """
     Finds and returns a journey plan with the given start and destination.
     """
+    start_station = db.query().filter(Station.name == start).first()
+    if start_station is None:
+        raise station_not_found_exception(start)
+    destination_station = db.query().filter(Station.name == destination).first()
+    if destination_station is None:
+        raise station_not_found_exception(destination)
     return JourneyPlan(
         start="Simmering",
         destination="Praterstern",
