@@ -7,9 +7,9 @@ from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
 from db import get_db
-from model import LineDetails
-from model import MeansOfTransportDetails, MeansOfTransportRequest
-from model import StationDetails, StationRequest
+from dto import LineDetails
+from dto import MeansOfTransportDetails, MeansOfTransportRequest
+from dto import StationDetails, StationRequest
 
 
 app = FastAPI()
