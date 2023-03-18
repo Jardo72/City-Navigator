@@ -416,6 +416,51 @@
                 }
             ]
         }, {
+            "label": "S45",
+            "meansOfTransport": "S-Bahn",
+            "itinerary": [
+                {
+                    "station": "Handelskai",
+                    "pointInTime": 0
+                },
+                {
+                    "station": "Heiligenstadt",
+                    "pointInTime": 5
+                },
+                {
+                    "station": "Oberdoebling",
+                    "pointInTime": 9
+                },
+                {
+                    "station": "Krottenbachstrasse",
+                    "pointInTime": 11
+                },
+                {
+                    "station": "Gersthof",
+                    "pointInTime": 13
+                },
+                {
+                    "station": "Hernals",
+                    "pointInTime": 16
+                },
+                {
+                    "station": "Ottakring",
+                    "pointInTime": 19
+                },
+                {
+                    "station": "Breitensee",
+                    "pointInTime": 21
+                },
+                {
+                    "station": "Penzing",
+                    "pointInTime": 24
+                },
+                {
+                    "station": "Huetteldorf",
+                    "pointInTime": 28
+                }
+            ]
+        }, {
             "label": "18",
             "meansOfTransport": "Tram",
             "itinerary": [
