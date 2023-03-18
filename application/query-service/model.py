@@ -48,8 +48,3 @@ class MeansOfTransportDetails(BaseModel):
 class StationDetails(BaseModel):
     name: str = None
     lines: List[LineInfo] = None
-
-
-class LineListEntry(BaseModel):
-    identifier: str = None
-    means_of_transport: str = None

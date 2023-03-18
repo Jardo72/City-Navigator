@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from db import Line, MeansOfTransport, Station
 from db import get_db
 from model import JourneyLeg, JourneyPlan
-from model import ItineraryEntry, LineDetails, LineInfo, LineItinerary, LineListEntry
+from model import ItineraryEntry, LineDetails, LineInfo, LineItinerary
 from model import MeansOfTransportDetails, StationDetails
 
 
@@ -38,6 +38,23 @@ def as_line_info(line: Line) -> LineInfo:
     )
 
 
+def as_line_details(line: Line) -> LineDetails:
+    return LineDetails(
+        label=line.label,
+        means_of_transport=line.means_of_transport.identifier,
+        direction_one_itinerary=LineItinerary(
+            start=line.terminal_stop_one.name,
+            destination=line.terminal_stop_two.name,
+            entries=[]
+        ),
+        direction_two_itinerary=LineItinerary(
+            start=line.terminal_stop_two.name,
+            destination=line.terminal_stop_one.name,
+            entries=[]
+        )
+    )
+
+
 # TODO: think about the source code organization for the mapper functions
 def as_station_details(station: Station) -> StationDetails:
     unique_lines = set()
@@ -63,7 +80,11 @@ async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     if the value 'S*' is specified as filter, all stations whose names start with the letter S
     will be returned.
     """
-    stations = db.query(Station).filter(Station.name.like("Sch" + "%")).order_by(Station.name).all()
+    if filter is None:
+        stations = db.query(Station).order_by(Station.name).all()
+    else:
+        filter = filter.replace("*", "%")
+        stations = db.query(Station).filter(Station.name.like(filter)).order_by(Station.name).all()
     return [as_station_details(single_station) for single_station in stations]
 
 
@@ -81,42 +102,18 @@ async def get_station_details(name: str, db: Session = Depends(get_db)):
     return as_station_details(station)
 
 
-@app.get("/lines", response_model=List[LineListEntry])
+@app.get("/lines", response_model=List[LineInfo])
 async def get_line_list(means_of_transport: str = None, db: Session = Depends(get_db)):
     """
     Provides a list of lines with the given means of transport. If no filter is specified
     (i.e. if the parameter is omitted), all lines are returned.
     """
-    return [
-        LineListEntry(
-            identifier="U1",
-            means_of_transport="U-Bahn"
-        ),
-        LineListEntry(
-            identifier="U2",
-            means_of_transport="U-Bahn"
-        ),
-        LineListEntry(
-            identifier="U3",
-            means_of_transport="U-Bahn"
-        ),
-        LineListEntry(
-            identifier="U4",
-            means_of_transport="U-Bahn"
-        ),
-        LineListEntry(
-            identifier="U6",
-            means_of_transport="U-Bahn"
-        ),
-        LineListEntry(
-            identifier="S1",
-            means_of_transport="S-Bahn"
-        ),
-        LineListEntry(
-            identifier="S3",
-            means_of_transport="S-Bahn"
-        )
-    ]
+    if means_of_transport is None:
+        lines = db.query(Line).order_by(Line.label).all()
+    else:
+        filter = db.query(MeansOfTransport).filter(MeansOfTransport.identifier == means_of_transport).first()
+        lines = db.query(Line).filter(Line.means_of_transport == filter).order_by(Line.label).all()
+    return [as_line_info(single_line) for single_line in lines]
 
 
 @app.get("/line", response_model=LineDetails)
@@ -124,26 +121,13 @@ async def get_line_details(label: str, db: Session = Depends(get_db)):
     """
     Provides the details of the line with the given label.
     """
-    return LineDetails(
-        label="U3",
-        means_of_transport="U-Bahn",
-        direction_one_itinerary=LineItinerary(
-            start="Simmering",
-            destination="Ottakring",
-            entries=[
-                ItineraryEntry(station="Simmering", point_in_time_minutes=None),
-                ItineraryEntry(station="Enkplatz", point_in_time_minutes=1),
-                ItineraryEntry(station="Zippererstrasse", point_in_time_minutes=2),
-            ]
-        ),
-        direction_two_itinerary=LineItinerary(
-            start="Ottakring",
-            destination="Simmering",
-            entries=[
-
-            ]
+    line = db.query(Line).filter(Line.label == label).first()
+    if not line:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="TODO"
         )
-    )
+    return as_line_details(line)
 
 
 @app.get("/journey-plan", response_model=JourneyPlan)
