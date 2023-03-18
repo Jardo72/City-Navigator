@@ -1,3 +1,4 @@
+from enum import Enum, unique
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException, status
@@ -38,20 +39,54 @@ def as_line_info(line: Line) -> LineInfo:
     )
 
 
+@unique
+class ItineraryDirection(Enum):
+    ONE = 1
+    TWO = 2
+
+
+# TODO: think about the source code organization for the mapper functions
+def as_itinerary(line: Line, direction: ItineraryDirection) -> LineItinerary:
+    entries = []
+    current_station = line.terminal_stop_one if direction is ItineraryDirection.ONE else line.terminal_stop_two
+    terminal_stop = line.terminal_stop_two if direction is ItineraryDirection.ONE else line.terminal_stop_one
+    previous_station = None
+    point_in_time_minutes = 0
+    entries.append(ItineraryEntry(
+        station=current_station.name,
+        point_in_time_minutes=None
+    ))
+    while current_station is not terminal_stop:
+        edge = next(filter(lambda e: e.line is line and e.end_station is not previous_station, current_station.outbound_edges))
+        previous_station = current_station
+        current_station = edge.end_station
+        point_in_time_minutes += edge.distance_min
+        print(f"Station = {current_station.name}, point in time = {point_in_time_minutes}")
+        entries.append(ItineraryEntry(
+            station=current_station.name,
+            point_in_time_minutes=point_in_time_minutes
+        ))
+    if direction is ItineraryDirection.ONE:
+        return LineItinerary(
+            start=line.terminal_stop_one.name,
+            destination=line.terminal_stop_two.name,
+            entries=entries
+        )
+    else:
+        return LineItinerary(
+            start=line.terminal_stop_two.name,
+            destination=line.terminal_stop_one.name,
+            entries=entries
+        )
+
+
+# TODO: think about the source code organization for the mapper functions
 def as_line_details(line: Line) -> LineDetails:
     return LineDetails(
         label=line.label,
         means_of_transport=line.means_of_transport.identifier,
-        direction_one_itinerary=LineItinerary(
-            start=line.terminal_stop_one.name,
-            destination=line.terminal_stop_two.name,
-            entries=[]
-        ),
-        direction_two_itinerary=LineItinerary(
-            start=line.terminal_stop_two.name,
-            destination=line.terminal_stop_one.name,
-            entries=[]
-        )
+        direction_one_itinerary=as_itinerary(line, ItineraryDirection.ONE),
+        direction_two_itinerary=as_itinerary(line, ItineraryDirection.TWO)
     )
 
 
