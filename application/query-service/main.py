@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import Depends, FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
@@ -13,6 +14,7 @@ from util import line_not_found_exception, station_not_found_exception
 
 
 app = FastAPI()
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/means-of-transport", response_model=List[MeansOfTransportDetails])
