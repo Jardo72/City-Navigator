@@ -5,6 +5,7 @@ fastapi==0.94.1
 h11==0.14.0
 httptools==0.5.0
 idna==3.4
+prometheus-fastapi-instrumentator==5.11.1
 pydantic==1.10.6
 python-dotenv==1.0.0
 PyYAML==6.0

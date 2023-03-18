@@ -3,6 +3,7 @@ from uuid import uuid4
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi import status
+from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
@@ -13,6 +14,7 @@ from dto import StationDetails, StationRequest
 
 
 app = FastAPI()
+Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/means-of-transport", response_model=List[MeansOfTransportDetails])
