@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, text
 from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -25,23 +25,53 @@ def get_db() -> SessionLocal:
 Base = declarative_base()
 
 
+DDL_STATEMENTS = [
+    """
+    CREATE TABLE MEANS_OF_TRANSPORT (
+        UUID VARCHAR(36) NOT NULL PRIMARY KEY,
+        IDENTIFIER VARCHAR(20) NOT NULL UNIQUE
+    );
+    """,
+    """
+    CREATE TABLE STATIONS (
+        UUID VARCHAR(36) NOT NULL PRIMARY KEY,
+        NAME VARCHAR(50) NOT NULL UNIQUE
+    );
+    """,
+    """
+    CREATE TABLE LINES (
+        UUID VARCHAR(36) NOT NULL PRIMARY KEY,
+        LABEL VARCHAR(5) NOT NULL UNIQUE,
+        MEANS_OF_TRANSPORT_UUID VARCHAR(36) NOT NULL,
+        TERMINAL_STOP_ONE_UUID VARCHAR(36) NOT NULL,
+        TERMINAL_STOP_TWO_UUID VARCHAR(36) NOT NULL,
+        CONSTRAINT MEANS_OF_TRANSPORT_FK FOREIGN KEY (MEANS_OF_TRANSPORT_UUID) REFERENCES MEANS_OF_TRANSPORT(UUID),
+        CHECK (TERMINAL_STOP_ONE_UUID <> TERMINAL_STOP_TWO_UUID),
+        CONSTRAINT TERMINAL_STOP_ONE_FK FOREIGN KEY (TERMINAL_STOP_ONE_UUID) REFERENCES STATIONS(UUID),
+        CONSTRAINT TERMINAL_STOP_TWO_FK FOREIGN KEY (TERMINAL_STOP_TWO_UUID) REFERENCES STATIONS(UUID)
+    );
+    """,
+    """
+    CREATE TABLE EDGES (
+        UUID VARCHAR(36) NOT NULL PRIMARY KEY,
+        START_STATION_UUID VARCHAR(36) NOT NULL,
+        END_STATION_UUID VARCHAR(36) NOT NULL,
+        LINE_UUID VARCHAR(36) NOT NULL,
+        DISTANCE_MIN INTEGER NOT NULL,
+        CONSTRAINT LINE_FK FOREIGN KEY (LINE_UUID) REFERENCES LINES(UUID),
+        CHECK (DISTANCE_MIN > 0),
+        CONSTRAINT START_STATION_FK FOREIGN KEY (START_STATION_UUID) REFERENCES STATIONS(UUID),
+        CONSTRAINT END_STATION_FK FOREIGN KEY (END_STATION_UUID) REFERENCES STATIONS(UUID),
+        CHECK (START_STATION_UUID <> END_STATION_UUID),
+        CONSTRAINT EDGE_UK UNIQUE(START_STATION_UUID, END_STATION_UUID, LINE_UUID)
+    );
+    """
+]
+
+
 # conn = engine.connect()
-# conn.execute(text(
-# """
-# CREATE TABLE MEANS_OF_TRANSPORT (
-#     ID INTEGER PRIMARY KEY AUTOINCREMENT,
-#     IDENTIFIER VARCHAR(20) NOT NULL UNIQUE
-# );
-# """
-# ))
-# conn.execute(text(
-# """
-# CREATE TABLE NODES (
-#     ID INTEGER PRIMARY KEY AUTOINCREMENT,
-#     NAME VARCHAR(50) NOT NULL UNIQUE
-# );
-# """
-# ))
+# for statement in DDL_STATEMENTS:
+#     conn.execute(text(statement))
 
 
 class MeansOfTransport(Base):
@@ -80,14 +110,3 @@ class Edge(Base):
     start_station = relationship("Station", foreign_keys="Edge.start_station_uuid", back_populates="outbound_edges")
     end_station = relationship("Station", foreign_keys="Edge.end_station_uuid")
     line = relationship("Line", foreign_keys="Edge.line_uuid")
-
-
-def main() -> None:
-    try:
-        db = SessionLocal()
-    finally:
-        db.close()
-
-
-if __name__ == "__main__":
-    main()
