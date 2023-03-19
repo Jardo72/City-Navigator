@@ -1,4 +1,5 @@
 from enum import Enum, unique
+from typing import List
 
 from db import Line, MeansOfTransport, Station
 from dto import ItineraryEntry, LineDetails, LineInfo, LineItinerary
@@ -27,6 +28,17 @@ class _ItineraryDirection(Enum):
     TWO = 2
 
 
+def _lines_except_of(station: Station, excluded_line: Line) -> List[LineInfo]:
+    unique_lines = set()
+    result = []
+    for edge in station.outbound_edges:
+        if edge.line is excluded_line or edge.line in unique_lines:
+            continue
+        unique_lines.add(edge.line)
+        result.append(as_line_info(edge.line))
+    return result
+
+
 def _as_itinerary(line: Line, direction: _ItineraryDirection) -> LineItinerary:
     entries = []
     if direction is _ItineraryDirection.ONE:
@@ -39,7 +51,8 @@ def _as_itinerary(line: Line, direction: _ItineraryDirection) -> LineItinerary:
     point_in_time_minutes = 0
     entries.append(ItineraryEntry(
         station=current_station.name,
-        point_in_time_minutes=None
+        point_in_time_minutes=None,
+        transfer=_lines_except_of(station=current_station, excluded_line=line)
     ))
     while current_station is not terminal_stop:
         edge = next(filter(lambda e: e.line is line and e.end_station is not previous_station, current_station.outbound_edges))
@@ -48,7 +61,8 @@ def _as_itinerary(line: Line, direction: _ItineraryDirection) -> LineItinerary:
         point_in_time_minutes += edge.distance_min
         entries.append(ItineraryEntry(
             station=current_station.name,
-            point_in_time_minutes=point_in_time_minutes
+            point_in_time_minutes=point_in_time_minutes,
+            transfer=_lines_except_of(station=current_station, excluded_line=line)
         ))
     if direction is _ItineraryDirection.ONE:
         return LineItinerary(

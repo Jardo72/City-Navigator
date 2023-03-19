@@ -2,6 +2,21 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
+class MeansOfTransportDetails(BaseModel):
+    identifier: str = None
+    lines: List[str] = None
+
+
+class LineInfo(BaseModel):
+    label: str = None
+    means_of_transport: str = None
+
+
+class StationDetails(BaseModel):
+    name: str = None
+    lines: List[LineInfo] = None
+
+
 class JourneyLeg(BaseModel):
     start: str = None
     destination: str = None
@@ -20,6 +35,7 @@ class JourneyPlan(BaseModel):
 class ItineraryEntry(BaseModel):
     station: str = None
     point_in_time_minutes: Optional[int] = None
+    transfer: Optional[List[LineInfo]] = None
 
 
 class LineItinerary(BaseModel):
@@ -33,18 +49,3 @@ class LineDetails(BaseModel):
     means_of_transport: str = None
     direction_one_itinerary: LineItinerary = None
     direction_two_itinerary: LineItinerary = None
-
-
-class LineInfo(BaseModel):
-    label: str = None
-    means_of_transport: str = None
-
-
-class MeansOfTransportDetails(BaseModel):
-    identifier: str = None
-    lines: List[str] = None
-
-
-class StationDetails(BaseModel):
-    name: str = None
-    lines: List[LineInfo] = None
