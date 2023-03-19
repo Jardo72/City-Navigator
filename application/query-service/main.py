@@ -6,10 +6,11 @@ from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
 from db import get_db
-from dto import JourneyLeg, JourneyPlan
+from dto import JourneyPlan
 from dto import LineDetails, LineInfo
 from dto import MeansOfTransportDetails, StationDetails
-from mapping import as_line_details, as_line_info, as_means_of_transport_details, as_station_details
+from mapping import as_journey_plan, as_line_details, as_line_info, as_means_of_transport_details, as_station_details
+from search import find_shortest_path
 from util import line_not_found_exception, station_not_found_exception
 
 
@@ -83,31 +84,11 @@ async def search_journey_plan(start: str, destination: str, db: Session = Depend
     """
     Finds and returns a journey plan with the given start and destination.
     """
-    start_station = db.query().filter(Station.name == start).first()
+    start_station = db.query(Station).filter(Station.name == start).first()
     if start_station is None:
         raise station_not_found_exception(start)
-    destination_station = db.query().filter(Station.name == destination).first()
+    destination_station = db.query(Station).filter(Station.name == destination).first()
     if destination_station is None:
         raise station_not_found_exception(destination)
-    return JourneyPlan(
-        start="Simmering",
-        destination="Praterstern",
-        legs=[
-            JourneyLeg(
-                start="Simmering",
-                destination="Landstrasse",
-                means_of_transport="U-Bahn",
-                line="U3",
-                stop_count=7,
-                duration_minutes=13
-            ),
-            JourneyLeg(
-                start="Landstrasse",
-                destination="Praterstern",
-                means_of_transport="S-Bahn",
-                line="S1",
-                stop_count=2,
-                duration_minutes=3
-            )
-        ]
-    )
+    search_result = find_shortest_path(start_station, destination_station)
+    return as_journey_plan(search_result)

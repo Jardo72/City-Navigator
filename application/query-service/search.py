@@ -58,7 +58,7 @@ class _RepriorizablePriorityQueue:
                 continue
             self._station_map.pop(queue_entry.station)
             self._size -= 1
-            return queue_entry.item
+            return queue_entry
         message = 'Cannot dequeue from empty queue.'
         raise IndexError(message)
 
@@ -109,10 +109,10 @@ def _build_distance_table(start: Station) -> _DistanceTable:
 
     for edge in start.outbound_edges:
         distance_table.update(edge, edge.distance_min)
-        queue.enqueue(_QueueEntry(
+        queue.enqueue(
             station=edge.end_station,
             distance_from_start_min=edge.distance_min
-        ))
+        )
 
     while queue.is_not_empty():
         entry = queue.dequeue()
@@ -124,10 +124,10 @@ def _build_distance_table(start: Station) -> _DistanceTable:
                 continue
             adjacent_distance_from_start = current_distance_from_start_min + edge.distance_min
             if distance_table.update(edge, adjacent_distance_from_start):
-                queue.enqueue(_QueueEntry(
+                queue.enqueue(
                     station=edge.end_station,
                     distance_from_start_min=adjacent_distance_from_start
-                ))
+                )
 
     return distance_table
 

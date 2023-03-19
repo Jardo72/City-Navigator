@@ -1,9 +1,11 @@
 from enum import Enum, unique
-from typing import List
+from typing import List, Optional
 
-from db import Line, MeansOfTransport, Station
+from db import Edge, Line, MeansOfTransport, Station
 from dto import ItineraryEntry, LineDetails, LineInfo, LineItinerary
 from dto import MeansOfTransportDetails, StationDetails
+from dto import JourneyLeg, JourneyPlan
+from search import ShortestPathSearchResult
 
 
 def as_means_of_transport_details(means_of_transport: MeansOfTransport) -> MeansOfTransportDetails:
@@ -101,3 +103,52 @@ def as_station_details(station: Station) -> StationDetails:
         name=station.name,
         lines=lines
     )
+
+
+class _JourneyPlanBuilder:
+
+    def __init__(self) -> None:
+        self._legs: List[JourneyLeg] = []
+        self._current_leg: List[Edge] = []
+        self._current_line: Optional[Line] = None
+
+    def _summarize_current_leg(self) -> JourneyLeg:
+        return JourneyLeg(
+            start=self._current_leg[0].start_station.name,
+            destination=self._current_leg[-1].end_station.name,
+            means_of_transport= self._current_line.means_of_transport.identifier,
+            line=self._current_line.label,
+            stop_count=len(self._current_leg),
+            duration_minutes=sum(map(lambda edge: edge.distance_min, self._current_leg))
+        )
+
+    def add_edge(self, edge: Edge) -> None:
+        if self._current_line is None:
+            self._current_leg.append(edge)
+            self._current_line = edge.line
+            return
+        
+        if self._current_line == edge.line:
+            self._current_leg.append(edge)
+            return
+
+        self._legs.append(self._summarize_current_leg())
+        self._current_leg = [edge]
+        self._current_line = edge.line
+
+    def build(self) -> JourneyPlan:
+        self._legs.append(self._summarize_current_leg())
+        return JourneyPlan(
+            start=self._legs[0].start,
+            destination=self._legs[-1].destination,
+            legs=self._legs,
+            stop_count=sum(map(lambda leg: leg.stop_count, self._legs)),
+            duration_minutes=sum(map(lambda leg: leg.duration_minutes, self._legs))
+        )
+
+
+def as_journey_plan(search_result: ShortestPathSearchResult) -> JourneyPlan:
+    builder = _JourneyPlanBuilder()
+    for edge in search_result.path:
+        builder.add_edge(edge)
+    return builder.build()

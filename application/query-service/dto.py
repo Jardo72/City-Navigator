@@ -30,6 +30,8 @@ class JourneyPlan(BaseModel):
     start: str = None
     destination: str = None
     legs: List[JourneyLeg] = None
+    stop_count: int = None
+    duration_minutes: int = None
 
 
 class ItineraryEntry(BaseModel):
