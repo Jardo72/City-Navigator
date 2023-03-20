@@ -825,6 +825,75 @@
                     "pointInTime": 27
                 }
             ]
+        }, {
+            "label": "31A",
+            "meansOfTransport": "Bus",
+            "itinerary": [
+                {
+                    "station": "Kagraner Platz",
+                    "pointInTime": 0
+                },
+                {
+                    "station": "Kagraner Friedhof",
+                    "pointInTime": 2
+                },
+                {
+                    "station": "Anton-Sattler-Gasse",
+                    "pointInTime": 3
+                },
+                {
+                    "station": "Jueptnergasse",
+                    "pointInTime": 4
+                },
+                {
+                    "station": "Zehdengasse",
+                    "pointInTime": 5
+                },
+                {
+                    "station": "Leopoldauer Strasse",
+                    "pointInTime": 6
+                },
+                {
+                    "station": "Sorgenthalgasse",
+                    "pointInTime": 7
+                },
+                {
+                    "station": "Heinrich-von-Buol-Gasse",
+                    "pointInTime": 8
+                },
+                {
+                    "station": "Franz-Sebek-Strasse",
+                    "pointInTime": 9
+                },
+                {
+                    "station": "Siemensstrasse",
+                    "pointInTime": 10
+                },
+                {
+                    "station": "Ruthnergasse",
+                    "pointInTime": 12
+                },
+                {
+                    "station": "Skraupstrasse",
+                    "pointInTime": 13
+                },
+                {
+                    "station": "Berzeliusgasse",
+                    "pointInTime": 14
+                },
+                {
+                    "station": "Grossjedlersdorf",
+                    "pointInTime": 15
+                },
+                {
+                    "station": "Haspingerplatz",
+                    "pointInTime": 16
+                },
+                {
+                    "station": "Grossjedlersdorf, Jochbergengasse",
+                    "pointInTime": 18
+                }
+            ]
         }
     ]
 }
