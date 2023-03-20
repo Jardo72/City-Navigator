@@ -11,7 +11,7 @@ from db import get_db
 from dto import LineDetails
 from dto import MeansOfTransportDetails, MeansOfTransportRequest
 from dto import StationDetails, StationRequest
-from mapping import as_means_of_transport, as_station_details
+from mapping import as_line_details, as_means_of_transport, as_station_details
 from util import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
 
 
@@ -130,16 +130,19 @@ async def delete_station(uuid: str, db: Session = Depends(get_db)):
 @app.get("/lines", response_model=List[LineDetails])
 async def get_lines(db: Session = Depends(get_db)):
     result_set = db.query(Line).order_by(Line.label).all()
-    result = []
-    for record in result_set:
-        result.append(LineDetails(
-            uuid=record.uuid,
-            label=record.label,
-            means_of_transport=record.means_of_transport.identifier,
-            terminal_stop_one=record.terminal_stop_one.name,
-            terminal_stop_two=record.terminal_stop_two.name
-        ))
-    return result
+    return [as_line_details(record) for record in result_set]
+    # TODO: remove
+    # result = []
+    # for record in result_set:
+    #     result.append(as_line_details(record))
+    #     result.append(LineDetails(
+    #         uuid=record.uuid,
+    #         label=record.label,
+    #         means_of_transport=record.means_of_transport.identifier,
+    #         terminal_stop_one=record.terminal_stop_one.name,
+    #         terminal_stop_two=record.terminal_stop_two.name
+    #     ))
+    # return result
 
 
 @app.get("/line/{uuid}", response_model=LineDetails)
