@@ -131,18 +131,6 @@ async def delete_station(uuid: str, db: Session = Depends(get_db)):
 async def get_lines(db: Session = Depends(get_db)):
     result_set = db.query(Line).order_by(Line.label).all()
     return [as_line_details(record) for record in result_set]
-    # TODO: remove
-    # result = []
-    # for record in result_set:
-    #     result.append(as_line_details(record))
-    #     result.append(LineDetails(
-    #         uuid=record.uuid,
-    #         label=record.label,
-    #         means_of_transport=record.means_of_transport.identifier,
-    #         terminal_stop_one=record.terminal_stop_one.name,
-    #         terminal_stop_two=record.terminal_stop_two.name
-    #     ))
-    # return result
 
 
 @app.get("/line/{uuid}", response_model=LineDetails)
