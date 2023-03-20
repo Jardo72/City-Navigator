@@ -143,6 +143,9 @@ async def get_lines(db: Session = Depends(get_db)):
 
 @app.get("/line/{uuid}", response_model=LineDetails)
 async def get_line(uuid: str, db: Session = Depends(get_db)):
+    """
+    Provides the details of the line with the given UUID.
+    """
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
@@ -157,6 +160,9 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
 
 @app.delete("/line/{uuid}")
 async def delete_line(uuid: str, db: Session = Depends(get_db)):
+    """
+    Deletes the line with the given UUID.
+    """
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
