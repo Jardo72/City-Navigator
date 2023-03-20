@@ -1,7 +1,7 @@
 from typing import List
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI
 from fastapi import status
 from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.orm import Session
@@ -11,6 +11,7 @@ from db import get_db
 from dto import LineDetails
 from dto import MeansOfTransportDetails, MeansOfTransportRequest
 from dto import StationDetails, StationRequest
+from util import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
 
 
 app = FastAPI(title="City Navigator - Master Data Service")
@@ -32,6 +33,8 @@ async def get_means_of_transport(uuid: str, db: Session = Depends(get_db)):
     Provides the details of the means of transport with the given UUID.
     """
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
+    if record is None:
+        raise means_of_transport_not_found_exception(uuid)
     return MeansOfTransportDetails(uuid=record.uuid, identifier=record.identifier)
 
 
@@ -50,6 +53,9 @@ async def create_means_of_transport(request: MeansOfTransportRequest, db: Sessio
 
 @app.put("/means-of-transport/{uuid}")
 async def update_means_of_transport(uuid: str, request: MeansOfTransportRequest, db: Session = Depends(get_db)):
+    record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
+    if record is None:
+        raise means_of_transport_not_found_exception(uuid)
     return MeansOfTransportDetails(
         uuid=uuid4(),
         identifier=request.identifier
@@ -63,10 +69,7 @@ async def delete_means_of_transport(uuid: str, db: Session = Depends(get_db)):
     """
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Means of transport with the UUID {uuid} not found."
-        )
+        raise means_of_transport_not_found_exception(uuid)
     db.delete(record)
     db.commit()
 
@@ -88,10 +91,7 @@ async def get_station(uuid: str, db: Session = Depends(get_db)):
     """
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Station with the UUID {uuid} not found."
-        )
+        raise station_not_found_exception(uuid)
     return StationDetails(uuid=record.uuid, name=record.name)
 
 
@@ -108,6 +108,8 @@ async def create_station(request: StationRequest, db: Session = Depends(get_db))
 @app.put("/station/{uuid}", response_model=StationDetails)
 async def update_station(uuid: str, request: StationRequest, db: Session = Depends(get_db)):
     record = db.query(Station).filter(Station.uuid == uuid).first()
+    if record is None:
+        raise station_not_found_exception(uuid)
     record.name = request.name
     db.commit()
 
@@ -118,6 +120,8 @@ async def delete_station(uuid: str, db: Session = Depends(get_db)):
     Deletes the station with the given UUID.
     """
     record = db.query(Station).filter(Station.uuid == uuid).first()
+    if record is None:
+        raise station_not_found_exception(uuid)
     db.delete(record)
     db.commit()
 
@@ -135,3 +139,26 @@ async def get_lines(db: Session = Depends(get_db)):
             terminal_stop_two=record.terminal_stop_two.name
         ))
     return result
+
+
+@app.get("/line/{uuid}", response_model=LineDetails)
+async def get_line(uuid: str, db: Session = Depends(get_db)):
+    record = db.query(Line).filter(Line.uuid == uuid).first()
+    if record is None:
+        raise line_not_found_exception(uuid)
+    return LineDetails(
+        uuid=record.uuid,
+        label=record.label,
+        means_of_transport=record.means_of_transport.identifier,
+        terminal_stop_one=record.terminal_stop_one.name,
+        terminal_stop_two=record.terminal_stop_two.name
+    )
+
+
+@app.delete("/line/{uuid}")
+async def delete_line(uuid: str, db: Session = Depends(get_db)):
+    record = db.query(Line).filter(Line.uuid == uuid).first()
+    if record is None:
+        raise line_not_found_exception(uuid)
+    db.delete(record)
+    db.commit()
