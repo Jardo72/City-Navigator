@@ -11,6 +11,7 @@ from db import get_db
 from dto import LineDetails
 from dto import MeansOfTransportDetails, MeansOfTransportRequest
 from dto import StationDetails, StationRequest
+from mapping import as_means_of_transport, as_station_details
 from util import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
 
 
@@ -24,7 +25,7 @@ async def get_means_of_transport_list(db: Session = Depends(get_db)):
     Provides a list with details of all means of transport.
     """
     result_set = db.query(MeansOfTransport).order_by(MeansOfTransport.identifier).all()
-    return [MeansOfTransportDetails(uuid=record.uuid, identifier=record.identifier) for record in result_set]
+    return [as_means_of_transport(record) for record in result_set]
 
 
 @app.get("/means-of-transport/{uuid}", response_model=MeansOfTransportDetails)
@@ -35,7 +36,7 @@ async def get_means_of_transport(uuid: str, db: Session = Depends(get_db)):
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
         raise means_of_transport_not_found_exception(uuid)
-    return MeansOfTransportDetails(uuid=record.uuid, identifier=record.identifier)
+    return as_means_of_transport(record)
 
 
 @app.post("/means-of-transport/", response_model=MeansOfTransportDetails, status_code=status.HTTP_201_CREATED)
@@ -81,7 +82,7 @@ async def get_station_list(db: Session = Depends(get_db)):
     the order is ascending.
     """
     result_set = db.query(Station).order_by(Station.name).all()
-    return [StationDetails(uuid=record.uuid, name=record.name) for record in result_set]
+    return [as_station_details(record) for record in result_set]
 
 
 @app.get("/station/{uuid}", response_model=StationDetails)
@@ -92,7 +93,7 @@ async def get_station(uuid: str, db: Session = Depends(get_db)):
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
-    return StationDetails(uuid=record.uuid, name=record.name)
+    return as_station_details(record)
 
 
 @app.post("/station", response_model=StationDetails, status_code=status.HTTP_201_CREATED)
@@ -158,10 +159,21 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
     )
 
 
+@app.post("/line")
+async def create_line(db: Session = Depends(get_db)):
+    ...
+
+
+@app.put("/line/{uuid}")
+async def update_line(uuid: str, db: Session = Depends(get_db)):
+    ...
+
+
 @app.delete("/line/{uuid}")
 async def delete_line(uuid: str, db: Session = Depends(get_db)):
     """
-    Deletes the line with the given UUID.
+    Deletes the line with the given UUID. This operation also deletes the itinerary
+    for the concerned line (both directions).
     """
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
