@@ -21,7 +21,7 @@ class StationRequest(BaseModel):
     name: str = None
 
 
-class LineDetails(BaseModel):
+class LineInfo(BaseModel):
     uuid: str = None
     label: str = None
     means_of_transport: str = None
@@ -32,3 +32,18 @@ class LineDetails(BaseModel):
 class ItineraryEntry(BaseModel):
     station: StationDetails = None
     point_in_time_minutes: int = None
+
+
+class LineDetails(BaseModel):
+    uuid: str = None
+    label: str = None
+    means_of_transport: str = None
+    terminal_stop_one: str = None
+    terminal_stop_two: str = None
+
+
+class LineRequest(BaseModel):
+    label: str = None
+    means_of_transport_uuid: str = None
+    terminal_stop_one_uuid: str = None
+    terminal_stop_two_uuid: str = None

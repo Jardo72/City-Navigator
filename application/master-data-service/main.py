@@ -8,10 +8,10 @@ from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
 from db import get_db
-from dto import LineDetails
+from dto import LineDetails, LineInfo, LineRequest
 from dto import MeansOfTransportDetails, MeansOfTransportRequest
 from dto import StationDetails, StationRequest
-from mapping import as_line_details, as_means_of_transport, as_station_details
+from mapping import as_line_details, as_line_info, as_means_of_transport, as_station_details
 from util import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
 
 
@@ -127,10 +127,10 @@ async def delete_station(uuid: str, db: Session = Depends(get_db)):
     db.commit()
 
 
-@app.get("/lines", response_model=List[LineDetails])
+@app.get("/lines", response_model=List[LineInfo])
 async def get_lines(db: Session = Depends(get_db)):
     result_set = db.query(Line).order_by(Line.label).all()
-    return [as_line_details(record) for record in result_set]
+    return [as_line_info(record) for record in result_set]
 
 
 @app.get("/line/{uuid}", response_model=LineDetails)
@@ -150,14 +150,28 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
     )
 
 
-@app.post("/line")
-async def create_line(db: Session = Depends(get_db)):
-    ...
+@app.post("/line", status_code=status.HTTP_201_CREATED)
+async def create_line(request: LineRequest, db: Session = Depends(get_db)):
+    line = Line()
+    line.uuid = str(uuid4())
+    line.label = request.label
+    line.means_of_transport_uuid = request.means_of_transport_uuid
+    line.terminal_stop_one_uuid = request.terminal_stop_one_uuid
+    line.terminal_stop_two_uuid = request.terminal_stop_two_uuid
+    db.add(line)
+    db.commit()
 
 
 @app.put("/line/{uuid}")
-async def update_line(uuid: str, db: Session = Depends(get_db)):
-    ...
+async def update_line(uuid: str, request: LineRequest, db: Session = Depends(get_db)):
+    record = db.query(Line).filter(Line.uuid == uuid).first()
+    if record is None:
+        raise line_not_found_exception(uuid)
+    record.label = request.label
+    record.means_of_transport_uuid = request.means_of_transport_uuid
+    record.terminal_stop_one_uuid = request.terminal_stop_one_uuid
+    record.terminal_stop_two_uuid = request.terminal_stop_two_uuid
+    db.commit()
 
 
 @app.delete("/line/{uuid}")

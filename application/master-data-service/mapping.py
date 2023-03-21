@@ -1,5 +1,15 @@
 from db import Line, MeansOfTransport, Station
-from dto import LineDetails, MeansOfTransportDetails, StationDetails
+from dto import LineDetails, LineInfo, MeansOfTransportDetails, StationDetails
+
+
+def as_line_info(line: Line) -> LineInfo:
+    return LineInfo(
+        uuid=line.uuid,
+        label=line.label,
+        means_of_transport=line.means_of_transport.identifier,
+        terminal_stop_one=line.terminal_stop_one.name,
+        terminal_stop_two=line.terminal_stop_two.name
+    )
 
 
 def as_line_details(line: Line) -> LineDetails:
