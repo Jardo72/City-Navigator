@@ -113,6 +113,7 @@ async def update_station(uuid: str, request: StationRequest, db: Session = Depen
         raise station_not_found_exception(uuid)
     record.name = request.name
     db.commit()
+    return as_station_details(record)
 
 
 @app.delete("/station/{uuid}")
@@ -150,7 +151,7 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
     )
 
 
-@app.post("/line", status_code=status.HTTP_201_CREATED)
+@app.post("/line", response_model=LineDetails, status_code=status.HTTP_201_CREATED)
 async def create_line(request: LineRequest, db: Session = Depends(get_db)):
     line = Line()
     line.uuid = str(uuid4())
@@ -160,9 +161,10 @@ async def create_line(request: LineRequest, db: Session = Depends(get_db)):
     line.terminal_stop_two_uuid = request.terminal_stop_two_uuid
     db.add(line)
     db.commit()
+    return as_line_details(line)
 
 
-@app.put("/line/{uuid}")
+@app.put("/line/{uuid}", response_model=LineDetails)
 async def update_line(uuid: str, request: LineRequest, db: Session = Depends(get_db)):
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
@@ -172,6 +174,7 @@ async def update_line(uuid: str, request: LineRequest, db: Session = Depends(get
     record.terminal_stop_one_uuid = request.terminal_stop_one_uuid
     record.terminal_stop_two_uuid = request.terminal_stop_two_uuid
     db.commit()
+    return as_line_details(record)
 
 
 @app.delete("/line/{uuid}")
