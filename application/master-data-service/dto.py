@@ -27,3 +27,8 @@ class LineDetails(BaseModel):
     means_of_transport: str = None
     terminal_stop_one: str = None
     terminal_stop_two: str = None
+
+
+class ItineraryEntry(BaseModel):
+    station: StationDetails = None
+    point_in_time_minutes: int = None
