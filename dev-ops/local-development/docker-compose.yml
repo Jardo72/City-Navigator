@@ -1,0 +1,15 @@
+services:
+  master-data-service:
+    image: jardo72/city-navigator-master-data-service:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+  query-service:
+    image: jardo72/city-navigator-query-service:latest
+    depends_on:
+      - master-data-service
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
