@@ -25,10 +25,10 @@ app = FastAPI(title=APPLICATION_NAME)
 Instrumentator().instrument(app).expose(app)
 
 
-@app.get("/version", response_model=List[VersionInfo])
+@app.get("/version", response_model=VersionInfo)
 async def get_version_indo():
     return VersionInfo(
-        applcation_name=APPLICATION_NAME,
+        application_name=APPLICATION_NAME,
         application_version=APPLICATION_VERSION,
         python_version=python_version
     )
