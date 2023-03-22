@@ -26,7 +26,7 @@ Instrumentator().instrument(app).expose(app)
 
 
 @app.get("/version", response_model=VersionInfo)
-async def get_version_indo():
+async def get_version_info():
     return VersionInfo(
         application_name=APPLICATION_NAME,
         application_version=APPLICATION_VERSION,
