@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
 
+class VersionInfo:
+    application_name: str = None
+    application_version: str = None
+    python_version: str = None
+
+
 class MeansOfTransportDetails(BaseModel):
     uuid: str = None
     identifier: str = None

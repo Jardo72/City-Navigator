@@ -1,3 +1,4 @@
+from sys import version as python_version
 from typing import List
 
 from fastapi import Depends, FastAPI
@@ -9,13 +10,27 @@ from db import get_db
 from dto import JourneyPlan
 from dto import LineDetails, LineInfo
 from dto import MeansOfTransportDetails, StationDetails
+from dto import VersionInfo
 from mapping import as_journey_plan, as_line_details, as_line_info, as_means_of_transport_details, as_station_details
 from search import find_shortest_path
 from util import line_not_found_exception, station_not_found_exception
 
 
-app = FastAPI(title="City Navigator - Query Service")
+APPLICATION_NAME = "City Navigator - Master Data Service"
+APPLICATION_VERSION = "0.1.0"
+
+
+app = FastAPI(title=APPLICATION_NAME)
 Instrumentator().instrument(app).expose(app)
+
+
+@app.get("/version", response_model=List[VersionInfo])
+async def get_version_indo():
+    return VersionInfo(
+        applcation_name=APPLICATION_NAME,
+        application_version=APPLICATION_VERSION,
+        python_version=python_version
+    )
 
 
 @app.get("/means-of-transport", response_model=List[MeansOfTransportDetails])
