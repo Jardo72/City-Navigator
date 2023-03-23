@@ -826,6 +826,115 @@
                 }
             ]
         }, {
+            "label": "10A",
+            "meansOfTransport": "Bus",
+            "itinerary": [
+                {
+                    "station": "Saarplatz",
+                    "pointInTime": 0
+                },
+                {
+                    "station": "Silbergasse",
+                    "pointInTime": 1
+                },
+                {
+                    "station": "Gatterburggasse",
+                    "pointInTime": 3
+                },
+                {
+                    "station": "Chimanistrasse",
+                    "pointInTime": 4
+                },
+                {
+                    "station": "Daenenstrasse",
+                    "pointInTime": 6
+                },
+                {
+                    "station": "Tuerkenschanzplatz",
+                    "pointInTime": 7
+                },
+                {
+                    "station": "Gersthof",
+                    "pointInTime": 9
+                },
+                {
+                    "station": "Czartoryskigasse",
+                    "pointInTime": 10
+                },
+                {
+                    "station": "Richthausenstrasse",
+                    "pointInTime": 12
+                },
+                {
+                    "station": "Hernals, Wattgasse",
+                    "pointInTime": 13
+                },
+                {
+                    "station": "Albrechtskreithgasse",
+                    "pointInTime": 14
+                },
+                {
+                    "station": "Wilhelminenstrasse",
+                    "pointInTime": 15
+                },
+                {
+                    "station": "Familienplatz",
+                    "pointInTime": 16
+                },
+                {
+                    "station": "Schuhmeierplatz",
+                    "pointInTime": 17
+                },
+                {
+                    "station": "Possingergasse",
+                    "pointInTime": 18
+                },
+                {
+                    "station": "Gablenzgasse",
+                    "pointInTime": 19
+                },
+                {
+                    "station": "Auf der Schmelz",
+                    "pointInTime": 20
+                },
+                {
+                    "station": "Schuselkagasse",
+                    "pointInTime": 22
+                },
+                {
+                    "station": "Johnstrasse",
+                    "pointInTime": 23
+                },
+                {
+                    "station": "Maerzstraße",
+                    "pointInTime": 24
+                },
+                {
+                    "station": "Linzer Strasse",
+                    "pointInTime": 26
+                },
+                {
+                    "station": "Schloss Schoenbrunn",
+                    "pointInTime": 29
+                },
+                {
+                    "station": "Schoenbrunn",
+                    "pointInTime": 30
+                },
+                {
+                    "station": "Rotenmuehlgasse",
+                    "pointInTime": 31
+                },
+                {
+                    "station": "Meidling Hauptstrasse",
+                    "pointInTime": 33
+                },
+                {
+                    "station": "Niederhofstrasse",
+                    "pointInTime": 35
+                }
+            ]
+        }, {
             "label": "31A",
             "meansOfTransport": "Bus",
             "itinerary": [
