@@ -29,8 +29,7 @@ class QueryServiceClient:
             json_data=response.json()
         )
 
-
-    def get_means_of_transport(self) -> Response:
+    def get_means_of_transport_list(self) -> Response:
         return self._get_request("/means-of-transport")
 
     def get_station_list(self) -> Response:
