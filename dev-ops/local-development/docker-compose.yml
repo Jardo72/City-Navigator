@@ -13,3 +13,16 @@ services:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+  http-router:
+    image: jardo72/city-navigator-router:latest
+    depends_on:
+      - master-data-service
+      - query-service
+    expose:
+      - 80
+    ports:
+      - 80:80
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
