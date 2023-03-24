@@ -157,13 +157,7 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
-    return LineDetails(
-        uuid=record.uuid,
-        label=record.label,
-        means_of_transport=record.means_of_transport.identifier,
-        terminal_stop_one=record.terminal_stop_one.name,
-        terminal_stop_two=record.terminal_stop_two.name
-    )
+    return as_line_details(record)
 
 
 @app.post("/line", response_model=LineDetails, status_code=status.HTTP_201_CREATED)

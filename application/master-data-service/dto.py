@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -44,8 +46,10 @@ class LineDetails(BaseModel):
     uuid: str = None
     label: str = None
     means_of_transport: str = None
-    terminal_stop_one: str = None
-    terminal_stop_two: str = None
+    terminal_stop_one: StationDetails = None
+    terminal_stop_two: StationDetails = None
+    direction_one_itinerary: List[ItineraryEntry] = None
+    direction_two_itinerary: List[ItineraryEntry] = None
 
 
 class LineRequest(BaseModel):
