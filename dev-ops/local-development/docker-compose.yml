@@ -1,6 +1,8 @@
 services:
   master-data-service:
     image: jardo72/city-navigator-master-data-service:latest
+    expose:
+      - 8000
     deploy:
       restart_policy:
         condition: on-failure
@@ -9,6 +11,8 @@ services:
     image: jardo72/city-navigator-query-service:latest
     depends_on:
       - master-data-service
+    expose:
+      - 8000
     deploy:
       restart_policy:
         condition: on-failure
