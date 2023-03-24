@@ -23,7 +23,7 @@ class MasterDataClient:
         self._base_url = base_url
 
     def get_means_of_transport(self):
-        response = requests.get(f"{self._base_url}/means_of_transport")
+        response = requests.get(f"{self._base_url}/means-of-transport")
         if response.status_code != 200:
             raise MasterDataClientException(response)
         return response.json()

@@ -12,6 +12,7 @@ from dto import LineDetails, LineInfo
 from dto import MeansOfTransportDetails, StationDetails
 from dto import VersionInfo
 from mapping import as_journey_plan, as_line_details, as_line_info, as_means_of_transport_details, as_station_details
+from master_data_client import MasterDataClient
 from search import find_shortest_path
 from util import line_not_found_exception, station_not_found_exception
 
@@ -22,6 +23,14 @@ APPLICATION_VERSION = "0.1.0"
 
 app = FastAPI(title=APPLICATION_NAME)
 Instrumentator().instrument(app).expose(app)
+
+master_data_client = MasterDataClient("http://localhost:90")
+means_of_transport = master_data_client.get_means_of_transport()
+print(means_of_transport)
+stations = master_data_client.get_stations()
+print(stations)
+lines = master_data_client.get_lines()
+print(lines)
 
 
 @app.get("/version", response_model=VersionInfo)

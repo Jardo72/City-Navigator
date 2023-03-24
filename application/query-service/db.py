@@ -5,7 +5,8 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 # see https://stackoverflow.com/questions/62333314/python-sqlalchemy-in-memory-database-connect
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
@@ -69,9 +70,9 @@ DDL_STATEMENTS = [
 ]
 
 
-# conn = engine.connect()
-# for statement in DDL_STATEMENTS:
-#     conn.execute(text(statement))
+conn = engine.connect()
+for statement in DDL_STATEMENTS:
+    conn.execute(text(statement))
 
 
 class MeansOfTransport(Base):
