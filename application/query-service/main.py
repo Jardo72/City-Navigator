@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from sys import version as python_version
 from typing import List
 
@@ -21,16 +22,24 @@ APPLICATION_NAME = "City Navigator - Master Data Service"
 APPLICATION_VERSION = "0.1.0"
 
 
-app = FastAPI(title=APPLICATION_NAME)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Going to initialize the in-memory database")
+    master_data_client = MasterDataClient("http://localhost:90")
+    means_of_transport = master_data_client.get_means_of_transport()
+    print(means_of_transport)
+    stations = master_data_client.get_stations()
+    print(stations)
+    lines = master_data_client.get_lines()
+    print(lines)
+
+    yield
+    print("Going to shutdown")
+
+
+app = FastAPI(title=APPLICATION_NAME, lifespan=lifespan)
 Instrumentator().instrument(app).expose(app)
 
-master_data_client = MasterDataClient("http://localhost:90")
-means_of_transport = master_data_client.get_means_of_transport()
-print(means_of_transport)
-stations = master_data_client.get_stations()
-print(stations)
-lines = master_data_client.get_lines()
-print(lines)
 
 
 @app.get("/version", response_model=VersionInfo)
