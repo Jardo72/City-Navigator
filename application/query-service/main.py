@@ -23,8 +23,13 @@ APPLICATION_VERSION = "0.1.0"
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI, db: Session = Depends(get_db)):
     print("Going to initialize the in-memory database")
+    if db is None:
+        print("WTF!!! DB is missing!")
+    else:
+        print("DB seems to be OK")
+    """
     master_data_client = MasterDataClient("http://localhost:90")
     means_of_transport = master_data_client.get_means_of_transport()
     print(means_of_transport)
@@ -32,6 +37,7 @@ async def lifespan(app: FastAPI):
     print(stations)
     lines = master_data_client.get_lines()
     print(lines)
+    """
 
     yield
     print("Going to shutdown")
@@ -39,7 +45,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title=APPLICATION_NAME, lifespan=lifespan)
 Instrumentator().instrument(app).expose(app)
-
 
 
 @app.get("/version", response_model=VersionInfo)
