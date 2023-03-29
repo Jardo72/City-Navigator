@@ -38,9 +38,9 @@ def _as_line(dict: Dict[str, str]) -> Line:
     return Line(
         uuid=dict["uuid"],
         label=dict["label"],
-        means_of_transport_uuid=dict["means_of_transport"]["uuid"],
-        terminal_stop_one_uuid=dict["terminal_stop_one"]["uuid"],
-        terminal_stop_two_uuid=dict["terminal_stop_two"]["uuid"]
+        means_of_transport=dict["means_of_transport"],
+        terminal_stop_one=dict["terminal_stop_one"],
+        terminal_stop_two=dict["terminal_stop_two"]
     )
 
 

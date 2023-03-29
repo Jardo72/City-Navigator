@@ -49,5 +49,7 @@ def init_db_from_master_data(db: Session) -> None:
         ))
     db.commit()
 
-    # line_list = client.get_lines()
-    # _logger.info("%d lines retrieved from master data", len(line_list))
+    line_list = client.get_lines()
+    _logger.info("%d lines retrieved from master data", len(line_list))
+    for line in line_list:
+        ...

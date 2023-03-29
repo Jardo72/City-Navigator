@@ -45,7 +45,7 @@ class ItineraryEntry(BaseModel):
 class LineDetails(BaseModel):
     uuid: str = None
     label: str = None
-    means_of_transport: str = None
+    means_of_transport: MeansOfTransportDetails = None
     terminal_stop_one: StationDetails = None
     terminal_stop_two: StationDetails = None
     direction_one_itinerary: List[ItineraryEntry] = None

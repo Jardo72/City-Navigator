@@ -30,9 +30,9 @@ class MeansOfTransport:
 class Line:
     uuid: str
     label: str
-    means_of_transport_uuid: str
-    terminal_stop_one_uuid: str
-    terminal_stop_two_uuid: str
+    means_of_transport: str
+    terminal_stop_one: str
+    terminal_stop_two: str
 
 
 @dataclass(frozen=True)

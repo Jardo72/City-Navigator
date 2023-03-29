@@ -60,7 +60,7 @@ def as_line_details(line: Line) -> LineDetails:
     return LineDetails(
         uuid=line.uuid,
         label=line.label,
-        means_of_transport=line.means_of_transport.identifier,
+        means_of_transport=as_means_of_transport(line.means_of_transport),
         terminal_stop_one=as_station_details(line.terminal_stop_one),
         terminal_stop_two=as_station_details(line.terminal_stop_two),
         direction_one_itinerary=_as_itinerary(line, _ItineraryDirection.ONE),
