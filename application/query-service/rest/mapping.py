@@ -21,10 +21,11 @@ from enum import Enum, unique
 from typing import List, Optional
 
 from db import Edge, Line, MeansOfTransport, Station
-from dto import ItineraryEntry, LineDetails, LineInfo, LineItinerary
-from dto import MeansOfTransportDetails, StationDetails
-from dto import JourneyLeg, JourneyPlan
 from journey_plan_search import ShortestPathSearchResult
+
+from .dto import ItineraryEntry, LineDetails, LineInfo, LineItinerary
+from .dto import MeansOfTransportDetails, StationDetails
+from .dto import JourneyLeg, JourneyPlan
 
 
 def as_means_of_transport_details(means_of_transport: MeansOfTransport) -> MeansOfTransportDetails:

@@ -21,12 +21,6 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 
-class VersionInfo(BaseModel):
-    application_name: str = None
-    application_version: str = None
-    python_version: str = None
-
-
 class MeansOfTransportDetails(BaseModel):
     identifier: str = None
     lines: List[str] = None
