@@ -16,3 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+from .distance_table import ShortestPathSearchResult
+from .search import find_shortest_path

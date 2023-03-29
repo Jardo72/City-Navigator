@@ -24,7 +24,7 @@ from db import Edge, Line, MeansOfTransport, Station
 from dto import ItineraryEntry, LineDetails, LineInfo, LineItinerary
 from dto import MeansOfTransportDetails, StationDetails
 from dto import JourneyLeg, JourneyPlan
-from search import ShortestPathSearchResult
+from journey_plan_search import ShortestPathSearchResult
 
 
 def as_means_of_transport_details(means_of_transport: MeansOfTransport) -> MeansOfTransportDetails:

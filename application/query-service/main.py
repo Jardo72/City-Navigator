@@ -12,9 +12,11 @@ from dto import JourneyPlan
 from dto import LineDetails, LineInfo
 from dto import MeansOfTransportDetails, StationDetails
 from dto import VersionInfo
+from journey_plan_search import ShortestPathSearchResult
+from journey_plan_search import find_shortest_path
 from mapping import as_journey_plan, as_line_details, as_line_info, as_means_of_transport_details, as_station_details
 from master_data_client import MasterDataClient
-from search import find_shortest_path
+# from search import find_shortest_path
 from util import line_not_found_exception, station_not_found_exception
 
 
