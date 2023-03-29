@@ -17,5 +17,3 @@
 # limitations under the License.
 #
 
-from .entities import Edge, Line, MeansOfTransport, Station
-from .session import get_db
