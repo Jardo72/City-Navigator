@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from logging import getLogger
 from sys import version as python_version
 
 from fastapi import Depends, FastAPI
@@ -10,20 +11,23 @@ from db import get_db
 from rest import router
 
 
-APPLICATION_NAME = "City Navigator - Master Data Service"
-APPLICATION_VERSION = "0.1.0"
+_logger = getLogger("main")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI, db: Session = Depends(get_db)):
-    print("Going to initialize the in-memory database")
+    _logger.debug("Going to initialize the in-memory database")
     if db is None:
-        print("WTF!!! DB is missing!")
+        _logger.error("WTF!!! DB is missing!")
     else:
-        print("DB seems to be OK")
+        _logger.info("DB seems to be OK")
 
     yield
     print("Going to shutdown")
+
+
+APPLICATION_NAME = "City Navigator - Master Data Service"
+APPLICATION_VERSION = "0.1.0"
 
 
 app = FastAPI(title=APPLICATION_NAME, lifespan=lifespan)
