@@ -20,14 +20,17 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
+from config import Config
 
+
+# TODO: remove
 # see https://stackoverflow.com/questions/62333314/python-sqlalchemy-in-memory-database-connect
-_SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+# _SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 # _SQLALCHEMY_DATABASE_URL = "sqlite://"
 
 
 _engine = create_engine(
-    url=_SQLALCHEMY_DATABASE_URL,
+    url=Config.get_database_url(),
     connect_args={"check_same_thread": False}
 )
 
@@ -40,6 +43,10 @@ def get_db() -> SessionLocal:
         yield db
     finally:
         db.close()
+
+
+def get_db_session() -> SessionLocal:
+    return SessionLocal()
 
 
 _DDL_STATEMENTS = [
@@ -86,7 +93,6 @@ _DDL_STATEMENTS = [
 ]
 
 
-# TODO
-# conn = _engine.connect()
-# for statement in _DDL_STATEMENTS:
-#     conn.execute(text(statement))
+conn = _engine.connect()
+for statement in _DDL_STATEMENTS:
+    conn.execute(text(statement))

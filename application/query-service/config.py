@@ -17,7 +17,11 @@
 # limitations under the License.
 #
 
+from logging import getLogger
 from os import environ
+
+
+_logger = getLogger("config")
 
 
 class Config:
@@ -32,7 +36,10 @@ class Config:
 
     @staticmethod
     def _get_environment_variable(name: str, default_value: str) -> str:
-        result = environ[name]
+        result = environ.get(name, None)
+        default_used = False
         if result is None:
+            default_used = True
             result = default_value
+        _logger.info("Config - env. var = '%s', result = '%s', default used = %s", name, result, default_used)
         return result

@@ -18,4 +18,4 @@
 #
 
 from .entities import Edge, Line, MeansOfTransport, Station
-from .session import get_db
+from .session import get_db, get_db_session

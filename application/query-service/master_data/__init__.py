@@ -17,5 +17,4 @@
 # limitations under the License.
 #
 
-from .client import MasterDataClient, MasterDataClientException
-from .dto import Line, MeansOfTransport, Station
+from .initialization import init_db_from_master_data
