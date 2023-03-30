@@ -17,7 +17,10 @@
 # limitations under the License.
 #
 
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from logging import getLogger
+from typing import List
 
 from sqlalchemy.orm import Session
 
@@ -31,8 +34,36 @@ from .dto import LineDetails
 _logger = getLogger('master-data-import')
 
 
-def _import_means_of_transport(db: Session, client: MasterDataClient) -> None:
-    means_of_transport_list = client.get_means_of_transport()
+@dataclass(frozen=True)
+class RetrievalResult:
+    means_of_transport: List[MeansOfTransport]
+    stations: List[Station]
+    lines: List[LineDetails]
+
+
+def _retrieve_means_of_transport() -> List[MeansOfTransport]:
+    client = MasterDataClient(Config.get_master_data_service_base_url())
+    return client.get_means_of_transport()
+
+
+def _retrieve_stations() -> List[Station]:
+    client = MasterDataClient(Config.get_master_data_service_base_url())
+    return client.get_stations()
+
+
+def _retrieve_from_master_data_service() -> RetrievalResult:
+    TIMEOUT_SEC = 6
+    with ThreadPoolExecutor(max_workers=6) as executor:
+        means_of_transport_future = executor.submit(_retrieve_means_of_transport)
+        stations_future = executor.submit(_retrieve_stations)
+    return RetrievalResult(
+        means_of_transport=means_of_transport_future.result(timeout=TIMEOUT_SEC),
+        stations=stations_future.result(timeout=TIMEOUT_SEC),
+        lines=[]
+    )
+
+
+def _import_means_of_transport(db: Session, means_of_transport_list: List[MeansOfTransport]) -> None:
     _logger.info("%d means of transport retrieved from master data", len(means_of_transport_list))
     for means_of_transport in means_of_transport_list:
         db.add(MeansOfTransport(
@@ -40,11 +71,10 @@ def _import_means_of_transport(db: Session, client: MasterDataClient) -> None:
             identifier=means_of_transport.identifier
         ))
     db.commit()
-    _logger.info("Means of transport imported from master data service")
+    _logger.info("Means of transport imported into the database")
 
 
-def _import_stations(db: Session, client: MasterDataClient) -> None:
-    station_list = client.get_stations()
+def _import_stations(db: Session, station_list: List[Station]) -> None:
     _logger.info("%d stations retrieved from master data", len(station_list))
     for station in station_list:
         db.add(Station(
@@ -52,7 +82,7 @@ def _import_stations(db: Session, client: MasterDataClient) -> None:
             name=station.name
         ))
     db.commit()
-    _logger.info("Stations imported from master data service")
+    _logger.info("Stations imported into the database")
 
 
 def _import_single_line(db: Session, line_details: LineDetails) -> None:
@@ -66,12 +96,11 @@ def _import_single_line(db: Session, line_details: LineDetails) -> None:
     db.commit()
 
 
-def _import_lines(db: Session, client: MasterDataClient) -> None:
-    line_list = client.get_lines()
+def _import_lines(db: Session, line_list: List[LineDetails]) -> None:
     _logger.info("%d lines retrieved from master data", len(line_list))
-    for line_dto in line_list:
-        line_details = client.get_line(line_dto.uuid)
+    for line_details in line_list:
         _import_single_line(db, line_details)
+    _logger.info("Lines imported into the database")
 
 
 def init_db_from_master_data(db: Session) -> None:
@@ -81,6 +110,7 @@ def init_db_from_master_data(db: Session) -> None:
     # - we could simply collect all the data from the master service
     # - the DB inserts can be done sequentially when all the data has been
     #   retrieved
-    _import_means_of_transport(db, client)
-    _import_stations(db, client)
-    _import_lines(db, client)
+    retrieval_result = _retrieve_from_master_data_service()
+    _import_means_of_transport(db, retrieval_result.means_of_transport)
+    _import_stations(db, retrieval_result.stations)
+    _import_lines(db, retrieval_result.lines)
