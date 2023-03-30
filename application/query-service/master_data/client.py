@@ -21,7 +21,7 @@ from typing import Dict, List
 
 import requests
 
-from .dto import Line, MeansOfTransport, Station
+from .dto import Line, LineDetails, MeansOfTransport, Station
 
 
 def _message_from(response: requests.Response) -> str:
@@ -41,6 +41,16 @@ def _as_line(dict: Dict[str, str]) -> Line:
         means_of_transport=dict["means_of_transport"],
         terminal_stop_one=dict["terminal_stop_one"],
         terminal_stop_two=dict["terminal_stop_two"]
+    )
+
+
+def _as_line_details(dict: Dict[str, str]) -> LineDetails:
+    return LineDetails(
+        uuid=dict["uuid"],
+        label=dict["label"],
+        means_of_transport=_as_means_of_transport(dict["means_of_transport"]),
+        terminal_stop_one=_as_station(dict["terminal_stop_one"]),
+        terminal_stop_two=_as_station(dict["terminal_stop_two"])
     )
 
 
@@ -95,8 +105,8 @@ class MasterDataClient:
         json_array = response.json()
         return [_as_line(element) for element in json_array]
 
-    def get_line(self, uuid: str) -> Line:
+    def get_line(self, uuid: str) -> LineDetails:
         response = requests.get(f"{self._base_url}/line/{uuid}")
         if response.status_code != 200:
             raise MasterDataClientException(response)
-        return _as_line(response.json())
+        return _as_line_details(response.json())

@@ -39,3 +39,12 @@ class Line:
 class Station:
     uuid: str
     name: str
+
+
+@dataclass(frozen=True)
+class LineDetails:
+    uuid: str
+    label: str
+    means_of_transport: MeansOfTransport
+    terminal_stop_one: Station
+    terminal_stop_two: Station
