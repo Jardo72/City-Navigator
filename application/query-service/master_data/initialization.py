@@ -51,15 +51,30 @@ def _retrieve_stations() -> List[Station]:
     return client.get_stations()
 
 
+def _retrieve_lines() -> List[Line]:
+    client = MasterDataClient(Config.get_master_data_service_base_url())
+    return client.get_lines()
+
+
+def _retrieve_line_details(uuid: str) -> LineDetails:
+    client = MasterDataClient(Config.get_master_data_service_base_url())
+    return client.get_line(uuid)
+
+
 def _retrieve_from_master_data_service() -> RetrievalResult:
     TIMEOUT_SEC = 6
     with ThreadPoolExecutor(max_workers=6) as executor:
+        lines_future = executor.submit(_retrieve_lines)
         means_of_transport_future = executor.submit(_retrieve_means_of_transport)
         stations_future = executor.submit(_retrieve_stations)
+        line_details_future_list = []
+        for line in lines_future.result(timeout=TIMEOUT_SEC):
+            line_details_future = executor.submit(lambda: _retrieve_line_details(line.uuid))
+            line_details_future_list.append(line_details_future)
     return RetrievalResult(
         means_of_transport=means_of_transport_future.result(timeout=TIMEOUT_SEC),
         stations=stations_future.result(timeout=TIMEOUT_SEC),
-        lines=[]
+        lines=[f.result(timeout=TIMEOUT_SEC) for f in line_details_future_list]
     )
 
 
@@ -104,7 +119,6 @@ def _import_lines(db: Session, line_list: List[LineDetails]) -> None:
 
 
 def init_db_from_master_data(db: Session) -> None:
-    client = MasterDataClient(Config.get_master_data_service_base_url())
     # TODO:
     # - retrieval of data from the master data service could be parallelized
     # - we could simply collect all the data from the master service
