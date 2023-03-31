@@ -69,13 +69,13 @@ def _retrieve_from_master_data_service() -> RetrievalResult:
         stations_future = executor.submit(_retrieve_stations)
         line_details_future_list = []
         for line in lines_future.result(timeout=TIMEOUT_SEC):
-            line_details_future = executor.submit(lambda: _retrieve_line_details(line.uuid))
+            line_details_future = executor.submit(_retrieve_line_details, line.uuid)
             line_details_future_list.append(line_details_future)
-    return RetrievalResult(
-        means_of_transport=means_of_transport_future.result(timeout=TIMEOUT_SEC),
-        stations=stations_future.result(timeout=TIMEOUT_SEC),
-        lines=[f.result(timeout=TIMEOUT_SEC) for f in line_details_future_list]
-    )
+        return RetrievalResult(
+            means_of_transport=means_of_transport_future.result(timeout=TIMEOUT_SEC),
+            stations=stations_future.result(timeout=TIMEOUT_SEC),
+            lines=[f.result(timeout=TIMEOUT_SEC) for f in line_details_future_list]
+        )
 
 
 def _import_means_of_transport(db: Session, means_of_transport_list: List[MeansOfTransport]) -> None:
@@ -119,11 +119,6 @@ def _import_lines(db: Session, line_list: List[LineDetails]) -> None:
 
 
 def init_db_from_master_data(db: Session) -> None:
-    # TODO:
-    # - retrieval of data from the master data service could be parallelized
-    # - we could simply collect all the data from the master service
-    # - the DB inserts can be done sequentially when all the data has been
-    #   retrieved
     retrieval_result = _retrieve_from_master_data_service()
     _import_means_of_transport(db, retrieval_result.means_of_transport)
     _import_stations(db, retrieval_result.stations)
