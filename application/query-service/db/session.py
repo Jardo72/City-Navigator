@@ -23,14 +23,8 @@ from sqlalchemy.orm import sessionmaker
 from config import Config
 
 
-# TODO: remove
-# see https://stackoverflow.com/questions/62333314/python-sqlalchemy-in-memory-database-connect
-# _SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
-# _SQLALCHEMY_DATABASE_URL = "sqlite://"
-
-
 _engine = create_engine(
-    url=Config.get_database_url(),
+    url="sqlite://",
     connect_args={"check_same_thread": False}
 )
 

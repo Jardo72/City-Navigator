@@ -31,10 +31,6 @@ class Config:
         return Config._get_environment_variable("MASTER_DATA_SERVICE_BASE_URL", "http://localhost:90")
 
     @staticmethod
-    def get_database_url() -> str:
-        return Config._get_environment_variable("DATABASE_URL", "sqlite://")
-
-    @staticmethod
     def _get_environment_variable(name: str, default_value: str) -> str:
         result = environ.get(name, None)
         default_used = False
