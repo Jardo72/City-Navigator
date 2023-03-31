@@ -18,6 +18,7 @@
 #
 
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -42,9 +43,17 @@ class Station:
 
 
 @dataclass(frozen=True)
+class ItineraryEntry:
+    station: Station = None
+    point_in_time_minutes: int = None
+
+
+@dataclass(frozen=True)
 class LineDetails:
     uuid: str
     label: str
     means_of_transport: MeansOfTransport
     terminal_stop_one: Station
     terminal_stop_two: Station
+    direction_one_itinerary: List[ItineraryEntry] = None
+    direction_two_itinerary: List[ItineraryEntry] = None

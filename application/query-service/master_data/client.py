@@ -17,11 +17,11 @@
 # limitations under the License.
 #
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 import requests
 
-from .dto import Line, LineDetails, MeansOfTransport, Station
+from .dto import ItineraryEntry, Line, LineDetails, MeansOfTransport, Station
 
 
 def _message_from(response: requests.Response) -> str:
@@ -44,13 +44,25 @@ def _as_line(dict: Dict[str, str]) -> Line:
     )
 
 
+def _as_itinerary(entries: List[Dict[str, Any]]) -> List[ItineraryEntry]:
+    result = []
+    for current_entry in entries:
+        result.append(ItineraryEntry(
+            station=_as_station(current_entry["station"]),
+            point_in_time_minutes=current_entry["point_in_time_minutes"]
+        ))
+    return result
+
+
 def _as_line_details(dict: Dict[str, str]) -> LineDetails:
     return LineDetails(
         uuid=dict["uuid"],
         label=dict["label"],
         means_of_transport=_as_means_of_transport(dict["means_of_transport"]),
         terminal_stop_one=_as_station(dict["terminal_stop_one"]),
-        terminal_stop_two=_as_station(dict["terminal_stop_two"])
+        terminal_stop_two=_as_station(dict["terminal_stop_two"]),
+        direction_one_itinerary=_as_itinerary(dict["direction_one_itinerary"]),
+        direction_two_itinerary=_as_itinerary(dict["direction_two_itinerary"])
     )
 
 
