@@ -5,9 +5,6 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 COPY *.py ./
 
-# TODO: temporary hack - remove
-COPY test.db ./
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 USER 1000:1000

@@ -1,25 +1,29 @@
 services:
-  database:
-    image: mariadb:10.9.3
-    ports:
-      - 3306:3306
-    environment:
-      MARIADB_ROOT_PASSWORD: secreT68
-      MARIADB_USER: appuser
-      MARIADB_PASSWORD: secreT68
-    networks:
-      - database-network
-    volumes:
-      - ./data:/var/lib/mysql
+  # TODO
+  # database:
+  #   image: mariadb:10.9.3
+  #   ports:
+  #     - 3306:3306
+  #   environment:
+  #     MARIADB_ROOT_PASSWORD: secreT68
+  #     MARIADB_USER: appuser
+  #     MARIADB_PASSWORD: secreT68
+  #   networks:
+  #     - database-network
+  #   volumes:
+  #     - ./data:/var/lib/mysql
 
   master-data-service:
     image: jardo72/city-navigator-master-data-service:latest
-    depends_on:
-      - database
+    # TODO
+    # depends_on:
+    #   - database
+    environment:
+      - name=value
     expose:
       - 8000
     networks:
-      - database-network
+      # - database-network
       - service-network
     deploy:
       restart_policy:
@@ -30,6 +34,8 @@ services:
     image: jardo72/city-navigator-query-service:latest
     depends_on:
       - master-data-service
+    environment:
+      - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
     expose:
       - 8000
     networks:
