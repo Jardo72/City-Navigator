@@ -29,7 +29,7 @@ class Config:
     @staticmethod
     def get_database_url() -> str:
         return Config._get_environment_variable(
-            name="",
+            name="DATABASE_URL",
             default_value="sqlite:///./test.db"
         )
 
