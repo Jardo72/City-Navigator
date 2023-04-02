@@ -21,9 +21,10 @@ from enum import Enum, unique
 from typing import List
 
 from db import Line, MeansOfTransport, Station
-from dto import LineDetails, LineInfo, ItineraryEntry
-from dto import MeansOfTransportDetails
-from dto import StationDetails
+
+from .dto import LineDetails, LineInfo, ItineraryEntry
+from .dto import MeansOfTransportDetails
+from .dto import StationDetails
 
 
 def as_line_info(line: Line) -> LineInfo:
