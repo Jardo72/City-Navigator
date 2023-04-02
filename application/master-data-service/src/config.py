@@ -27,6 +27,13 @@ _logger = getLogger("config")
 class Config:
 
     @staticmethod
+    def get_database_url() -> str:
+        return Config._get_environment_variable(
+            name="",
+            default_value="sqlite:///./test.db"
+        )
+
+    @staticmethod
     def _get_environment_variable(name: str, default_value: str) -> str:
         result = environ.get(name, None)
         default_used = False
