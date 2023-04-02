@@ -3,7 +3,7 @@ FROM python:3.10-slim-buster
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./
-COPY *.py ./
+COPY src ./
 
 # TODO: temporary hack - remove
 COPY test.db ./
