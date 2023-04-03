@@ -32,7 +32,7 @@ from .client import MasterDataClient
 from .dto import ItineraryEntry, LineDetails
 
 
-_logger = getLogger('master-data-import')
+_logger = getLogger("master-data")
 
 
 @dataclass(frozen=True)
@@ -140,6 +140,7 @@ def _import_lines(db: Session, line_list: List[LineDetails]) -> None:
 
 def init_db_from_master_data(db: Session) -> None:
     retrieval_result = _retrieve_from_master_data_service()
+    _logger.info("All data retrieved from master data service")
     _import_means_of_transport(db, retrieval_result.means_of_transport)
     _import_stations(db, retrieval_result.stations)
     _import_lines(db, retrieval_result.lines)

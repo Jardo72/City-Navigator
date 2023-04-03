@@ -19,9 +19,13 @@
 
 from collections import deque
 from dataclasses import dataclass
+from logging import getLogger
 from typing import Dict, Tuple
 
 from db import Edge, Station
+
+
+_logger = getLogger("search")
 
 
 @dataclass(frozen=True, slots=True)
@@ -47,10 +51,18 @@ class _DistanceTableEntry:
     distance_from_start_min: int
 
     def update(self, edge: Edge, distance_from_start_min) -> bool:
+        _logger.debug(
+            "Updating distance table entry: %s -> %s, distance from start (min) = %d",
+            edge.start_station.name,
+            edge.end_station.name,
+            distance_from_start_min
+        )
         if self.distance_from_start_min > distance_from_start_min:
             self.distance_from_start_min = distance_from_start_min
             self.edge_from_previous_station = edge
+            _logger.debug("Update NEEDED (current distance from start %s)", self.distance_from_start_min)
             return True
+        _logger.debug("Update NOT needed (current distance from start %s)", self.distance_from_start_min)
         return False
 
 
@@ -61,8 +73,15 @@ class DistanceTable:
         self._entries: Dict[Station, _DistanceTableEntry] = {}
 
     def update(self, edge: Edge, distance_from_start_min: int) -> bool:
+        _logger.debug(
+            "Updating distance table: %s -> %s, distance from start (min) = %d",
+            edge.start_station.name,
+            edge.end_station.name,
+            distance_from_start_min
+        )
         if edge.end_station in self._entries:
             return self._entries[edge.end_station].update(edge, distance_from_start_min)
+        _logger.debug("No entry found in the distance table, going to create new entry")
         self._entries[edge.end_station] = _DistanceTableEntry(edge, distance_from_start_min)
         return True
 

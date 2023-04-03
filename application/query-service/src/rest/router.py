@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+from logging import getLogger
 from typing import List
 
 from fastapi import Depends, APIRouter
@@ -29,6 +30,9 @@ from journey_plan_search import find_shortest_path
 from .dto import JourneyPlan, LineDetails, LineInfo, MeansOfTransportDetails, StationDetails
 from .errors import line_not_found_exception, station_not_found_exception
 from .mapping import as_journey_plan, as_line_details, as_line_info, as_means_of_transport_details, as_station_details
+
+
+_logger = getLogger("rest")
 
 
 router = APIRouter()
@@ -51,6 +55,7 @@ async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     if the value 'S*' is specified as filter, all stations whose names start with the letter S
     will be returned.
     """
+    _logger.debug("Asked for stations - filter = %s", filter)
     if filter is None:
         stations = db.query(Station).order_by(Station.name).all()
     else:
@@ -64,6 +69,7 @@ async def get_station_details(name: str, db: Session = Depends(get_db)):
     """
     Provides the details of the station with the given name.
     """
+    _logger.debug("Asked for single station - name = %s", name)
     station = db.query(Station).filter(Station.name == name).first()
     if station is None:
         raise station_not_found_exception(name)
@@ -100,6 +106,7 @@ async def search_journey_plan(start: str, destination: str, db: Session = Depend
     """
     Finds and returns a journey plan with the given start and destination.
     """
+    _logger.debug("Asked to search path from %s to %s", start, destination)
     start_station = db.query(Station).filter(Station.name == start).first()
     if start_station is None:
         raise station_not_found_exception(start)
