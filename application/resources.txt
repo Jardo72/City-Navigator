@@ -1,3 +1,8 @@
+# Nginx
 https://blog.devgenius.io/how-to-use-redis-pub-sub-in-your-python-application-b6d5e11fc8de
 https://www.nginx.com/blog/deploying-nginx-plus-as-an-api-gateway-part-1/
 
+
+# Uvicorn logging
+https://www.uvicorn.org/settings/#logging
+https://docs.python.org/3/library/logging.config.html#configuration-file-format
