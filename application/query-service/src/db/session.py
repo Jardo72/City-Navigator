@@ -17,10 +17,13 @@
 # limitations under the License.
 #
 
+from logging import getLogger
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
-from config import Config
+
+_logger = getLogger("db")
 
 
 _engine = create_engine(
@@ -89,4 +92,5 @@ _DDL_STATEMENTS = [
 
 conn = _engine.connect()
 for statement in _DDL_STATEMENTS:
+    _logger.debug("Going to execute DDL statement:\n%s", statement)
     conn.execute(text(statement))

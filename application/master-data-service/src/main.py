@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+from logging import getLogger
 from sys import version as python_version
 
 from fastapi import FastAPI
@@ -24,6 +25,9 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
 from rest import router
+
+
+_logger = getLogger("main")
 
 
 APPLICATION_NAME = "City Navigator - Master Data Service"
@@ -43,6 +47,7 @@ class VersionInfo(BaseModel):
 
 @app.get("/version", response_model=VersionInfo)
 async def get_version_info():
+    _logger.debug("Asked for version info - app-name = %s, app-version = %s", APPLICATION_NAME, APPLICATION_VERSION)
     return VersionInfo(
         application_name=APPLICATION_NAME,
         application_version=APPLICATION_VERSION,

@@ -17,10 +17,15 @@
 # limitations under the License.
 #
 
+from logging import getLogger
+
+from db import Station
+
 from .distance_table import DistanceTable, ShortestPathSearchResult
 from .queue import RepriorizablePriorityQueue
 
-from db import Station
+
+_logger = getLogger("search")
 
 
 def _build_distance_table(start: Station) -> DistanceTable:
@@ -54,5 +59,6 @@ def _build_distance_table(start: Station) -> DistanceTable:
 
 
 def find_shortest_path(start: Station, destination: Station) -> ShortestPathSearchResult:
+    _logger.info("Going to search path from %s to %s", start.name, destination.name)
     distance_table = _build_distance_table(start)
     return distance_table.backtrack_shortest_path(destination)

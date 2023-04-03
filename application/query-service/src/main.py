@@ -34,7 +34,7 @@ _logger = getLogger("main")
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:
     _logger.info("Going to initialize the in-memory database")
     init_db_from_master_data(get_db_session())
 
@@ -59,6 +59,7 @@ class VersionInfo(BaseModel):
 
 @app.get("/version", response_model=VersionInfo)
 async def get_version_info() -> VersionInfo:
+    _logger.debug("Asked for version info - app-name = %s, app-version = %s", APPLICATION_NAME, APPLICATION_VERSION)
     return VersionInfo(
         application_name=APPLICATION_NAME,
         application_version=APPLICATION_VERSION,
