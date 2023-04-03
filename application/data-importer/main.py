@@ -32,6 +32,10 @@ def create_command_line_arguments_parser() -> ArgumentParser:
         "input_file",
         help="the name of the input JSON file containing the city plan"
     )
+    parser.add_argument(
+        "sql_alchemy_db_url",
+        help="the name of the SQLite database file the data is to be imported to"
+    )
 
     return parser
 
@@ -52,7 +56,7 @@ def print_summary(import_summary: ImportSummary) -> None:
 def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     city_plan = read_from_file(command_line_arguments.input_file)
-    import_summary = import_to_database(city_plan)
+    import_summary = import_to_database(city_plan, command_line_arguments.sql_alchemy_db_url)
     print_summary(import_summary)
 
 
