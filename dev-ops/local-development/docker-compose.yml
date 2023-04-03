@@ -5,9 +5,9 @@ services:
   #   ports:
   #     - 3306:3306
   #   environment:
-  #     MARIADB_ROOT_PASSWORD: secreT68
+  #     MARIADB_ROOT_PASSWORD: SecreT68
   #     MARIADB_USER: appuser
-  #     MARIADB_PASSWORD: secreT68
+  #     MARIADB_PASSWORD: SecreT68
   #   networks:
   #     - database-network
   #   volumes:
@@ -20,8 +20,6 @@ services:
     #   - database
     environment:
       - name=value
-    expose:
-      - 8000
     networks:
       # - database-network
       - service-network
@@ -36,8 +34,6 @@ services:
       - master-data-service
     environment:
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
-    expose:
-      - 8000
     networks:
       - service-network
     deploy:
