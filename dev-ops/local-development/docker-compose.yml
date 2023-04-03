@@ -1,28 +1,14 @@
 services:
-  # TODO
-  # database:
-  #   image: mariadb:10.9.3
-  #   ports:
-  #     - 3306:3306
-  #   environment:
-  #     MARIADB_ROOT_PASSWORD: SecreT68
-  #     MARIADB_USER: appuser
-  #     MARIADB_PASSWORD: SecreT68
-  #   networks:
-  #     - database-network
-  #   volumes:
-  #     - ./data:/var/lib/mysql
-
   master-data-service:
     image: jardo72/city-navigator-master-data-service:latest
-    # TODO
-    # depends_on:
-    #   - database
     environment:
-      - name=value
+      - DATABASE_URL=sqlite:////db/sqlite.db
     networks:
-      # - database-network
       - service-network
+    volumes:
+      - type: bind
+        source: ./data
+        target: /db
     deploy:
       restart_policy:
         condition: on-failure
@@ -58,8 +44,5 @@ services:
         max_attempts: 3
 
 networks:
-  database-network:
-    driver: bridge
-
   service-network:
     driver: bridge
