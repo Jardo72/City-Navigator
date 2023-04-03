@@ -42,7 +42,7 @@ async def lifespan(app: FastAPI) -> None:
     ...
 
 
-APPLICATION_NAME = "City Navigator - Master Data Service"
+APPLICATION_NAME = "City Navigator - Query Service"
 APPLICATION_VERSION = "0.1.0"
 
 
