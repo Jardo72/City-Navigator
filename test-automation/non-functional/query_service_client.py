@@ -28,8 +28,10 @@ class QueryServiceClient(AbstractClient):
     def get_means_of_transport_list(self) -> Response:
         return self._get_request("/means-of-transport")
 
-    def get_station_list(self) -> Response:
-        return self._get_request("/stations")
+    def get_station_list(self, filter: str = None) -> Response:
+        if filter is None:
+            return self._get_request("/stations")
+        return self._get_request("/stations", params={"filter": filter})
 
     def get_station_details(self, name: str) -> Response:
         return self._get_request("/station", params={"name": name})
@@ -53,18 +55,24 @@ def main() -> None:
         print(f"Status code = {response.status_code}, duration = {response.duration_millis} millis")
 
     print()
+    print("Stations with filter")
+    for filter in "A*", "Sch*", "Br*", "H*", "K*", "P*", "T*":
+        response = client.get_station_list(filter)
+        print(f"Status code = {response.status_code}, duration = {response.duration_millis} millis")
+
+    print()
     print("Lines")
     for _ in range(20):
         response = client.get_line_list()
         print(f"Status code = {response.status_code}, duration = {response.duration_millis} millis")
 
     print()
-    print("Jounrey plans")
+    print("Journey plans")
     journeys = [
         ("Simmering", "Albertinaplatz"),
         ("Karlsplatz", "Alte Donau"),
         ("Am Tabor", "Herrengasse"),
-        ("Schoenbrunn", "Heiligenstadt"),
+        ("Schoenbrunn", "Am Tabor"),
         ("Penzing", "Rauscherstrasse"),
         ("Krottenbachstrasse", "Heiligenstadt"),
         ("Ottakring", "Sorgenthalgasse")
