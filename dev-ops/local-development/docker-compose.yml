@@ -22,6 +22,8 @@ services:
     image: jardo72/city-navigator-master-data-service:latest
     environment:
       - DATABASE_URL=sqlite:////db/sqlite.db
+    expose:
+      - 8000
     networks:
       - service-network
     volumes:
@@ -37,6 +39,8 @@ services:
     image: jardo72/city-navigator-query-service:latest
     depends_on:
       - master-data-service
+    expose:
+      - 8000
     environment:
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
     networks:
@@ -57,6 +61,20 @@ services:
       - service-network
     ports:
       - 80:80
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+
+  prometheus-server:
+    image: jardo72/city-navigator-prometheus:latest
+    depends_on:
+      - master-data-server
+      - query-service
+    networks:
+      - service-network
+    ports:
+      - 9090:9090
     deploy:
       restart_policy:
         condition: on-failure
