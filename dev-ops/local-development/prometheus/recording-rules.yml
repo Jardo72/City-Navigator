@@ -1,0 +1,6 @@
+groups:
+  - name: City-Navigator-Requests
+    rules:
+      - record: "job_handler:http_requests_total:rate"
+        expr: rate(http_requests{job="query-service", handler!~"/(version|metrics)"}[1m])
+
