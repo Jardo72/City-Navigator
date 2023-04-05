@@ -18,8 +18,18 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from dataclasses import dataclass
+from typing import Tuple
 
-from config import read_from_file
+from config import Config, read_from_file
+from query_service_client import QueryServiceClient
+
+
+@dataclass(frozen=True, slots=True)
+class DataCollections:
+    means_of_transport: Tuple[str]
+    stations: Tuple[str]
+    lines: Tuple[str]
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
@@ -40,15 +50,40 @@ def parse_command_line_arguments() -> Namespace:
     return params
 
 
+def read_lists_from_master_data(config: Config) -> DataCollections:
+    client = QueryServiceClient(config.query_service_base_url)
+
+    response = client.get_means_of_transport_list()
+    assert response.status_code == 200
+    means_of_transport = map(lambda d: d["identifier"], response.json_data)
+
+    response = client.get_station_list()
+    assert response.status_code == 200
+    stations = map(lambda d: d["name"], response.json_data)
+
+    response = client.get_line_list()
+    assert response.status_code == 200
+    lines = map(lambda d: d["label"], response.json_data)
+
+    return DataCollections(
+        means_of_transport=tuple(means_of_transport),
+        stations=tuple(stations),
+        lines=tuple(lines)
+    )
+
+
 def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     config = read_from_file(command_line_arguments.config_file)
-    print(config)
+    data_collections = read_lists_from_master_data(config)
+    print(data_collections.means_of_transport)
+    print(data_collections.stations)
+    print(data_collections.lines)
     # TODO: 
-    # - load the lists of means of transport, lines & stations so you can use them to generate random requests
     # - start the configured number of threads
     # - wait for the completion of threads
     # - summarize the statistics (number of successful/failed requests, min/max/avg response times per request type)
+    # - print the statistics
 
 
 if __name__ == "__main__":
