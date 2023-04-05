@@ -19,6 +19,7 @@
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from dataclasses import dataclass
+from random import randint
 from typing import Tuple
 
 from config import Config, read_from_file
@@ -30,6 +31,24 @@ class DataCollections:
     means_of_transport: Tuple[str]
     stations: Tuple[str]
     lines: Tuple[str]
+
+
+class RandomSelector:
+
+    def __init__(self, values: Tuple[str]) -> None:
+        self._values = values
+        self._max_index = len(values) - 1
+
+    def radnom_value(self) -> str:
+        random_index = randint(0, self._max_index)
+        return self._values[random_index]
+
+    def random_pair(self) -> Tuple[str, str]:
+        a = self.radnom_value()
+        b = self.radnom_value()
+        while a == b:
+            b = self.radnom_value()
+        return (a, b)
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
@@ -72,13 +91,20 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
     )
 
 
+def query_journey_plans(config: Config, stations: Tuple[str]) -> None:
+    client = QueryServiceClient(config.query_service_base_url)
+    selector = RandomSelector(stations)
+    for _ in range(100):
+        start, destination =selector.random_pair()
+        response = client.search_journey_plan(start, destination)
+        print(f"Status code = {response.status_code}, duration {response.duration_millis} millis")
+
+
 def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     config = read_from_file(command_line_arguments.config_file)
     data_collections = read_lists_from_master_data(config)
-    print(data_collections.means_of_transport)
-    print(data_collections.stations)
-    print(data_collections.lines)
+    query_journey_plans(config, data_collections.stations)
     # TODO: 
     # - start the configured number of threads
     # - wait for the completion of threads
