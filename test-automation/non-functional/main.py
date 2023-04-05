@@ -18,8 +18,11 @@
 #
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from random import randint
+from threading import Thread
+from time import perf_counter
 from typing import Tuple
 
 from config import Config, read_from_file
@@ -49,6 +52,17 @@ class RandomSelector:
         while a == b:
             b = self.radnom_value()
         return (a, b)
+
+
+class Timeout:
+
+    def __init__(self, timeout_min: int) -> None:
+        self._start_time = perf_counter()
+        self._timeout_millis = 60 * 1000 * timeout_min
+
+    def has_not_expired_yet(self) -> bool:
+        current_time = perf_counter()
+        return (1000 * (current_time - self._start_time)) < self._timeout_millis
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
@@ -93,18 +107,24 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
 
 def query_journey_plans(config: Config, stations: Tuple[str]) -> None:
     client = QueryServiceClient(config.query_service_base_url)
+    timeout = Timeout(config.test_duration_minutes)
     selector = RandomSelector(stations)
-    for _ in range(100):
-        start, destination =selector.random_pair()
-        response = client.search_journey_plan(start, destination)
-        print(f"Status code = {response.status_code}, duration {response.duration_millis} millis")
+    while timeout.has_not_expired_yet():
+        for _ in range(10):
+            start, destination =selector.random_pair()
+            response = client.search_journey_plan(start, destination)
+            print(f"Status code = {response.status_code}, duration {response.duration_millis} millis")
 
 
 def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     config = read_from_file(command_line_arguments.config_file)
     data_collections = read_lists_from_master_data(config)
-    query_journey_plans(config, data_collections.stations)
+    thread_list = []
+    for _ in range(config.journey_plan_search_threads):
+        thread = Thread(target=query_journey_plans, args=(config, data_collections.stations), daemon=False)
+        thread_list.append(thread)
+        thread.start()
     # TODO: 
     # - start the configured number of threads
     # - wait for the completion of threads
