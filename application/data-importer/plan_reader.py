@@ -39,7 +39,7 @@ def _read_single_line(json_data: Dict[str, Any]) -> Line:
     return Line(label, means_of_transport, itinerary)
 
 
-def _read_from_dict(json_data: Dict[str, Any]) -> CityPlan:
+def _read_city_plan(json_data: Dict[str, Any]) -> CityPlan:
     lines: List[Line] = []
     version = json_data['version']
     for element in json_data['lines']:
@@ -50,5 +50,5 @@ def _read_from_dict(json_data: Dict[str, Any]) -> CityPlan:
 
 def read_from_file(filename: str) -> CityPlan:
     with open(filename, "r") as json_file:
-        json_string = load(json_file)
-        return _read_from_dict(json_string)
+        json_data = load(json_file)
+        return _read_city_plan(json_data)

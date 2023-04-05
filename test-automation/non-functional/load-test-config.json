@@ -1,0 +1,6 @@
+{
+    "query_service_base_url": "",
+    "test_duration_minutes": 10,
+    "journey_plan_search_threads": 5,
+    "non_journey_plan_search_threads": 5
+}
