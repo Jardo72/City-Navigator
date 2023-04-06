@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+from __future__ import annotations
+
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from dataclasses import dataclass
 from random import randint
@@ -73,6 +75,21 @@ class TestThreadSummary:
     overall_success_duration_millis: int
     min_success_duration_millis: int
     max_success_duration_millis: int
+
+    @property
+    def avg_success_duration_millis(self) -> int:
+        return round(self.overall_success_duration_millis / self.success_count)
+
+    def __add__(self, other: TestThreadSummary) -> TestThreadSummary:
+        assert isinstance(other, TestThreadSummary)
+        return TestThreadSummary(
+            success_count=self.success_count + other.success_count,
+            client_error_count=self.client_error_count + other.client_error_count,
+            server_error_count=self.server_error_count + other.server_error_count,
+            overall_success_duration_millis=self.overall_success_duration_millis + other.overall_success_duration_millis,
+            min_success_duration_millis=self.min_success_duration_millis + other.min_success_duration_millis,
+            max_success_duration_millis=self.max_success_duration_millis + other.max_success_duration_millis
+        )
 
 
 class TestThreadSummaryCollector:
