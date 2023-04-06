@@ -227,9 +227,18 @@ def main() -> None:
     data_collections = read_lists_from_master_data(config)
     thread_list = []
     for _ in range(config.journey_plan_search_threads):
-        thread = Thread(target=search_journey_plans, args=(config, data_collections.stations), daemon=False)
+        thread = JourneyPlanSearchThread(config, data_collections.stations)
         thread_list.append(thread)
         thread.start()
+    summary = None
+    for thread in thread_list:
+        thread.join()
+        if summary is None:
+            summary = thread.get_summary()
+        else:
+            summary += thread.get_summary()
+    print(summary)
+
     # TODO: 
     # - start the configured number of threads
     # - wait for the completion of threads
