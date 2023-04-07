@@ -87,8 +87,8 @@ class TestThreadSummary:
             client_error_count=self.client_error_count + other.client_error_count,
             server_error_count=self.server_error_count + other.server_error_count,
             overall_success_duration_millis=self.overall_success_duration_millis + other.overall_success_duration_millis,
-            min_success_duration_millis=self.min_success_duration_millis + other.min_success_duration_millis,
-            max_success_duration_millis=self.max_success_duration_millis + other.max_success_duration_millis
+            min_success_duration_millis=min(self.min_success_duration_millis, other.min_success_duration_millis),
+            max_success_duration_millis=max(self.max_success_duration_millis, other.max_success_duration_millis)
         )
 
 
@@ -225,6 +225,8 @@ def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     config = read_from_file(command_line_arguments.config_file)
     data_collections = read_lists_from_master_data(config)
+
+    print()
     thread_list = []
     for _ in range(config.journey_plan_search_threads):
         thread = JourneyPlanSearchThread(config, data_collections.stations)
@@ -237,12 +239,14 @@ def main() -> None:
             summary = thread.get_summary()
         else:
             summary += thread.get_summary()
+        print(f"Intermediate summary: {summary}")
     print()
     print("Journey plan search summary")
     print(summary)
 
+    print()
     thread_list = []
-    for _ in range(config.journey_plan_search_threads):
+    for _ in range(config.non_journey_plan_search_threads):
         thread = StationQueryThread(config, data_collections.stations)
         thread_list.append(thread)
         thread.start()
@@ -253,8 +257,9 @@ def main() -> None:
             summary = thread.get_summary()
         else:
             summary += thread.get_summary()
+        print(f"Intermediate summary: {summary}")
     print()
-    print("Stations queries summary")
+    print("Station queries summary")
     print(summary)
 
     # TODO: 
