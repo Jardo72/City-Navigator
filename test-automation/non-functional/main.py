@@ -25,7 +25,8 @@ from threading import Thread
 from typing import Tuple
 
 from config import Config, read_from_file
-from rest import QueryServiceClient, Response
+from rest import QueryServiceClient
+from stats import Collector, Summary
 from util import RandomSelector, Timeout
 
 
@@ -36,70 +37,72 @@ class DataCollections:
     lines: Tuple[str]
 
 
-@dataclass(frozen=True, slots=True)
-class TestThreadSummary:
-    success_count: int
-    client_error_count: int
-    server_error_count: int
-    overall_success_duration_millis: int
-    min_success_duration_millis: int
-    max_success_duration_millis: int
+# TODO: remove
+# @dataclass(frozen=True, slots=True)
+# class TestThreadSummary:
+#     success_count: int
+#     client_error_count: int
+#     server_error_count: int
+#     overall_success_duration_millis: int
+#     min_success_duration_millis: int
+#     max_success_duration_millis: int
 
-    @property
-    def avg_success_duration_millis(self) -> int:
-        return round(self.overall_success_duration_millis / self.success_count)
+#     @property
+#     def avg_success_duration_millis(self) -> int:
+#         return round(self.overall_success_duration_millis / self.success_count)
 
-    def __add__(self, other: TestThreadSummary) -> TestThreadSummary:
-        assert isinstance(other, TestThreadSummary)
-        return TestThreadSummary(
-            success_count=self.success_count + other.success_count,
-            client_error_count=self.client_error_count + other.client_error_count,
-            server_error_count=self.server_error_count + other.server_error_count,
-            overall_success_duration_millis=self.overall_success_duration_millis + other.overall_success_duration_millis,
-            min_success_duration_millis=min(self.min_success_duration_millis, other.min_success_duration_millis),
-            max_success_duration_millis=max(self.max_success_duration_millis, other.max_success_duration_millis)
-        )
+#     def __add__(self, other: TestThreadSummary) -> TestThreadSummary:
+#         assert isinstance(other, TestThreadSummary)
+#         return TestThreadSummary(
+#             success_count=self.success_count + other.success_count,
+#             client_error_count=self.client_error_count + other.client_error_count,
+#             server_error_count=self.server_error_count + other.server_error_count,
+#             overall_success_duration_millis=self.overall_success_duration_millis + other.overall_success_duration_millis,
+#             min_success_duration_millis=min(self.min_success_duration_millis, other.min_success_duration_millis),
+#             max_success_duration_millis=max(self.max_success_duration_millis, other.max_success_duration_millis)
+#         )
 
 
-class TestThreadSummaryCollector:
+# TODO: remove
+# class TestThreadSummaryCollector:
 
-    def __init__(self) -> None:
-        self._success_count: int = 0
-        self._client_error_count: int = 0
-        self._server_error_count: int = 0
-        self._overall_success_duration_millis: int = 0
-        self._min_success_duration_millis: int = 1000000
-        self._max_success_duration_millis: int = 0
+#     def __init__(self) -> None:
+#         self._success_count: int = 0
+#         self._client_error_count: int = 0
+#         self._server_error_count: int = 0
+#         self._overall_success_duration_millis: int = 0
+#         self._min_success_duration_millis: int = 1000000
+#         self._max_success_duration_millis: int = 0
 
-    def add(self, response: Response) -> None:
-        if 200 <= response.status_code < 300:
-            self._success_count += 1
-            self._overall_success_duration_millis += response.duration_millis
-            if self._min_success_duration_millis > response.duration_millis:
-                self._min_success_duration_millis = response.duration_millis
-            if self._max_success_duration_millis < response.duration_millis:
-                self._max_success_duration_millis = response.duration_millis
-        if 400 <= response.status_code < 500:
-            self._client_error_count += 1
-        if 500 <= response.status_code < 600:
-            self._server_error_count += 1
+#     def add(self, response: Response) -> None:
+#         if 200 <= response.status_code < 300:
+#             self._success_count += 1
+#             self._overall_success_duration_millis += response.duration_millis
+#             if self._min_success_duration_millis > response.duration_millis:
+#                 self._min_success_duration_millis = response.duration_millis
+#             if self._max_success_duration_millis < response.duration_millis:
+#                 self._max_success_duration_millis = response.duration_millis
+#         if 400 <= response.status_code < 500:
+#             self._client_error_count += 1
+#         if 500 <= response.status_code < 600:
+#             self._server_error_count += 1
 
-    def get_summary(self) -> TestThreadSummary:
-        return TestThreadSummary(
-            success_count=self._success_count,
-            client_error_count=self._client_error_count,
-            server_error_count=self._server_error_count,
-            overall_success_duration_millis=self._overall_success_duration_millis,
-            min_success_duration_millis=self._min_success_duration_millis,
-            max_success_duration_millis=self._max_success_duration_millis
-        )
+#     def get_summary(self) -> TestThreadSummary:
+#         return TestThreadSummary(
+#             success_count=self._success_count,
+#             client_error_count=self._client_error_count,
+#             server_error_count=self._server_error_count,
+#             overall_success_duration_millis=self._overall_success_duration_millis,
+#             min_success_duration_millis=self._min_success_duration_millis,
+#             max_success_duration_millis=self._max_success_duration_millis
+#         )
 
 
 class JourneyPlanSearchThread(Thread):
 
     def __init__(self, config: Config, stations: Tuple[str]) -> None:
         super().__init__(daemon=False)
-        self._summary_collector = TestThreadSummaryCollector()
+        self._summary_collector = Collector()
         self._stations = stations
         self._config = config
 
@@ -113,7 +116,7 @@ class JourneyPlanSearchThread(Thread):
                 response = client.search_journey_plan(start, destination)
                 self._summary_collector.add(response)
 
-    def get_summary(self) -> TestThreadSummary:
+    def get_summary(self) -> Summary:
         return self._summary_collector.get_summary()
 
 
@@ -121,7 +124,7 @@ class StationQueryThread(Thread):
 
     def __init__(self, config: Config, stations: Tuple[str]) -> None:
         super().__init__(daemon=False)
-        self._summary_collector = TestThreadSummaryCollector()
+        self._summary_collector = Collector()
         self._stations = stations
         self._config = config
 
@@ -135,7 +138,7 @@ class StationQueryThread(Thread):
                 response = client.get_station_details(name)
                 self._summary_collector.add(response)
 
-    def get_summary(self) -> TestThreadSummary:
+    def get_summary(self) -> Summary:
         return self._summary_collector.get_summary()
 
 

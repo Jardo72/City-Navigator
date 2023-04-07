@@ -35,9 +35,9 @@ class Summary:
     def avg_success_duration_millis(self) -> int:
         return round(self.overall_success_duration_millis / self.success_count)
 
-    def __add__(self, other: TestThreadSummary) -> TestThreadSummary:
-        assert isinstance(other, TestThreadSummary)
-        return TestThreadSummary(
+    def __add__(self, other: Summary) -> Summary:
+        assert isinstance(other, Summary)
+        return Summary(
             success_count=self.success_count + other.success_count,
             client_error_count=self.client_error_count + other.client_error_count,
             server_error_count=self.server_error_count + other.server_error_count,
