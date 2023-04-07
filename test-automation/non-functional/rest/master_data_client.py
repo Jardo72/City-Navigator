@@ -17,6 +17,20 @@
 # limitations under the License.
 #
 
-from .master_data_client import MasterDataClient
-from .query_service_client import QueryServiceClient
+from .abstract_client import AbstractClient
 from .response import Response
+
+
+class MasterDataClient(AbstractClient):
+
+    def __init__(self, base_url: str) -> None:
+        super().__init__(base_url)
+
+    def get_means_of_transport_list(self) -> Response:
+        return self._get_request("/means-of-transport")
+
+    def get_station_list(self) -> Response:
+        return self._get_request("/stations")
+
+    def get_line_list(self) -> Response:
+        return self._get_request("/lines")
