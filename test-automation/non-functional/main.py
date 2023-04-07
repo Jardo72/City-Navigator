@@ -20,20 +20,12 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-from dataclasses import dataclass
 from threading import Thread
 from typing import Tuple
 
 from config import Config, read_from_file
 from rest import QueryServiceClient
-from util import Collector, RandomSelector, Summary, Timeout
-
-
-@dataclass(frozen=True, slots=True)
-class DataCollections:
-    means_of_transport: Tuple[str]
-    stations: Tuple[str]
-    lines: Tuple[str]
+from util import Collector, DataCollections, RandomSelector, Summary, Timeout
 
 
 class JourneyPlanSearchThread(Thread):

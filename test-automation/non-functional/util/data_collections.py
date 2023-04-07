@@ -17,8 +17,12 @@
 # limitations under the License.
 #
 
-from .collector import Collector
-from .data_collections import DataCollections
-from .random_selector import RandomSelector
-from .summary import Summary
-from .timeout import Timeout
+from dataclasses import dataclass
+from typing import Tuple
+
+
+@dataclass(frozen=True, slots=True)
+class DataCollections:
+    means_of_transport: Tuple[str]
+    stations: Tuple[str]
+    lines: Tuple[str]
