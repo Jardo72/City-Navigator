@@ -148,6 +148,28 @@ class JourneyPlanSearchThread(Thread):
         return self._summary_collector.get_summary()
 
 
+class StationQueryThread(Thread):
+
+    def __init__(self, config: Config, stations: Tuple[str]) -> None:
+        super().__init__(daemon=False)
+        self._summary_collector = TestThreadSummaryCollector()
+        self._stations = stations
+        self._config = config
+
+    def run(self) -> None:
+        client = QueryServiceClient(self._config.query_service_base_url)
+        timeout = Timeout(self._config.test_duration_minutes)
+        selector = RandomSelector(self._stations)
+        while timeout.has_not_expired_yet():
+            for _ in range(10):
+                name = selector.random_value()
+                response = client.get_station_details(name)
+                self._summary_collector.add(response)
+
+    def get_summary(self) -> TestThreadSummary:
+        return self._summary_collector.get_summary()
+
+
 def create_command_line_arguments_parser() -> ArgumentParser:
     parser = ArgumentParser(description="City Navigator - Query Service Load Test", formatter_class=RawTextHelpFormatter)
 
@@ -188,28 +210,6 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
     )
 
 
-def search_journey_plans(config: Config, stations: Tuple[str]) -> None:
-    client = QueryServiceClient(config.query_service_base_url)
-    timeout = Timeout(config.test_duration_minutes)
-    selector = RandomSelector(stations)
-    while timeout.has_not_expired_yet():
-        for _ in range(10):
-            start, destination = selector.random_pair()
-            response = client.search_journey_plan(start, destination)
-            print(f"Status code = {response.status_code}, duration {response.duration_millis} millis")
-
-
-def query_stations(config: Config, stations: Tuple[str]) -> None:
-    client = QueryServiceClient(config.query_service_base_url)
-    timeout = Timeout(config.test_duration_minutes)
-    selector = RandomSelector(stations)
-    while timeout.has_not_expired_yet():
-        for _ in range(10):
-            name = selector.random_value()
-            response = client.get_station_details(name)
-            print(f"Status code = {response.status_code}, duration {response.duration_millis} millis")
-
-
 def query_lines(config: Config, lines: Tuple[str]) -> None:
     client = QueryServiceClient(config.query_service_base_url)
     timeout = Timeout(config.test_duration_minutes)
@@ -237,6 +237,24 @@ def main() -> None:
             summary = thread.get_summary()
         else:
             summary += thread.get_summary()
+    print()
+    print("Journey plan search summary")
+    print(summary)
+
+    thread_list = []
+    for _ in range(config.journey_plan_search_threads):
+        thread = StationQueryThread(config, data_collections.stations)
+        thread_list.append(thread)
+        thread.start()
+    summary = None
+    for thread in thread_list:
+        thread.join()
+        if summary is None:
+            summary = thread.get_summary()
+        else:
+            summary += thread.get_summary()
+    print()
+    print("Stations queries summary")
     print(summary)
 
     # TODO: 
