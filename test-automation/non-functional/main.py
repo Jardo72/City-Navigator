@@ -22,13 +22,9 @@ from __future__ import annotations
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 
 from config import Config, read_from_file
+from executor import TestRun
 from rest import QueryServiceClient
 from util import DataCollections
-
-# TODO: most likely not needed - should be encapsulated by some facade
-from executor.journey_plan_search_thread import JourneyPlanSearchThread
-from executor.line_query_thread import LineQueryThread
-from executor.station_query_thread import StationQueryThread
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
@@ -75,44 +71,10 @@ def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     config = read_from_file(command_line_arguments.config_file)
     data_collections = read_lists_from_master_data(config)
-
-    print()
-    thread_list = []
-    for _ in range(config.journey_plan_search_threads):
-        thread = JourneyPlanSearchThread(config, data_collections.stations)
-        thread_list.append(thread)
-        thread.start()
-    summary = None
-    for thread in thread_list:
-        if summary is None:
-            summary = thread.wait_for_summary()
-        else:
-            summary += thread.wait_for_summary()
-        print(f"Intermediate summary: {summary}")
-    print()
-    print("Journey plan search summary")
-    print(summary)
-
-    print()
-    thread_list = []
-    for _ in range(config.station_query_threads):
-        thread = StationQueryThread(config, data_collections.stations)
-        thread_list.append(thread)
-        thread.start()
-    summary = None
-    for thread in thread_list:
-        if summary is None:
-            summary = thread.wait_for_summary()
-        else:
-            summary += thread.wait_for_summary()
-        print(f"Intermediate summary: {summary}")
-    print()
-    print("Station queries summary")
-    print(summary)
+    test_run = TestRun(config, data_collections)
+    test_run.run()
 
     # TODO: 
-    # - start the configured number of threads
-    # - wait for the completion of threads
     # - summarize the statistics (number of successful/failed requests, min/max/avg response times per request type)
     # - print the statistics
 

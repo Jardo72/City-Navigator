@@ -26,7 +26,7 @@ from util import RandomSelector
 from .abstract_test_thread import AbstractTestThread
 
 
-class StationQueryThread(AbstractTestThread):
+class StationFilterThread(AbstractTestThread):
 
     def __init__(self, config: Config) -> None:
         super().__init__(config)
