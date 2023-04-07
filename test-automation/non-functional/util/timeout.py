@@ -17,28 +17,15 @@
 # limitations under the License.
 #
 
-from abstract_client import AbstractClient, Response
+from time import perf_counter
 
 
-class MasterDataClient(AbstractClient):
+class Timeout:
 
-    def __init__(self, base_url: str) -> None:
-        super().__init__(base_url)
+    def __init__(self, timeout_min: int) -> None:
+        self._start_time = perf_counter()
+        self._timeout_millis = 60 * 1000 * timeout_min
 
-    def get_means_of_transport_list(self) -> Response:
-        return self._get_request("/means-of-transport")
-
-    def get_station_list(self) -> Response:
-        return self._get_request("/stations")
-
-    def get_line_list(self) -> Response:
-        return self._get_request("/lines")
-
-
-def main() -> None:
-    client = MasterDataClient("http://localhost/city-navigator/api/master-data")
-    print(client.get_means_of_transport_list())
-
-
-if __name__ == "__main__":
-    main()
+    def has_not_expired_yet(self) -> bool:
+        current_time = perf_counter()
+        return (1000 * (current_time - self._start_time)) < self._timeout_millis

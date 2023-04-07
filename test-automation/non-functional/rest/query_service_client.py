@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-from abstract_client import AbstractClient
+from .abstract_client import AbstractClient
 from .response import Response
 
 

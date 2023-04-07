@@ -21,14 +21,12 @@ from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from dataclasses import dataclass
-from random import randint
 from threading import Thread
-from time import perf_counter
 from typing import Tuple
 
-from abstract_client import Response
 from config import Config, read_from_file
-from query_service_client import QueryServiceClient
+from rest import QueryServiceClient, Response
+from util import RandomSelector, Timeout
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,35 +34,6 @@ class DataCollections:
     means_of_transport: Tuple[str]
     stations: Tuple[str]
     lines: Tuple[str]
-
-
-class RandomSelector:
-
-    def __init__(self, values: Tuple[str]) -> None:
-        self._values = values
-        self._max_index = len(values) - 1
-
-    def random_value(self) -> str:
-        random_index = randint(0, self._max_index)
-        return self._values[random_index]
-
-    def random_pair(self) -> Tuple[str, str]:
-        a = self.random_value()
-        b = self.random_value()
-        while a == b:
-            b = self.random_value()
-        return (a, b)
-
-
-class Timeout:
-
-    def __init__(self, timeout_min: int) -> None:
-        self._start_time = perf_counter()
-        self._timeout_millis = 60 * 1000 * timeout_min
-
-    def has_not_expired_yet(self) -> bool:
-        current_time = perf_counter()
-        return (1000 * (current_time - self._start_time)) < self._timeout_millis
 
 
 @dataclass(frozen=True, slots=True)
