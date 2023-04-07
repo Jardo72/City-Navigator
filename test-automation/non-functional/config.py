@@ -28,6 +28,7 @@ class Config:
     journey_plan_search_threads: int
     line_query_threads: int
     station_query_threads: int
+    station_filter_threads: int
 
 
 def read_from_file(filename: str) -> Config:
@@ -38,5 +39,6 @@ def read_from_file(filename: str) -> Config:
             test_duration_minutes=json_data["test_duration_minutes"],
             journey_plan_search_threads=json_data["journey_plan_search_threads"],
             line_query_threads=json_data["line_query_threads"],
-            station_query_threads=json_data["station_query_threads"]
+            station_query_threads=json_data["station_query_threads"],
+            station_filter_threads=json_data["station_filter_threads"]
         )

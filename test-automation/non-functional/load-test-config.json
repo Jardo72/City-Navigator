@@ -3,5 +3,6 @@
     "test_duration_minutes": 2,
     "journey_plan_search_threads": 5,
     "line_query_threads": 3,
-    "station_query_threads": 3
+    "station_query_threads": 3,
+    "station_filter_threads": 3
 }

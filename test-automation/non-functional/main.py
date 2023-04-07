@@ -20,11 +20,10 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-from typing import Tuple
 
 from config import Config, read_from_file
 from rest import QueryServiceClient
-from util import DataCollections, RandomSelector, Timeout
+from util import DataCollections
 
 # TODO: most likely not needed - should be encapsulated by some facade
 from executor.journey_plan_search_thread import JourneyPlanSearchThread
@@ -70,17 +69,6 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
         stations=tuple(stations),
         lines=tuple(lines)
     )
-
-
-def query_lines(config: Config, lines: Tuple[str]) -> None:
-    client = QueryServiceClient(config.query_service_base_url)
-    timeout = Timeout(config.test_duration_minutes)
-    selector = RandomSelector(lines)
-    while timeout.has_not_expired_yet():
-        for _ in range(10):
-            label = selector.random_value()
-            response = client.get_line_details(label)
-            print(f"Status code = {response.status_code}, duration {response.duration_millis} millis")
 
 
 def main() -> None:
