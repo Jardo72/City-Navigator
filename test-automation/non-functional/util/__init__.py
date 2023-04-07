@@ -17,5 +17,7 @@
 # limitations under the License.
 #
 
+from .collector import Collector
 from .random_selector import RandomSelector
+from .summary import Summary
 from .timeout import Timeout

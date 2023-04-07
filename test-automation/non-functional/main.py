@@ -26,8 +26,7 @@ from typing import Tuple
 
 from config import Config, read_from_file
 from rest import QueryServiceClient
-from stats import Collector, Summary
-from util import RandomSelector, Timeout
+from util import Collector, RandomSelector, Summary, Timeout
 
 
 @dataclass(frozen=True, slots=True)
