@@ -49,10 +49,10 @@ class RandomSelector:
         return self._values[random_index]
 
     def random_pair(self) -> Tuple[str, str]:
-        a = self.radnom_value()
-        b = self.radnom_value()
+        a = self.random_value()
+        b = self.random_value()
         while a == b:
-            b = self.radnom_value()
+            b = self.random_value()
         return (a, b)
 
 
@@ -130,18 +130,18 @@ class JourneyPlanSearchThread(Thread):
 
     def __init__(self, config: Config, stations: Tuple[str]) -> None:
         super().__init__(daemon=False)
-        self._client = QueryServiceClient(config.query_service_base_url)
         self._summary_collector = TestThreadSummaryCollector()
         self._stations = stations
         self._config = config
 
     def run(self) -> None:
+        client = QueryServiceClient(self._config.query_service_base_url)
         timeout = Timeout(self._config.test_duration_minutes)
         selector = RandomSelector(self._stations)
         while timeout.has_not_expired_yet():
             for _ in range(10):
-                name = selector.random_value()
-                response = self._client.get_station_details(name)
+                start, destination = selector.random_pair()
+                response = client.search_journey_plan(start, destination)
                 self._summary_collector.add(response)
 
     def get_summary(self) -> TestThreadSummary:
