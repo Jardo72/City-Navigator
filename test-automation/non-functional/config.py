@@ -26,7 +26,8 @@ class Config:
     query_service_base_url: str
     test_duration_minutes: int
     journey_plan_search_threads: int
-    non_journey_plan_search_threads: int
+    line_query_threads: int
+    station_query_threads: int
 
 
 def read_from_file(filename: str) -> Config:
@@ -36,5 +37,6 @@ def read_from_file(filename: str) -> Config:
             query_service_base_url=json_data["query_service_base_url"],
             test_duration_minutes=json_data["test_duration_minutes"],
             journey_plan_search_threads=json_data["journey_plan_search_threads"],
-            non_journey_plan_search_threads=json_data["non_journey_plan_search_threads"]
+            line_query_threads=json_data["line_query_threads"],
+            station_query_threads=json_data["station_query_threads"]
         )

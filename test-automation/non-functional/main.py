@@ -20,56 +20,16 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-from threading import Thread
 from typing import Tuple
 
 from config import Config, read_from_file
 from rest import QueryServiceClient
-from util import Collector, DataCollections, RandomSelector, Summary, Timeout
+from util import DataCollections, RandomSelector, Timeout
 
-
-class JourneyPlanSearchThread(Thread):
-
-    def __init__(self, config: Config, stations: Tuple[str]) -> None:
-        super().__init__(daemon=False)
-        self._summary_collector = Collector()
-        self._stations = stations
-        self._config = config
-
-    def run(self) -> None:
-        client = QueryServiceClient(self._config.query_service_base_url)
-        timeout = Timeout(self._config.test_duration_minutes)
-        selector = RandomSelector(self._stations)
-        while timeout.has_not_expired_yet():
-            for _ in range(10):
-                start, destination = selector.random_pair()
-                response = client.search_journey_plan(start, destination)
-                self._summary_collector.add(response)
-
-    def get_summary(self) -> Summary:
-        return self._summary_collector.get_summary()
-
-
-class StationQueryThread(Thread):
-
-    def __init__(self, config: Config, stations: Tuple[str]) -> None:
-        super().__init__(daemon=False)
-        self._summary_collector = Collector()
-        self._stations = stations
-        self._config = config
-
-    def run(self) -> None:
-        client = QueryServiceClient(self._config.query_service_base_url)
-        timeout = Timeout(self._config.test_duration_minutes)
-        selector = RandomSelector(self._stations)
-        while timeout.has_not_expired_yet():
-            for _ in range(10):
-                name = selector.random_value()
-                response = client.get_station_details(name)
-                self._summary_collector.add(response)
-
-    def get_summary(self) -> Summary:
-        return self._summary_collector.get_summary()
+# TODO: most likely not needed - should be encapsulated by some facade
+from executor.journey_plan_search_thread import JourneyPlanSearchThread
+from executor.line_query_thread import LineQueryThread
+from executor.station_query_thread import StationQueryThread
 
 
 def create_command_line_arguments_parser() -> ArgumentParser:
@@ -136,11 +96,10 @@ def main() -> None:
         thread.start()
     summary = None
     for thread in thread_list:
-        thread.join()
         if summary is None:
-            summary = thread.get_summary()
+            summary = thread.wait_for_summary()
         else:
-            summary += thread.get_summary()
+            summary += thread.wait_for_summary()
         print(f"Intermediate summary: {summary}")
     print()
     print("Journey plan search summary")
@@ -148,17 +107,16 @@ def main() -> None:
 
     print()
     thread_list = []
-    for _ in range(config.non_journey_plan_search_threads):
+    for _ in range(config.station_query_threads):
         thread = StationQueryThread(config, data_collections.stations)
         thread_list.append(thread)
         thread.start()
     summary = None
     for thread in thread_list:
-        thread.join()
         if summary is None:
-            summary = thread.get_summary()
+            summary = thread.wait_for_summary()
         else:
-            summary += thread.get_summary()
+            summary += thread.wait_for_summary()
         print(f"Intermediate summary: {summary}")
     print()
     print("Station queries summary")
