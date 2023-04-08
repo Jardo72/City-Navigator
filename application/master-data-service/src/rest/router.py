@@ -17,20 +17,26 @@
 # limitations under the License.
 #
 
+from logging import getLogger
 from typing import List
 from uuid import uuid4
 
 from fastapi import Depends, APIRouter, status
 from sqlalchemy.orm import Session
+from redis import Redis
 
 from db import Line, MeansOfTransport, Station
 from db import get_db
+from notifications import get_redis
 
 from .dto import LineDetails, LineInfo, LineRequest
 from .dto import MeansOfTransportDetails, MeansOfTransportRequest
 from .dto import StationDetails, StationRequest
 from .errors import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
 from .mapping import as_line_details, as_line_info, as_means_of_transport, as_station_details
+
+
+_logger = getLogger("rest")
 
 
 router = APIRouter()
@@ -56,17 +62,26 @@ async def get_means_of_transport(uuid: str, db: Session = Depends(get_db)):
     return as_means_of_transport(record)
 
 
-@router.post("/means-of-transport/", response_model=MeansOfTransportDetails, status_code=status.HTTP_201_CREATED)
-async def create_means_of_transport(request: MeansOfTransportRequest, db: Session = Depends(get_db)):
+@router.post("/means-of-transport", response_model=MeansOfTransportDetails, status_code=status.HTTP_201_CREATED)
+async def create_means_of_transport(
+    request: MeansOfTransportRequest,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     means_of_transport = MeansOfTransport()
     means_of_transport.uuid = str(uuid4())
     means_of_transport.identifier = request.identifier
     db.add(means_of_transport)
     db.commit()
-    return MeansOfTransportDetails(
+    _logger.debug("New means of transport inserted into the database")
+    result = MeansOfTransportDetails(
         uuid=means_of_transport.uuid,
         identifier=request.identifier
     )
+    # TODO: real message content would be highly appreciated
+    redis.publish(channel="means-of-transport", message="Means of transport created")
+    _logger.debug("Notification published to Redis")
+    return result
 
 
 @router.put("/means-of-transport/{uuid}")
@@ -81,7 +96,11 @@ async def update_means_of_transport(uuid: str, request: MeansOfTransportRequest,
 
 
 @router.delete("/means-of-transport/{uuid}")
-async def delete_means_of_transport(uuid: str, db: Session = Depends(get_db)):
+async def delete_means_of_transport(
+    uuid: str,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     """
     Deletes the means of transport with the given UUID.
     """
@@ -90,6 +109,9 @@ async def delete_means_of_transport(uuid: str, db: Session = Depends(get_db)):
         raise means_of_transport_not_found_exception(uuid)
     db.delete(record)
     db.commit()
+    _logger.debug("Means of transport deleted from the database")
+    redis.publish(channel="means-of-transport", message="Means of transport deleted")
+    _logger.debug("Notification published to Redis")
 
 
 @router.get("/stations", response_model=List[StationDetails])
