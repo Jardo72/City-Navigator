@@ -17,6 +17,20 @@
 # limitations under the License.
 #
 
-from .data_collections import DataCollections
-from .random_selector import RandomSelector
-from .timeout import Timeout
+from dataclasses import dataclass
+from datetime import datetime
+
+from config import Config
+
+from .api_enpoint_summary import APIEndpointSummary
+
+
+@dataclass(frozen=True, slots=True)
+class TestRunSummary:
+    config: Config
+    start_time: datetime
+    end_time: datetime
+    journey_plan_search_summary: APIEndpointSummary
+    station_query_summary: APIEndpointSummary
+    station_filter_summary: APIEndpointSummary
+    line_query_summary: APIEndpointSummary

@@ -72,10 +72,10 @@ def main() -> None:
     config = read_from_file(command_line_arguments.config_file)
     data_collections = read_lists_from_master_data(config)
     test_run = TestRun(config, data_collections)
-    test_run.run()
+    summary = test_run.run()
+    print(summary)
 
     # TODO: 
-    # - summarize the statistics (number of successful/failed requests, min/max/avg response times per request type)
     # - print the statistics
 
 

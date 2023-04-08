@@ -17,16 +17,19 @@
 # limitations under the License.
 #
 
+from datetime import datetime
 from typing import List
 
 from config import Config
-from util import DataCollections, Summary
+from util import DataCollections
 
 from .abstract_test_thread import AbstractTestThread
+from .api_enpoint_summary import APIEndpointSummary
 from .journey_plan_search_thread import JourneyPlanSearchThread
 from .line_query_thread import LineQueryThread
 from .station_filter_thread import StationFilterThread
 from .station_query_thread import StationQueryThread
+from .test_run_summary import TestRunSummary
 
 
 class TestRun:
@@ -47,42 +50,42 @@ class TestRun:
             LineQueryThread(config, data_collections.lines) for _ in range(config.line_query_threads)
         ]
 
-    def run(self) -> None:
+    def run(self) -> TestRunSummary:
         all_threads = (
             self._journey_plan_search_threads +
             self._station_query_threads +
             self._station_filter_threads +
             self._line_query_threads
         )
+        start_time = datetime.now()
         for single_thread in all_threads:
             single_thread.start()
 
-        journey_plan_search_summary = self._wait_for_summary(self._journey_plan_search_threads)
-        print()
-        print("Journey plan search summary")
-        print(journey_plan_search_summary)
+        for single_thread in all_threads:
+            single_thread.join()
+        end_time=datetime.now()
 
-        station_query_summary = self._wait_for_summary(self._station_query_threads)
-        print()
-        print("Station query summary")
-        print(station_query_summary)
+        journey_plan_search_summary = self._get_summary(self._journey_plan_search_threads)
+        station_query_summary = self._get_summary(self._station_query_threads)
+        station_filter_summary = self._get_summary(self._station_filter_threads)
+        line_query_summary = self._get_summary(self._line_query_threads)
 
-        station_filter_summary = self._wait_for_summary(self._station_filter_threads)
-        print()
-        print("Station filter summary")
-        print(station_filter_summary)
-
-        line_query_summary = self._wait_for_summary(self._line_query_threads)
-        print()
-        print("line query summary")
-        print(line_query_summary)
+        return TestRunSummary(
+            config=self._config,
+            start_time=start_time,
+            end_time=end_time,
+            journey_plan_search_summary=journey_plan_search_summary,
+            station_query_summary=station_query_summary,
+            station_filter_summary=station_filter_summary,
+            line_query_summary=line_query_summary,
+        )
 
     @staticmethod
-    def _wait_for_summary(thread_list: List[AbstractTestThread]) -> Summary:
+    def _get_summary(thread_list: List[AbstractTestThread]) -> APIEndpointSummary:
         summary = None
         for thread in thread_list:
             if summary is None:
-                summary = thread.wait_for_summary()
+                summary = thread.get_summary()
             else:
-                summary += thread.wait_for_summary()
+                summary += thread.get_summary()
         return summary

@@ -19,9 +19,9 @@
 
 from rest import Response
 
-from .summary import Summary
+from .api_enpoint_summary import APIEndpointSummary
 
-class Collector:
+class StatisticsCollector:
 
     def __init__(self) -> None:
         self._success_count: int = 0
@@ -44,8 +44,8 @@ class Collector:
         if 500 <= response.status_code < 600:
             self._server_error_count += 1
 
-    def get_summary(self) -> Summary:
-        return Summary(
+    def get_summary(self) -> APIEndpointSummary:
+        return APIEndpointSummary(
             success_count=self._success_count,
             client_error_count=self._client_error_count,
             server_error_count=self._server_error_count,

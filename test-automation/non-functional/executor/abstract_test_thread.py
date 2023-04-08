@@ -22,14 +22,17 @@ from threading import Thread
 
 from config import Config
 from rest import QueryServiceClient, Response
-from util import Collector, Summary, Timeout
+from util import Timeout
+
+from .api_enpoint_summary import APIEndpointSummary
+from .statistics_collector import StatisticsCollector
 
 
 class AbstractTestThread(Thread, ABC):
 
     def __init__(self, config: Config) -> None:
         super().__init__(daemon=False)
-        self._summary_collector = Collector()
+        self._summary_collector = StatisticsCollector()
         self._config = config
 
     def run(self) -> None:
@@ -44,6 +47,5 @@ class AbstractTestThread(Thread, ABC):
     def send_single_request(self, client: QueryServiceClient) -> Response:
         ...
 
-    def wait_for_summary(self) -> Summary:
-        self.join()
+    def get_summary(self) -> APIEndpointSummary:
         return self._summary_collector.get_summary()

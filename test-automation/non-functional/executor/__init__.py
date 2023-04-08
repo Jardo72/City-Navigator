@@ -17,4 +17,5 @@
 # limitations under the License.
 #
 
-from .executor import TestRun
+from .test_run import TestRun
+from .test_run_summary import TestRunSummary
