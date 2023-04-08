@@ -34,6 +34,21 @@ class Config:
         )
 
     @staticmethod
+    def get_redis_host() -> str:
+        return Config._get_environment_variable(
+            name="REDIS_HOST",
+            default_value="localhost"
+        )
+
+    @staticmethod
+    def get_redis_port() -> int:
+        value = Config._get_environment_variable(
+            name="REDIS_PORT",
+            default_value="6379"
+        )
+        return int(value)
+
+    @staticmethod
     def _get_environment_variable(name: str, default_value: str) -> str:
         result = environ.get(name, None)
         default_used = False
