@@ -68,19 +68,21 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
 
 
 def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int) -> None:
-    print(f"  Worker thread count:            {thread_count}")
-    print(f"  Number of successful requests:  {summary.success_count}")
-    print(f"  Avg. response time:             {summary.avg_success_duration_millis} millis")
-    print(f"  Min. response time:             {summary.min_success_duration_millis} millis")
-    print(f"  Max. response time:             {summary.max_success_duration_millis} millis")
-    print(f"  Client error count:             {summary.client_error_count}")
-    print(f"  Server error count:             {summary.server_error_count}")
+    INDENTATION = 4 * " "
+    print(f"{INDENTATION}Worker thread count:            {thread_count}")
+    print(f"{INDENTATION}Number of successful requests:  {summary.success_count}")
+    print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis")
+    print(f"{INDENTATION}Min. response time:             {summary.min_success_duration_millis} millis")
+    print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis")
+    print(f"{INDENTATION}Client error count:             {summary.client_error_count}")
+    print(f"{INDENTATION}Server error count:             {summary.server_error_count}")
 
 
 def print_test_run_summary(summary: TestRunSummary) -> None:
+    FORMAT = "%Y-%m-%dT%H:%M:%SZ"
     print(f"Query service base URL: {summary.config.query_service_base_url}")
-    print(f"Test run start time:    {summary.start_time.strftime('%Y-%m-%dT%H:%M:%SZ')}")
-    print(f"Test run end time:      {summary.end_time.strftime('%Y-%m-%dT%H:%M:%SZ')}")
+    print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}")
+    print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}")
     print("Journey plan search")
     print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads)
     print("Station query summary")
