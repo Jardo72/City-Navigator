@@ -65,10 +65,10 @@ class TestRun:
             single_thread.join()
         end_time=datetime.now()
 
-        journey_plan_search_summary = self._get_summary(self._journey_plan_search_threads)
-        station_query_summary = self._get_summary(self._station_query_threads)
-        station_filter_summary = self._get_summary(self._station_filter_threads)
-        line_query_summary = self._get_summary(self._line_query_threads)
+        journey_plan_search_summary = self._calculate_summary(self._journey_plan_search_threads)
+        station_query_summary = self._calculate_summary(self._station_query_threads)
+        station_filter_summary = self._calculate_summary(self._station_filter_threads)
+        line_query_summary = self._calculate_summary(self._line_query_threads)
 
         return TestRunSummary(
             config=self._config,
@@ -81,7 +81,7 @@ class TestRun:
         )
 
     @staticmethod
-    def _get_summary(thread_list: List[AbstractTestThread]) -> APIEndpointSummary:
+    def _calculate_summary(thread_list: List[AbstractTestThread]) -> APIEndpointSummary:
         summary = None
         for thread in thread_list:
             if summary is None:

@@ -22,7 +22,7 @@ from __future__ import annotations
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 
 from config import Config, read_from_file
-from executor import TestRun
+from executor import APIEndpointSummary, TestRun, TestRunSummary
 from rest import QueryServiceClient
 from util import DataCollections
 
@@ -67,16 +67,37 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
     )
 
 
+def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int) -> None:
+    print(f"  Worker thread count:            {thread_count}")
+    print(f"  Number of successful requests:  {summary.success_count}")
+    print(f"  Avg. response time:             {summary.avg_success_duration_millis} millis")
+    print(f"  Min. response time:             {summary.min_success_duration_millis} millis")
+    print(f"  Max. response time:             {summary.max_success_duration_millis} millis")
+    print(f"  Client error count:             {summary.client_error_count}")
+    print(f"  Server error count:             {summary.server_error_count}")
+
+
+def print_test_run_summary(summary: TestRunSummary) -> None:
+    print(f"Query service base URL: {summary.config.query_service_base_url}")
+    print(f"Test run start time:    {summary.start_time.strftime('%Y-%m-%dT%H:%M:%SZ')}")
+    print(f"Test run end time:      {summary.end_time.strftime('%Y-%m-%dT%H:%M:%SZ')}")
+    print("Journey plan search")
+    print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads)
+    print("Station query summary")
+    print_api_endpoint_summary(summary.station_query_summary, summary.config.station_query_threads)
+    print("Station filter summary")
+    print_api_endpoint_summary(summary.station_filter_summary, summary.config.station_filter_threads)
+    print("Line query summary")
+    print_api_endpoint_summary(summary.line_query_summary, summary.config.line_query_threads)
+
+
 def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     config = read_from_file(command_line_arguments.config_file)
     data_collections = read_lists_from_master_data(config)
     test_run = TestRun(config, data_collections)
     summary = test_run.run()
-    print(summary)
-
-    # TODO: 
-    # - print the statistics
+    print_test_run_summary(summary)
 
 
 if __name__ == "__main__":

@@ -17,5 +17,6 @@
 # limitations under the License.
 #
 
+from .api_enpoint_summary import APIEndpointSummary
 from .test_run import TestRun
 from .test_run_summary import TestRunSummary
