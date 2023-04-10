@@ -25,7 +25,8 @@ from config import Config
 
 engine = create_engine(
     url=Config.get_database_url(),
-    connect_args={"check_same_thread": False}
+    connect_args={"check_same_thread": False},
+    pool_size=20
 )
 
 
