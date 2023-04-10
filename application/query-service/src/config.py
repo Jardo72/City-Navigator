@@ -28,28 +28,19 @@ class Config:
 
     @staticmethod
     def get_master_data_service_base_url() -> str:
-        return Config._get_environment_variable(
-            name="MASTER_DATA_SERVICE_BASE_URL",
-            default_value="http://localhost:90"
-        )
+        return Config._get_environment_variable("MASTER_DATA_SERVICE_BASE_URL")
 
     @staticmethod
     def get_redis_host() -> str:
-        return Config._get_environment_variable(
-            name="REDIS_HOST",
-            default_value="localhost"
-        )
+        return Config._get_environment_variable("REDIS_HOST")
 
     @staticmethod
     def get_redis_port() -> int:
-        value = Config._get_environment_variable(
-            name="REDIS_PORT",
-            default_value="6379"
-        )
+        value = Config._get_environment_variable("REDIS_PORT", default_value="6379")
         return int(value)
 
     @staticmethod
-    def _get_environment_variable(name: str, default_value: str) -> str:
+    def _get_environment_variable(name: str, default_value: str = None) -> str:
         result = environ.get(name, None)
         default_used = False
         if result is None:
