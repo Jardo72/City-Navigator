@@ -77,7 +77,7 @@ def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int, t
     print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis")
     print(f"{INDENTATION}Client error count:             {summary.client_error_count}")
     print(f"{INDENTATION}Server error count:             {summary.server_error_count}")
-    print(f"{INDENTATION}Throughput:                     {throughput} requests/sec")
+    print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec")
 
 
 def print_test_run_summary(summary: TestRunSummary) -> None:
@@ -86,7 +86,7 @@ def print_test_run_summary(summary: TestRunSummary) -> None:
     print(f"Query service base URL: {summary.config.query_service_base_url}")
     print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}")
     print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}")
-    print(f"Overall duration:       {summary.duration.total_seconds} secs")
+    print(f"Overall duration:       {duration_sec:.1f} secs")
     print("Journey plan search")
     print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads, duration_sec)
     print("Station query summary")
