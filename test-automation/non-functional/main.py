@@ -67,8 +67,9 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
     )
 
 
-def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int) -> None:
+def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int, test_duration_sec: float) -> None:
     INDENTATION = 4 * " "
+    throughput = summary.success_count / test_duration_sec
     print(f"{INDENTATION}Worker thread count:            {thread_count}")
     print(f"{INDENTATION}Number of successful requests:  {summary.success_count}")
     print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis")
@@ -76,21 +77,24 @@ def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int) -
     print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis")
     print(f"{INDENTATION}Client error count:             {summary.client_error_count}")
     print(f"{INDENTATION}Server error count:             {summary.server_error_count}")
+    print(f"{INDENTATION}Throughput:                     {throughput} requests/sec")
 
 
 def print_test_run_summary(summary: TestRunSummary) -> None:
     FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+    duration = summary.duration
     print(f"Query service base URL: {summary.config.query_service_base_url}")
     print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}")
     print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}")
+    print(f"Overall duration:       {summary.duration.total_seconds} secs")
     print("Journey plan search")
-    print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads)
+    print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads, summary.duration)
     print("Station query summary")
-    print_api_endpoint_summary(summary.station_query_summary, summary.config.station_query_threads)
+    print_api_endpoint_summary(summary.station_query_summary, summary.config.station_query_threads, summary.duration)
     print("Station filter summary")
-    print_api_endpoint_summary(summary.station_filter_summary, summary.config.station_filter_threads)
+    print_api_endpoint_summary(summary.station_filter_summary, summary.config.station_filter_threads, summary.duration)
     print("Line query summary")
-    print_api_endpoint_summary(summary.line_query_summary, summary.config.line_query_threads)
+    print_api_endpoint_summary(summary.line_query_summary, summary.config.line_query_threads, summary.duration)
 
 
 def main() -> None:

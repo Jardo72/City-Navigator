@@ -18,7 +18,7 @@
 #
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from config import Config
 
@@ -34,3 +34,7 @@ class TestRunSummary:
     station_query_summary: APIEndpointSummary
     station_filter_summary: APIEndpointSummary
     line_query_summary: APIEndpointSummary
+
+    @property
+    def duration(self) -> timedelta:
+        return self.end_time - self.start_time
