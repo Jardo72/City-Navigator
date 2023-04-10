@@ -81,13 +81,14 @@ def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int, t
 
 
 def format_duration(duration_sec: float) -> str:
+    duration_sec = round(duration_sec)
     hours, remainder = divmod(duration_sec, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 
 def print_test_run_summary(summary: TestRunSummary) -> None:
-    FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+    FORMAT = "%Y-%m-%dT%H:%M:%S"
     duration_sec = summary.duration.total_seconds()
     print(f"Query service base URL: {summary.config.query_service_base_url}")
     print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}")
