@@ -80,13 +80,19 @@ def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int, t
     print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec")
 
 
+def format_duration(duration_sec: float) -> str:
+    hours, remainder = divmod(duration_sec, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
+
+
 def print_test_run_summary(summary: TestRunSummary) -> None:
     FORMAT = "%Y-%m-%dT%H:%M:%SZ"
     duration_sec = summary.duration.total_seconds()
     print(f"Query service base URL: {summary.config.query_service_base_url}")
     print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}")
     print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}")
-    print(f"Overall duration:       {duration_sec:.1f} secs")
+    print(f"Overall duration:       {format_duration(duration_sec)}")
     print("Journey plan search")
     print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads, duration_sec)
     print("Station query summary")
