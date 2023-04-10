@@ -82,19 +82,19 @@ def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int, t
 
 def print_test_run_summary(summary: TestRunSummary) -> None:
     FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-    duration = summary.duration
+    duration_sec = summary.duration.total_seconds()
     print(f"Query service base URL: {summary.config.query_service_base_url}")
     print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}")
     print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}")
     print(f"Overall duration:       {summary.duration.total_seconds} secs")
     print("Journey plan search")
-    print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads, summary.duration)
+    print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads, duration_sec)
     print("Station query summary")
-    print_api_endpoint_summary(summary.station_query_summary, summary.config.station_query_threads, summary.duration)
+    print_api_endpoint_summary(summary.station_query_summary, summary.config.station_query_threads, duration_sec)
     print("Station filter summary")
-    print_api_endpoint_summary(summary.station_filter_summary, summary.config.station_filter_threads, summary.duration)
+    print_api_endpoint_summary(summary.station_filter_summary, summary.config.station_filter_threads, duration_sec)
     print("Line query summary")
-    print_api_endpoint_summary(summary.line_query_summary, summary.config.line_query_threads, summary.duration)
+    print_api_endpoint_summary(summary.line_query_summary, summary.config.line_query_threads, duration_sec)
 
 
 def main() -> None:
