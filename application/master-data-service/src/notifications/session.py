@@ -18,10 +18,13 @@
 #
 
 from logging import getLogger
+from typing import Type
 
 from redis import ConnectionPool, Redis
 
 from config import Config
+
+from .dto import Event, EventType
 
 
 _logger = getLogger("notifications")
@@ -37,14 +40,26 @@ _pool = ConnectionPool(
 _logger.info("Redis connection pool created (host = %s, port = %d)", Config.get_redis_host(), Config.get_redis_port())
 
 
-def get_redis() -> Redis:
+class Notifier:
+
+    def __init__(self, redis: Redis) -> None:
+        self._redis = redis
+
+    def send_notification(self, event_type: EventType, entity: Type, uuid: str) -> None:
+        event = Event(
+            event_type=event_type,
+            entity=entity,
+            uuid=uuid
+        )
+        self._redis.publish(Config.get_redis_channel(), event.json())
+        _logger.debug("Notification sent - event = %s, entity = %s, uuid = %s", event_type, entity, uuid)
+
+
+def get_notifier() -> Notifier:
     redis = Redis(connection_pool=_pool)
     try:
         _logger.debug("Redis session created")
-        yield redis
+        yield Notifier(redis)
     finally:
         redis.close()
         _logger.debug("Redis session closed")
-
-# TODO: remove when not needed anymore
-# see https://stackoverflow.com/questions/73563804/what-is-the-recommended-way-to-instantiate-and-pass-around-a-redis-client-with-f

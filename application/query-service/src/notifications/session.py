@@ -36,7 +36,7 @@ def _consume_master_data_notifications(redis: Redis) -> None:
     while True:
         message = pubsub.get_message(timeout=15)
         if message is not None:
-            _logger.info("Notification received")
+            _logger.info("Notification received: %s", message)
 
 
 def subscribe_master_data_notifications() -> None:
@@ -48,6 +48,7 @@ def subscribe_master_data_notifications() -> None:
     )
     _logger.info("Redis client created (consumer)")
     consumer_thread = Thread(
+        name="Master-Data-Nofitication-Consumer",
         target=_consume_master_data_notifications,
         args=[redis_client],
         daemon=True

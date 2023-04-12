@@ -23,12 +23,11 @@ from uuid import uuid4
 
 from fastapi import Depends, APIRouter, status
 from sqlalchemy.orm import Session
-from redis import Redis
 
 from db import Line, MeansOfTransport, Station
 from db import get_db
-from notifications import Event, EventType
-from notifications import get_redis
+from notifications import EventType
+from notifications import get_notifier, Notifier
 
 from .dto import LineDetails, LineInfo, LineRequest
 from .dto import MeansOfTransportDetails, MeansOfTransportRequest
@@ -67,7 +66,7 @@ async def get_means_of_transport(uuid: str, db: Session = Depends(get_db)):
 async def create_means_of_transport(
     request: MeansOfTransportRequest,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     means_of_transport = MeansOfTransport()
     means_of_transport.uuid = str(uuid4())
@@ -75,14 +74,11 @@ async def create_means_of_transport(
     db.add(means_of_transport)
     db.commit()
     _logger.debug("New means of transport (uuid = %s) inserted into the database", means_of_transport.uuid)
-    result = MeansOfTransportDetails(
+    notifier.send_notification(EventType.CREATED, MeansOfTransport, means_of_transport.uuid)
+    return MeansOfTransportDetails(
         uuid=means_of_transport.uuid,
         identifier=request.identifier
     )
-    # TODO: real message content would be highly appreciated
-    redis.publish(channel="means-of-transport", message="Means of transport created")
-    _logger.debug("Notification published to Redis")
-    return result
 
 
 @router.put("/means-of-transport/{uuid}")
@@ -90,7 +86,7 @@ async def update_means_of_transport(
     uuid: str,
     request: MeansOfTransportRequest,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
@@ -98,10 +94,9 @@ async def update_means_of_transport(
     record.identifier = request.identifier
     db.commit()
     _logger.debug("Means of transport (uuid = %s) updated in the database", uuid)
-    # TODO: real message content would be highly appreciated
-    redis.publish(channel="means-of-transport", message="Means of transport updated")
+    notifier.send_notification(EventType.UPDATED, MeansOfTransport, uuid)
     return MeansOfTransportDetails(
-        uuid=uuid4(),
+        uuid=uuid,
         identifier=request.identifier
     )
 
@@ -110,7 +105,7 @@ async def update_means_of_transport(
 async def delete_means_of_transport(
     uuid: str,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     """
     Deletes the means of transport with the given UUID.
@@ -121,8 +116,7 @@ async def delete_means_of_transport(
     db.delete(record)
     db.commit()
     _logger.debug("Means of transport deleted from the database")
-    redis.publish(channel="means-of-transport", message="Means of transport deleted")
-    _logger.debug("Notification published to Redis")
+    notifier.send_notification(EventType.DELETED, MeansOfTransport, uuid)
 
 
 @router.get("/stations", response_model=List[StationDetails])
@@ -150,7 +144,7 @@ async def get_station(uuid: str, db: Session = Depends(get_db)):
 async def create_station(
     request: StationRequest,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     station = Station()
     station.uuid = str(uuid4())
@@ -158,13 +152,8 @@ async def create_station(
     db.add(station)
     db.commit()
     _logger.debug("New station (uuid = %s) inserted into the database", station.uuid)
-
-    result = StationDetails(uuid=station.uuid, name=station.name)
-    event = Event(event_type=EventType.CREATED, data=result)
-    redis.publish(channel="station", message=event.json())
-    _logger.debug("Notification published to Redis")
-
-    return result
+    notifier.send_notification(EventType.CREATED, Station, station.uuid)
+    return StationDetails(uuid=station.uuid, name=station.name)
 
 
 @router.put("/station/{uuid}", response_model=StationDetails)
@@ -172,13 +161,14 @@ async def update_station(
     uuid: str,
     request: StationRequest,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
     record.name = request.name
     db.commit()
+    notifier.send_notification(EventType.UPDATED, Station, uuid)
     return as_station_details(record)
 
 
@@ -186,7 +176,7 @@ async def update_station(
 async def delete_station(
     uuid: str,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     """
     Deletes the station with the given UUID.
@@ -196,6 +186,7 @@ async def delete_station(
         raise station_not_found_exception(uuid)
     db.delete(record)
     db.commit()
+    notifier.send_notification(EventType.DELETED, Station, uuid)
 
 
 @router.get("/lines", response_model=List[LineInfo])
@@ -219,7 +210,7 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
 async def create_line(
     request: LineRequest,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     line = Line()
     line.uuid = str(uuid4())
@@ -229,6 +220,7 @@ async def create_line(
     line.terminal_stop_two_uuid = request.terminal_stop_two_uuid
     db.add(line)
     db.commit()
+    notifier.send_notification(EventType.CREATED, Line, line.uuid)
     return as_line_details(line)
 
 
@@ -237,7 +229,7 @@ async def update_line(
     uuid: str,
     request: LineRequest,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
@@ -247,6 +239,7 @@ async def update_line(
     record.terminal_stop_one_uuid = request.terminal_stop_one_uuid
     record.terminal_stop_two_uuid = request.terminal_stop_two_uuid
     db.commit()
+    notifier.send_notification(EventType.UPDATED, Line, uuid)
     return as_line_details(record)
 
 
@@ -254,7 +247,7 @@ async def update_line(
 async def delete_line(
     uuid: str,
     db: Session = Depends(get_db),
-    redis: Redis = Depends(get_redis)
+    notifier: Notifier = Depends(get_notifier)
 ):
     """
     Deletes the line with the given UUID. This operation also deletes the itinerary
@@ -265,3 +258,4 @@ async def delete_line(
         raise line_not_found_exception(uuid)
     db.delete(record)
     db.commit()
+    notifier.send_notification(EventType.DELETED, Line, uuid)

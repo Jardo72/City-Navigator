@@ -18,4 +18,4 @@
 #
 
 from .dto import Event, EventType
-from .session import get_redis
+from .session import get_notifier, Notifier
