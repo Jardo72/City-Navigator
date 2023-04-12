@@ -7,6 +7,7 @@ COPY logging.ini ./
 COPY src ./
 
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir gunicorn uvloop
 
 USER 1000:1000
 

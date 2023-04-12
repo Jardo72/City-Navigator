@@ -40,6 +40,10 @@ class Config:
         return int(value)
 
     @staticmethod
+    def get_redis_channel() -> str:
+        return Config._get_environment_variable("REDIS_CHANNEL", default_value="city-navigator")
+
+    @staticmethod
     def _get_environment_variable(name: str, default_value: str = None) -> str:
         result = environ.get(name, None)
         default_used = False

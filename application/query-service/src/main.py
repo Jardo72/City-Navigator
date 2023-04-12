@@ -27,6 +27,7 @@ from pydantic import BaseModel
 
 from db import get_db_session
 from master_data import init_db_from_master_data
+from notifications import subscribe_master_data_notifications
 from rest import router
 
 
@@ -37,6 +38,9 @@ _logger = getLogger("main")
 async def lifespan(app: FastAPI) -> None:
     _logger.info("Going to initialize the in-memory database")
     init_db_from_master_data(get_db_session())
+
+    _logger.info("Going to subscribe Redis notifications")
+    subscribe_master_data_notifications()
 
     yield
     ...
