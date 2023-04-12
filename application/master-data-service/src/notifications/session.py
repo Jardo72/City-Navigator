@@ -17,25 +17,34 @@
 # limitations under the License.
 #
 
-from config import Config
+from logging import getLogger
 
 from redis import ConnectionPool, Redis
+
+from config import Config
+
+
+_logger = getLogger("notifications")
 
 
 _pool = ConnectionPool(
     host=Config.get_redis_host(),
     port=Config.get_redis_port(),
     db=0,
-    decode_responses=True
+    decode_responses=True,
+    max_connections=10
 )
+_logger.info("Redis connection pool created (host = %s, port = %d)", Config.get_redis_host(), Config.get_redis_port())
 
 
 def get_redis() -> Redis:
     redis = Redis(connection_pool=_pool)
     try:
+        _logger.debug("Redis session created")
         yield redis
     finally:
         redis.close()
+        _logger.debug("Redis session closed")
 
 # TODO: remove when not needed anymore
 # see https://stackoverflow.com/questions/73563804/what-is-the-recommended-way-to-instantiate-and-pass-around-a-redis-client-with-f

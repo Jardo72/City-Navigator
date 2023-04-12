@@ -43,8 +43,8 @@ def get_db() -> SessionLocal:
         _logger.debug("DB session created")
         yield db
     finally:
-        _logger.debug("DB session closed")
         db.close()
+        _logger.debug("DB session closed")
 
 
 def get_db_session() -> SessionLocal:
