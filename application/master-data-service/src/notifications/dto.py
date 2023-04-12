@@ -17,21 +17,18 @@
 # limitations under the License.
 #
 
-from config import Config
+from enum import auto, unique, StrEnum
 
-from redis import ConnectionPool, Redis
-
-
-_pool = ConnectionPool(
-    host=Config.get_redis_host(),
-    port=Config.get_redis_port(),
-    db=0,
-    decode_responses=True
-)
+from pydantic import BaseModel
 
 
-def get_redis() -> Redis:
-    return Redis(connection_pool=_pool)
+@unique
+class EventType(StrEnum):
+    CREATED = auto()
+    UPDATED = auto()
+    DELETED = auto()
 
-# TODO: remove when not needed anymore
-# see https://stackoverflow.com/questions/73563804/what-is-the-recommended-way-to-instantiate-and-pass-around-a-redis-client-with-f
+
+class Event(BaseModel):
+    event_type: EventType
+    data: BaseModel

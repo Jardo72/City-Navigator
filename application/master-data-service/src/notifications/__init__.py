@@ -17,4 +17,5 @@
 # limitations under the License.
 #
 
+from .dto import Event, EventType
 from .session import get_redis

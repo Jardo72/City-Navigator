@@ -27,6 +27,7 @@ from redis import Redis
 
 from db import Line, MeansOfTransport, Station
 from db import get_db
+from notifications import Event, EventType
 from notifications import get_redis
 
 from .dto import LineDetails, LineInfo, LineRequest
@@ -73,7 +74,7 @@ async def create_means_of_transport(
     means_of_transport.identifier = request.identifier
     db.add(means_of_transport)
     db.commit()
-    _logger.debug("New means of transport inserted into the database")
+    _logger.debug("New means of transport (uuid = %s) inserted into the database", means_of_transport.uuid)
     result = MeansOfTransportDetails(
         uuid=means_of_transport.uuid,
         identifier=request.identifier
@@ -85,10 +86,20 @@ async def create_means_of_transport(
 
 
 @router.put("/means-of-transport/{uuid}")
-async def update_means_of_transport(uuid: str, request: MeansOfTransportRequest, db: Session = Depends(get_db)):
+async def update_means_of_transport(
+    uuid: str,
+    request: MeansOfTransportRequest,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
         raise means_of_transport_not_found_exception(uuid)
+    record.identifier = request.identifier
+    db.commit()
+    _logger.debug("Means of transport (uuid = %s) updated in the database", uuid)
+    # TODO: real message content would be highly appreciated
+    redis.publish(channel="means-of-transport", message="Means of transport updated")
     return MeansOfTransportDetails(
         uuid=uuid4(),
         identifier=request.identifier
@@ -136,17 +147,33 @@ async def get_station(uuid: str, db: Session = Depends(get_db)):
 
 
 @router.post("/station", response_model=StationDetails, status_code=status.HTTP_201_CREATED)
-async def create_station(request: StationRequest, db: Session = Depends(get_db)):
+async def create_station(
+    request: StationRequest,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     station = Station()
     station.uuid = str(uuid4())
     station.name = request.name
     db.add(station)
     db.commit()
-    return StationDetails(uuid=station.uuid, name=station.name)
+    _logger.debug("New station (uuid = %s) inserted into the database", station.uuid)
+
+    result = StationDetails(uuid=station.uuid, name=station.name)
+    event = Event(event_type=EventType.CREATED, data=result)
+    redis.publish(channel="station", message=event.json())
+    _logger.debug("Notification published to Redis")
+
+    return result
 
 
 @router.put("/station/{uuid}", response_model=StationDetails)
-async def update_station(uuid: str, request: StationRequest, db: Session = Depends(get_db)):
+async def update_station(
+    uuid: str,
+    request: StationRequest,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
@@ -156,7 +183,11 @@ async def update_station(uuid: str, request: StationRequest, db: Session = Depen
 
 
 @router.delete("/station/{uuid}")
-async def delete_station(uuid: str, db: Session = Depends(get_db)):
+async def delete_station(
+    uuid: str,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     """
     Deletes the station with the given UUID.
     """
@@ -185,7 +216,11 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
 
 
 @router.post("/line", response_model=LineDetails, status_code=status.HTTP_201_CREATED)
-async def create_line(request: LineRequest, db: Session = Depends(get_db)):
+async def create_line(
+    request: LineRequest,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     line = Line()
     line.uuid = str(uuid4())
     line.label = request.label
@@ -198,7 +233,12 @@ async def create_line(request: LineRequest, db: Session = Depends(get_db)):
 
 
 @router.put("/line/{uuid}", response_model=LineDetails)
-async def update_line(uuid: str, request: LineRequest, db: Session = Depends(get_db)):
+async def update_line(
+    uuid: str,
+    request: LineRequest,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
@@ -211,7 +251,11 @@ async def update_line(uuid: str, request: LineRequest, db: Session = Depends(get
 
 
 @router.delete("/line/{uuid}")
-async def delete_line(uuid: str, db: Session = Depends(get_db)):
+async def delete_line(
+    uuid: str,
+    db: Session = Depends(get_db),
+    redis: Redis = Depends(get_redis)
+):
     """
     Deletes the line with the given UUID. This operation also deletes the itinerary
     for the concerned line (both directions).

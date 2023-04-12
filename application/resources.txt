@@ -6,3 +6,10 @@ https://www.nginx.com/blog/deploying-nginx-plus-as-an-api-gateway-part-1/
 # Uvicorn logging
 https://www.uvicorn.org/settings/#logging
 https://docs.python.org/3/library/logging.config.html#configuration-file-format
+
+# Grafana
+https://grafana.com/docs/grafana/latest/administration/provisioning/
+https://grafana.com/docs/grafana/latest/setup-grafana/configure-docker/
+
+# FastAPI, gunicorn
+https://github.com/mikeckennedy/docker-build-fastapi-app-april-2021
