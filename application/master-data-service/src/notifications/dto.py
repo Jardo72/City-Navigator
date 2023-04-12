@@ -31,4 +31,5 @@ class EventType(StrEnum):
 
 class Event(BaseModel):
     event_type: EventType
-    data: BaseModel
+    entity: str
+    uuid: str

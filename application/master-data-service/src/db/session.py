@@ -17,10 +17,15 @@
 # limitations under the License.
 #
 
+from logging import getLogger
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from config import Config
+
+
+_logger = getLogger("db")
 
 
 engine = create_engine(
@@ -28,14 +33,18 @@ engine = create_engine(
     connect_args={"check_same_thread": False},
     pool_size=20
 )
+_logger.info("DB engine created, URL = '%s'", Config.get_database_url())
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+_logger.info("DB session maker created")
 
 
 def get_db() -> SessionLocal:
     db = SessionLocal()
     try:
+        _logger.debug("DB session created")
         yield db
     finally:
         db.close()
+        _logger.debug("DB session closed")

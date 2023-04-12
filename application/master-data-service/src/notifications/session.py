@@ -31,7 +31,11 @@ _pool = ConnectionPool(
 
 
 def get_redis() -> Redis:
-    return Redis(connection_pool=_pool)
+    redis = Redis(connection_pool=_pool)
+    try:
+        yield redis
+    finally:
+        redis.close()
 
 # TODO: remove when not needed anymore
 # see https://stackoverflow.com/questions/73563804/what-is-the-recommended-way-to-instantiate-and-pass-around-a-redis-client-with-f

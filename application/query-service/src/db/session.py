@@ -30,15 +30,20 @@ _engine = create_engine(
     url="sqlite://",
     connect_args={"check_same_thread": False}
 )
+_logger.info("DB engine created")
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
+_logger.info("DB session maker created")
 
 
 def get_db() -> SessionLocal:
     db = SessionLocal()
     try:
+        _logger.debug("DB session created")
         yield db
     finally:
+        _logger.debug("DB session closed")
         db.close()
 
 
@@ -91,6 +96,9 @@ _DDL_STATEMENTS = [
 
 
 conn = _engine.connect()
+_logger.info("Going to create DB schema")
 for statement in _DDL_STATEMENTS:
     _logger.debug("Going to execute DDL statement:\n%s", statement)
     conn.execute(text(statement))
+_logger.info("DB schema created")
+conn.close()
