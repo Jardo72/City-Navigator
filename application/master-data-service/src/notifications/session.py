@@ -48,11 +48,11 @@ class Notifier:
     def send_notification(self, event_type: EventType, entity: Type, uuid: str) -> None:
         event = Event(
             event_type=event_type,
-            entity=entity,
+            entity=entity.__name__,
             uuid=uuid
         )
         self._redis.publish(Config.get_redis_channel(), event.json())
-        _logger.debug("Notification sent - event = %s, entity = %s, uuid = %s", event_type, entity, uuid)
+        _logger.debug("Notification sent - event = %s", event.dict())
 
 
 def get_notifier() -> Notifier:
