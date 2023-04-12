@@ -68,6 +68,9 @@ async def create_means_of_transport(
     db: Session = Depends(get_db),
     notifier: Notifier = Depends(get_notifier)
 ):
+    """
+    Creates a new means of transport using the given request data.
+    """
     means_of_transport = MeansOfTransport()
     means_of_transport.uuid = str(uuid4())
     means_of_transport.identifier = request.identifier
@@ -88,6 +91,9 @@ async def update_means_of_transport(
     db: Session = Depends(get_db),
     notifier: Notifier = Depends(get_notifier)
 ):
+    """
+    Updates the means of transport with the given UUID, using the given request data.
+    """
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
         raise means_of_transport_not_found_exception(uuid)
@@ -146,6 +152,9 @@ async def create_station(
     db: Session = Depends(get_db),
     notifier: Notifier = Depends(get_notifier)
 ):
+    """
+    Creates a new station using the given request data.
+    """
     station = Station()
     station.uuid = str(uuid4())
     station.name = request.name
@@ -163,6 +172,9 @@ async def update_station(
     db: Session = Depends(get_db),
     notifier: Notifier = Depends(get_notifier)
 ):
+    """
+    Updates the station with the given UUID, using the given request data.
+    """
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
@@ -212,6 +224,9 @@ async def create_line(
     db: Session = Depends(get_db),
     notifier: Notifier = Depends(get_notifier)
 ):
+    """
+    Creates a new line using the given request data.
+    """
     line = Line()
     line.uuid = str(uuid4())
     line.label = request.label
@@ -231,6 +246,9 @@ async def update_line(
     db: Session = Depends(get_db),
     notifier: Notifier = Depends(get_notifier)
 ):
+    """
+    Updates the the line with the given UUID, using the given request data.
+    """
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
