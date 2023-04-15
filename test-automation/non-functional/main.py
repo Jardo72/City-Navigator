@@ -20,6 +20,7 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from io import TextIOWrapper
 
 from config import Config, read_from_file
 from executor import APIEndpointSummary, TestRun, TestRunSummary
@@ -34,6 +35,14 @@ def create_command_line_arguments_parser() -> ArgumentParser:
     parser.add_argument(
         "config_file",
         help="the name of the JSON file containing the test configuration"
+    )
+
+    # optional arguments
+    parser.add_argument(
+        "-s", "--summary-file",
+        dest="summary_file",
+        default=None,
+        help="the optional name of an output file the test run summary is to be written to"
     )
 
     return parser
@@ -67,17 +76,22 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
     )
 
 
-def print_api_endpoint_summary(summary: APIEndpointSummary, thread_count: int, test_duration_sec: float) -> None:
+def print_api_endpoint_summary(
+        summary: APIEndpointSummary,
+        thread_count: int,
+        test_duration_sec: float,
+        summary_file: TextIOWrapper = None
+) -> None:
     INDENTATION = 4 * " "
     throughput = summary.success_count / test_duration_sec
-    print(f"{INDENTATION}Worker thread count:            {thread_count}")
-    print(f"{INDENTATION}Number of successful requests:  {summary.success_count}")
-    print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis")
-    print(f"{INDENTATION}Min. response time:             {summary.min_success_duration_millis} millis")
-    print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis")
-    print(f"{INDENTATION}Client error count:             {summary.client_error_count}")
-    print(f"{INDENTATION}Server error count:             {summary.server_error_count}")
-    print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec")
+    print(f"{INDENTATION}Worker thread count:            {thread_count}", file=summary_file)
+    print(f"{INDENTATION}Number of successful requests:  {summary.success_count}", file=summary_file)
+    print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
+    print(f"{INDENTATION}Min. response time:             {summary.min_success_duration_millis} millis", file=summary_file)
+    print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
+    print(f"{INDENTATION}Client error count:             {summary.client_error_count}", file=summary_file)
+    print(f"{INDENTATION}Server error count:             {summary.server_error_count}", file=summary_file)
+    print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
 
 
 def format_duration(duration_sec: float) -> str:
@@ -87,21 +101,41 @@ def format_duration(duration_sec: float) -> str:
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 
-def print_test_run_summary(summary: TestRunSummary) -> None:
+def print_test_run_summary(summary: TestRunSummary, summary_file: TextIOWrapper = None) -> None:
     FORMAT = "%Y-%m-%dT%H:%M:%S"
     duration_sec = summary.duration.total_seconds()
-    print(f"Query service base URL: {summary.config.query_service_base_url}")
-    print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}")
-    print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}")
-    print(f"Overall duration:       {format_duration(duration_sec)}")
-    print("Journey plan search")
-    print_api_endpoint_summary(summary.journey_plan_search_summary, summary.config.journey_plan_search_threads, duration_sec)
-    print("Station query summary")
-    print_api_endpoint_summary(summary.station_query_summary, summary.config.station_query_threads, duration_sec)
-    print("Station filter summary")
-    print_api_endpoint_summary(summary.station_filter_summary, summary.config.station_filter_threads, duration_sec)
-    print("Line query summary")
-    print_api_endpoint_summary(summary.line_query_summary, summary.config.line_query_threads, duration_sec)
+    print(f"Query service base URL: {summary.config.query_service_base_url}", file=summary_file)
+    print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}", file=summary_file)
+    print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}", file=summary_file)
+    print(f"Overall duration:       {format_duration(duration_sec)}", file=summary_file)
+    print("Journey plan search", file=summary_file)
+    print_api_endpoint_summary(
+        summary=summary.journey_plan_search_summary,
+        thread_count=summary.config.journey_plan_search_threads,
+        test_duration_sec=duration_sec,
+        summary_file=summary_file
+    )
+    print("Station query summary", file=summary_file)
+    print_api_endpoint_summary(
+        summary=summary.station_query_summary,
+        thread_count=summary.config.station_query_threads,
+        test_duration_sec=duration_sec,
+        summary_file=summary_file
+    )
+    print("Station filter summary", file=summary_file)
+    print_api_endpoint_summary(
+        summary=summary.station_filter_summary,
+        thread_count=summary.config.station_filter_threads,
+        test_duration_sec=duration_sec,
+        summary_file=summary_file
+    )
+    print("Line query summary", file=summary_file)
+    print_api_endpoint_summary(
+        summary=summary.line_query_summary,
+        thread_count=summary.config.line_query_threads,
+        test_duration_sec=duration_sec,
+        summary_file=summary_file
+    )
 
 
 def main() -> None:
@@ -111,6 +145,9 @@ def main() -> None:
     test_run = TestRun(config, data_collections)
     summary = test_run.run()
     print_test_run_summary(summary)
+    if command_line_arguments.summary_file:
+        with open(command_line_arguments.summary_file, mode="w") as summary_file:
+            print_test_run_summary(summary, summary_file)
 
 
 if __name__ == "__main__":
