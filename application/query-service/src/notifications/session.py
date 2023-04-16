@@ -43,15 +43,20 @@ def _is_irrelevant(message: Dict[str, Any]) -> bool:
 
 
 def _extract_event_details(message: Dict[str, Any]) -> Event:
-    json_data = loads(message["data"])
-    event_type = json_data["event_type"]
-    entity = json_data["entity"]
-    uuid = json_data["uuid"]
-    return Event(
-        event_type=EventType[event_type.upper()],
-        entity=Entity[entity.upper()],
-        uuid=uuid
-    )
+    try:
+        json_data = loads(message["data"])
+        event_type = json_data["event_type"]
+        entity = json_data["entity"]
+        uuid = json_data["uuid"]
+        return Event(
+            event_type=EventType[event_type.upper()],
+            entity=Entity[entity.upper()],
+            uuid=uuid
+        )
+    except Exception as e:
+        _logger.error("Failed to extract event details from %s", message)
+        _logger.error(str(e))
+        return None
 
 
 def _consume_master_data_notifications(redis: Redis) -> None:
@@ -67,6 +72,14 @@ def _consume_master_data_notifications(redis: Redis) -> None:
             continue
         event = _extract_event_details(message)
         _logger.debug("Event = %s", event)
+        if event is None:
+            continue
+        if event.entity == Entity.MEANS_OF_TRANSPORT:
+            ...
+        elif event.entity == Entity.STATION:
+            ...
+        elif event.entity == Entity.LINE:
+            ...
 
 
 def subscribe_master_data_notifications() -> None:
