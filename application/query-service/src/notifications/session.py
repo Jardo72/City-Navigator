@@ -17,15 +17,41 @@
 # limitations under the License.
 #
 
+from json import loads
 from logging import getLogger
 from threading import Thread
+from typing import Any, Dict
 
 from redis import Redis
 
 from config import Config
 
+from .dto import Entity, Event, EventType
+
 
 _logger = getLogger("notifications")
+
+
+def _is_irrelevant(message: Dict[str, Any]) -> bool:
+    if message is None:
+        return True
+    if message["type"] != "message":
+        return True
+    if message["channel"] != Config.get_redis_channel():
+        return True
+    return False
+
+
+def _extract_event_details(message: Dict[str, Any]) -> Event:
+    json_data = loads(message["data"])
+    event_type = json_data["event_type"]
+    entity = json_data["entity"]
+    uuid = json_data["uuid"]
+    return Event(
+        event_type=EventType[event_type.upper()],
+        entity=Entity[entity.upper()],
+        uuid=uuid
+    )
 
 
 def _consume_master_data_notifications(redis: Redis) -> None:
@@ -35,8 +61,12 @@ def _consume_master_data_notifications(redis: Redis) -> None:
 
     while True:
         message = pubsub.get_message(timeout=15)
-        if message is not None:
-            _logger.info("Notification received: %s", message)
+        _logger.info("Message received: %s", message)
+        if _is_irrelevant(message):
+            _logger.debug("Ignoring irrelevant message")
+            continue
+        event = _extract_event_details(message)
+        _logger.debug("Event = %s", event)
 
 
 def subscribe_master_data_notifications() -> None:
