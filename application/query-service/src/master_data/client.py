@@ -89,8 +89,13 @@ class MasterDataClient:
 
     def __init__(self, base_url: str) -> None:
         self._base_url = base_url
-        adapter = requests.adapters.HTTPAdapter(pool_connections=10, pool_maxsize=10, max_retries=3)
-        self._session = requests.session()
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=10,
+            pool_maxsize=20,
+            max_retries=3,
+            pool_block=True
+        )
+        self._session = requests.Session()
         self._session.mount("http://", adapter)
         self._session.mount("https://", adapter)
 

@@ -255,11 +255,7 @@ async def update_line(
     # TODO:
     # - validate the line - terminal stops should match with the itineraries
 
-    # TODO:
-    # - we should also update the itinerary
-    # - one way to do so is to delete the entire itinerary, and create it from scratch
-    # db.query(Edge).filter(Edge.line_uuid == uuid).delete()
-
+    db.query(Edge).filter(Edge.line_uuid == uuid).delete()
     for single_edge in itinerary_one + itinerary_two:
         db.add(single_edge)
 
