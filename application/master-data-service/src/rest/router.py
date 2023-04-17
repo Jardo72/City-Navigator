@@ -225,11 +225,11 @@ async def create_line(
     line = Line()
     line.uuid = str(uuid4())
     update_line_entity_from_dto(entity=line, dto=request)
-    edges = create_edges_from_dto(dto=request, line_uuid=line.uuid)
+    itinerary_one, itinerary_two = create_edges_from_dto(dto=request, line_uuid=line.uuid)
     # TODO:
     # - validate the line - terminal stops should match with the itineraries
     db.add(line)
-    for single_edge in edges:
+    for single_edge in itinerary_one + itinerary_two:
         db.add(single_edge)
     db.commit()
     notifier.send_notification(EventType.CREATED, Line, line.uuid)
@@ -250,7 +250,7 @@ async def update_line(
     if record is None:
         raise line_not_found_exception(uuid)
     update_line_entity_from_dto(entity=record, dto=request)
-    edges = create_edges_from_dto(dto=request, line_uuid=uuid)
+    itinerary_one, itinerary_two = create_edges_from_dto(dto=request, line_uuid=uuid)
     # TODO:
     # - validate the line - terminal stops should match with the itineraries
 
@@ -259,7 +259,7 @@ async def update_line(
     # - one way to do so is to delete the entire itinerary, and create it from scratch
     # db.query(Edge).filter(Edge.line_uuid == uuid).delete()
 
-    for single_edge in edges:
+    for single_edge in itinerary_one + itinerary_two:
         db.add(single_edge)
 
     db.commit()

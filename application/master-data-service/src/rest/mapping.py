@@ -18,7 +18,7 @@
 #
 
 from enum import Enum, unique
-from typing import List
+from typing import List, Tuple
 from uuid import uuid4
 
 from db import Edge, Line, MeansOfTransport, Station
@@ -51,7 +51,7 @@ class _ItineraryDirection(Enum):
     TWO = 2
 
 
-def _as_itinerary(line: Line, direction: _ItineraryDirection) -> List[ItineraryEntry]:
+def _as_itinerary_dto(line: Line, direction: _ItineraryDirection) -> List[ItineraryEntry]:
     entries = []
     if direction is _ItineraryDirection.ONE:
         current_station = line.terminal_stop_one
@@ -84,8 +84,8 @@ def as_line_details_dto(line: Line) -> LineDetails:
         means_of_transport=as_means_of_transport_dto(line.means_of_transport),
         terminal_stop_one=as_station_details_dto(line.terminal_stop_one),
         terminal_stop_two=as_station_details_dto(line.terminal_stop_two),
-        direction_one_itinerary=_as_itinerary(line, _ItineraryDirection.ONE),
-        direction_two_itinerary=_as_itinerary(line, _ItineraryDirection.TWO)
+        direction_one_itinerary=_as_itinerary_dto(line, _ItineraryDirection.ONE),
+        direction_two_itinerary=_as_itinerary_dto(line, _ItineraryDirection.TWO)
     )
 
 
@@ -103,15 +103,25 @@ def update_line_entity_from_dto(entity: Line, dto: LineRequest) -> None:
     entity.terminal_stop_two_uuid = dto.terminal_stop_two_uuid
 
 
-def create_edges_from_dto(dto: LineRequest, line_uuid: str) -> List[Edge]:
+def _itinerary_as_edge_list(dto: LineRequest, line_uuid: str, direction: _ItineraryDirection) -> List[Edge]:
     result = []
-    """ TODO:
-    result.append(Edge(
-        uuid=str(uuid4()),
-        distance_min=,
-        start_station_uuid=,
-        end_station_uuid=,
-        line_uuid=line_uuid
-    ))
-    """
+    if direction is _ItineraryDirection.ONE:
+        itinerary = dto.direction_one_itinerary
+    else:
+        itinerary = dto.direction_two_itinerary
+    for i in range(1, len(itinerary) - 1):
+        distance_min = itinerary[i]["point_in_time_minutes"] - itinerary[i - 1]["point_in_time_minutes"]
+        result.append(Edge(
+            uuid=str(uuid4()),
+            distance_min=distance_min,
+            start_station_uuid=itinerary[i - 1]["station_uuid"],
+            end_station_uuid=itinerary[i]["station_uuid"],
+            line_uuid=line_uuid
+        ))
     return result
+
+
+def create_edges_from_dto(dto: LineRequest, line_uuid: str) -> Tuple[List[Edge], List[Edge]]:
+    itinerary_one = _itinerary_as_edge_list(dto, line_uuid, _ItineraryDirection.ONE)
+    itinerary_two = _itinerary_as_edge_list(dto, line_uuid, _ItineraryDirection.TWO)
+    return (itinerary_one, itinerary_two)
