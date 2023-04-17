@@ -226,6 +226,7 @@ async def create_line(
     line.uuid = str(uuid4())
     update_line_entity_from_dto(entity=line, dto=request)
     itinerary_one, itinerary_two = create_edges_from_dto(dto=request, line_uuid=line.uuid)
+    _logger.debug("%d edges in itinerary one, %d edges in itinerary two", len(itinerary_one), len(itinerary_two))
     # TODO:
     # - validate the line - terminal stops should match with the itineraries
     db.add(line)
