@@ -24,7 +24,7 @@ from uuid import uuid4
 from fastapi import Depends, APIRouter, status
 from sqlalchemy.orm import Session
 
-from db import Line, MeansOfTransport, Station
+from db import Edge, Line, MeansOfTransport, Station
 from db import get_db
 from notifications import EventType
 from notifications import get_notifier, Notifier
@@ -33,7 +33,7 @@ from .dto import LineDetails, LineInfo, LineRequest
 from .dto import MeansOfTransportDetails, MeansOfTransportRequest
 from .dto import StationDetails, StationRequest
 from .errors import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
-from .mapping import as_line_details, as_line_info, as_means_of_transport, as_station_details
+from .mapping import as_line_details_dto, as_line_info_dto, as_means_of_transport_dto, as_station_details_dto
 
 
 _logger = getLogger("rest")
@@ -48,7 +48,7 @@ async def get_means_of_transport_list(db: Session = Depends(get_db)):
     Provides a list with details of all means of transport.
     """
     result_set = db.query(MeansOfTransport).order_by(MeansOfTransport.identifier).all()
-    return [as_means_of_transport(record) for record in result_set]
+    return [as_means_of_transport_dto(record) for record in result_set]
 
 
 @router.get("/means-of-transport/{uuid}", response_model=MeansOfTransportDetails)
@@ -59,7 +59,7 @@ async def get_means_of_transport(uuid: str, db: Session = Depends(get_db)):
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
         raise means_of_transport_not_found_exception(uuid)
-    return as_means_of_transport(record)
+    return as_means_of_transport_dto(record)
 
 
 @router.post("/means-of-transport", response_model=MeansOfTransportDetails, status_code=status.HTTP_201_CREATED)
@@ -78,10 +78,7 @@ async def create_means_of_transport(
     db.commit()
     _logger.debug("New means of transport (uuid = %s) inserted into the database", means_of_transport.uuid)
     notifier.send_notification(EventType.CREATED, MeansOfTransport, means_of_transport.uuid)
-    return MeansOfTransportDetails(
-        uuid=means_of_transport.uuid,
-        identifier=request.identifier
-    )
+    return as_means_of_transport_dto(means_of_transport)
 
 
 @router.put("/means-of-transport/{uuid}")
@@ -101,10 +98,7 @@ async def update_means_of_transport(
     db.commit()
     _logger.debug("Means of transport (uuid = %s) updated in the database", uuid)
     notifier.send_notification(EventType.UPDATED, MeansOfTransport, uuid)
-    return MeansOfTransportDetails(
-        uuid=uuid,
-        identifier=request.identifier
-    )
+    return as_means_of_transport_dto(record)
 
 
 @router.delete("/means-of-transport/{uuid}")
@@ -132,7 +126,7 @@ async def get_station_list(db: Session = Depends(get_db)):
     the order is ascending.
     """
     result_set = db.query(Station).order_by(Station.name).all()
-    return [as_station_details(record) for record in result_set]
+    return [as_station_details_dto(record) for record in result_set]
 
 
 @router.get("/station/{uuid}", response_model=StationDetails)
@@ -143,7 +137,7 @@ async def get_station(uuid: str, db: Session = Depends(get_db)):
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
-    return as_station_details(record)
+    return as_station_details_dto(record)
 
 
 @router.post("/station", response_model=StationDetails, status_code=status.HTTP_201_CREATED)
@@ -162,7 +156,7 @@ async def create_station(
     db.commit()
     _logger.debug("New station (uuid = %s) inserted into the database", station.uuid)
     notifier.send_notification(EventType.CREATED, Station, station.uuid)
-    return StationDetails(uuid=station.uuid, name=station.name)
+    return as_station_details_dto(station)
 
 
 @router.put("/station/{uuid}", response_model=StationDetails)
@@ -181,7 +175,7 @@ async def update_station(
     record.name = request.name
     db.commit()
     notifier.send_notification(EventType.UPDATED, Station, uuid)
-    return as_station_details(record)
+    return as_station_details_dto(record)
 
 
 @router.delete("/station/{uuid}")
@@ -204,7 +198,7 @@ async def delete_station(
 @router.get("/lines", response_model=List[LineInfo])
 async def get_lines(db: Session = Depends(get_db)):
     result_set = db.query(Line).order_by(Line.label).all()
-    return [as_line_info(record) for record in result_set]
+    return [as_line_info_dto(record) for record in result_set]
 
 
 @router.get("/line/{uuid}", response_model=LineDetails)
@@ -215,7 +209,7 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
-    return as_line_details(record)
+    return as_line_details_dto(record)
 
 
 @router.post("/line", response_model=LineDetails, status_code=status.HTTP_201_CREATED)
@@ -236,7 +230,7 @@ async def create_line(
     db.add(line)
     db.commit()
     notifier.send_notification(EventType.CREATED, Line, line.uuid)
-    return as_line_details(line)
+    return as_line_details_dto(line)
 
 
 @router.put("/line/{uuid}", response_model=LineDetails)
@@ -256,9 +250,15 @@ async def update_line(
     record.means_of_transport_uuid = request.means_of_transport_uuid
     record.terminal_stop_one_uuid = request.terminal_stop_one_uuid
     record.terminal_stop_two_uuid = request.terminal_stop_two_uuid
+
+    # TODO:
+    # - we should also update the itinerary
+    # - one way to do so is to delete the entire itinerary, and create it from scratch
+    # db.query(Edge).filter(Edge.line_uuid == uuid).delete()
+
     db.commit()
     notifier.send_notification(EventType.UPDATED, Line, uuid)
-    return as_line_details(record)
+    return as_line_details_dto(record)
 
 
 @router.delete("/line/{uuid}")

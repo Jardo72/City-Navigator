@@ -27,7 +27,7 @@ from .dto import MeansOfTransportDetails
 from .dto import StationDetails
 
 
-def as_line_info(line: Line) -> LineInfo:
+def as_line_info_dto(line: Line) -> LineInfo:
     return LineInfo(
         uuid=line.uuid,
         label=line.label,
@@ -37,7 +37,7 @@ def as_line_info(line: Line) -> LineInfo:
     )
 
 
-def as_station_details(station: Station) -> StationDetails:
+def as_station_details_dto(station: Station) -> StationDetails:
     return StationDetails(
         uuid=station.uuid,
         name=station.name
@@ -61,7 +61,7 @@ def _as_itinerary(line: Line, direction: _ItineraryDirection) -> List[ItineraryE
     previous_station = None
     point_in_time_minutes = 0
     entries.append(ItineraryEntry(
-        station=as_station_details(current_station),
+        station=as_station_details_dto(current_station),
         point_in_time_minutes=None
     ))
     while current_station is not terminal_stop:
@@ -70,25 +70,25 @@ def _as_itinerary(line: Line, direction: _ItineraryDirection) -> List[ItineraryE
         current_station = edge.end_station
         point_in_time_minutes += edge.distance_min
         entries.append(ItineraryEntry(
-            station=as_station_details(current_station),
+            station=as_station_details_dto(current_station),
             point_in_time_minutes=point_in_time_minutes,
         ))
     return entries
 
 
-def as_line_details(line: Line) -> LineDetails:
+def as_line_details_dto(line: Line) -> LineDetails:
     return LineDetails(
         uuid=line.uuid,
         label=line.label,
-        means_of_transport=as_means_of_transport(line.means_of_transport),
-        terminal_stop_one=as_station_details(line.terminal_stop_one),
-        terminal_stop_two=as_station_details(line.terminal_stop_two),
+        means_of_transport=as_means_of_transport_dto(line.means_of_transport),
+        terminal_stop_one=as_station_details_dto(line.terminal_stop_one),
+        terminal_stop_two=as_station_details_dto(line.terminal_stop_two),
         direction_one_itinerary=_as_itinerary(line, _ItineraryDirection.ONE),
         direction_two_itinerary=_as_itinerary(line, _ItineraryDirection.TWO)
     )
 
 
-def as_means_of_transport(means_of_transport: MeansOfTransport) -> MeansOfTransportDetails:
+def as_means_of_transport_dto(means_of_transport: MeansOfTransport) -> MeansOfTransportDetails:
     return MeansOfTransportDetails(
         uuid=means_of_transport.uuid,
         identifier=means_of_transport.identifier
