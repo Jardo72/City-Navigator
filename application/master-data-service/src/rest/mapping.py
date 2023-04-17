@@ -22,7 +22,7 @@ from typing import List
 
 from db import Line, MeansOfTransport, Station
 
-from .dto import LineDetails, LineInfo, ItineraryEntry
+from .dto import LineDetails, LineInfo, LineRequest, ItineraryEntry
 from .dto import MeansOfTransportDetails
 from .dto import StationDetails
 
@@ -93,3 +93,10 @@ def as_means_of_transport_dto(means_of_transport: MeansOfTransport) -> MeansOfTr
         uuid=means_of_transport.uuid,
         identifier=means_of_transport.identifier
     )
+
+
+def update_line_entity_from_dto(entity: Line, dto: LineRequest) -> None:
+    entity.label = dto.label
+    entity.means_of_transport_uuid = dto.means_of_transport_uuid
+    entity.terminal_stop_one_uuid = dto.terminal_stop_one_uuid
+    entity.terminal_stop_two_uuid = dto.terminal_stop_two_uuid

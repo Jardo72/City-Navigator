@@ -34,6 +34,7 @@ from .dto import MeansOfTransportDetails, MeansOfTransportRequest
 from .dto import StationDetails, StationRequest
 from .errors import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
 from .mapping import as_line_details_dto, as_line_info_dto, as_means_of_transport_dto, as_station_details_dto
+from .mapping import update_line_entity_from_dto
 
 
 _logger = getLogger("rest")
@@ -223,10 +224,7 @@ async def create_line(
     """
     line = Line()
     line.uuid = str(uuid4())
-    line.label = request.label
-    line.means_of_transport_uuid = request.means_of_transport_uuid
-    line.terminal_stop_one_uuid = request.terminal_stop_one_uuid
-    line.terminal_stop_two_uuid = request.terminal_stop_two_uuid
+    update_line_entity_from_dto(entity=line, dto=request)
     db.add(line)
     db.commit()
     notifier.send_notification(EventType.CREATED, Line, line.uuid)
@@ -246,10 +244,7 @@ async def update_line(
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
-    record.label = request.label
-    record.means_of_transport_uuid = request.means_of_transport_uuid
-    record.terminal_stop_one_uuid = request.terminal_stop_one_uuid
-    record.terminal_stop_two_uuid = request.terminal_stop_two_uuid
+    update_line_entity_from_dto(entity=record, dto=request)
 
     # TODO:
     # - we should also update the itinerary
