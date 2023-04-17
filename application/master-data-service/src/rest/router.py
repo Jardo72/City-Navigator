@@ -34,7 +34,7 @@ from .dto import MeansOfTransportDetails, MeansOfTransportRequest
 from .dto import StationDetails, StationRequest
 from .errors import line_not_found_exception, means_of_transport_not_found_exception, station_not_found_exception
 from .mapping import as_line_details_dto, as_line_info_dto, as_means_of_transport_dto, as_station_details_dto
-from .mapping import update_line_entity_from_dto
+from .mapping import create_edges_from_dto, update_line_entity_from_dto
 
 
 _logger = getLogger("rest")
@@ -225,7 +225,12 @@ async def create_line(
     line = Line()
     line.uuid = str(uuid4())
     update_line_entity_from_dto(entity=line, dto=request)
+    edges = create_edges_from_dto(dto=request, line_uuid=line.uuid)
+    # TODO:
+    # - validate the line - terminal stops should match with the itineraries
     db.add(line)
+    for single_edge in edges:
+        db.add(single_edge)
     db.commit()
     notifier.send_notification(EventType.CREATED, Line, line.uuid)
     return as_line_details_dto(line)
@@ -245,11 +250,17 @@ async def update_line(
     if record is None:
         raise line_not_found_exception(uuid)
     update_line_entity_from_dto(entity=record, dto=request)
+    edges = create_edges_from_dto(dto=request, line_uuid=uuid)
+    # TODO:
+    # - validate the line - terminal stops should match with the itineraries
 
     # TODO:
     # - we should also update the itinerary
     # - one way to do so is to delete the entire itinerary, and create it from scratch
     # db.query(Edge).filter(Edge.line_uuid == uuid).delete()
+
+    for single_edge in edges:
+        db.add(single_edge)
 
     db.commit()
     notifier.send_notification(EventType.UPDATED, Line, uuid)

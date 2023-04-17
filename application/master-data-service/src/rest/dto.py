@@ -65,8 +65,15 @@ class LineDetails(BaseModel):
     direction_two_itinerary: List[ItineraryEntry] = None
 
 
+class ItineraryEntryRequest(BaseModel):
+    station_uuid: str = None
+    point_in_time_minutes: int = None
+
+
 class LineRequest(BaseModel):
     label: str = None
     means_of_transport_uuid: str = None
     terminal_stop_one_uuid: str = None
     terminal_stop_two_uuid: str = None
+    direction_one_itinerary: List[ItineraryEntryRequest] = None
+    direction_two_itinerary: List[ItineraryEntryRequest] = None

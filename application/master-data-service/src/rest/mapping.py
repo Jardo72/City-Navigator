@@ -19,8 +19,9 @@
 
 from enum import Enum, unique
 from typing import List
+from uuid import uuid4
 
-from db import Line, MeansOfTransport, Station
+from db import Edge, Line, MeansOfTransport, Station
 
 from .dto import LineDetails, LineInfo, LineRequest, ItineraryEntry
 from .dto import MeansOfTransportDetails
@@ -100,3 +101,17 @@ def update_line_entity_from_dto(entity: Line, dto: LineRequest) -> None:
     entity.means_of_transport_uuid = dto.means_of_transport_uuid
     entity.terminal_stop_one_uuid = dto.terminal_stop_one_uuid
     entity.terminal_stop_two_uuid = dto.terminal_stop_two_uuid
+
+
+def create_edges_from_dto(dto: LineRequest, line_uuid: str) -> List[Edge]:
+    result = []
+    """ TODO:
+    result.append(Edge(
+        uuid=str(uuid4()),
+        distance_min=,
+        start_station_uuid=,
+        end_station_uuid=,
+        line_uuid=line_uuid
+    ))
+    """
+    return result
