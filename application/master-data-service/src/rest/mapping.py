@@ -110,12 +110,12 @@ def _itinerary_as_edge_list(dto: LineRequest, line_uuid: str, direction: _Itiner
     else:
         itinerary = dto.direction_two_itinerary
     for i in range(1, len(itinerary) - 1):
-        distance_min = itinerary[i]["point_in_time_minutes"] - itinerary[i - 1]["point_in_time_minutes"]
+        distance_min = itinerary[i].point_in_time_minutes - itinerary[i - 1].point_in_time_minutes
         result.append(Edge(
             uuid=str(uuid4()),
             distance_min=distance_min,
-            start_station_uuid=itinerary[i - 1]["station_uuid"],
-            end_station_uuid=itinerary[i]["station_uuid"],
+            start_station_uuid=itinerary[i - 1].station_uuid,
+            end_station_uuid=itinerary[i].station_uuid,
             line_uuid=line_uuid
         ))
     return result
