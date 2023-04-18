@@ -104,14 +104,14 @@ def format_duration(duration_sec: float) -> str:
 
 
 def print_test_run_summary(summary: TestRunSummary, summary_file: TextIOWrapper = None) -> None:
-    FORMAT = "%Y-%m-%dT%H:%M:%S"
+    FORMAT = "%Y-%m-%d %H:%M:%S"
     duration_sec = summary.duration.total_seconds()
     print(f"Query service base URL:                 {summary.config.query_service_base_url}", file=summary_file)
     print(f"Test run start time:                    {summary.start_time.strftime(FORMAT)}", file=summary_file)
     print(f"Test run end time:                      {summary.end_time.strftime(FORMAT)}", file=summary_file)
     print(f"Overall duration:                       {format_duration(duration_sec)}", file=summary_file)
-    print(f"Overall thread count:                   {summary.config.overall_thread_count}", file=summary_file)
     print(f"Overall number of successful requests:  {summary.overall_success_count}", file=summary_file)
+    print(f"Overall thread count:                   {summary.config.overall_thread_count}", file=summary_file)
     print_api_endpoint_summary(
         title="Journey plan search",
         summary=summary.journey_plan_search_summary,
