@@ -77,6 +77,7 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
 
 
 def print_api_endpoint_summary(
+        title: str,
         summary: APIEndpointSummary,
         thread_count: int,
         test_duration_sec: float,
@@ -84,6 +85,7 @@ def print_api_endpoint_summary(
 ) -> None:
     INDENTATION = 4 * " "
     throughput = summary.success_count / test_duration_sec
+    print(title, file=summary_file)
     print(f"{INDENTATION}Worker thread count:            {thread_count}", file=summary_file)
     print(f"{INDENTATION}Number of successful requests:  {summary.success_count}", file=summary_file)
     print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
@@ -104,33 +106,35 @@ def format_duration(duration_sec: float) -> str:
 def print_test_run_summary(summary: TestRunSummary, summary_file: TextIOWrapper = None) -> None:
     FORMAT = "%Y-%m-%dT%H:%M:%S"
     duration_sec = summary.duration.total_seconds()
-    print(f"Query service base URL: {summary.config.query_service_base_url}", file=summary_file)
-    print(f"Test run start time:    {summary.start_time.strftime(FORMAT)}", file=summary_file)
-    print(f"Test run end time:      {summary.end_time.strftime(FORMAT)}", file=summary_file)
-    print(f"Overall duration:       {format_duration(duration_sec)}", file=summary_file)
-    print("Journey plan search", file=summary_file)
+    print(f"Query service base URL:                 {summary.config.query_service_base_url}", file=summary_file)
+    print(f"Test run start time:                    {summary.start_time.strftime(FORMAT)}", file=summary_file)
+    print(f"Test run end time:                      {summary.end_time.strftime(FORMAT)}", file=summary_file)
+    print(f"Overall duration:                       {format_duration(duration_sec)}", file=summary_file)
+    print(f"Overall thread count:                   {summary.config.overall_thread_count}", file=summary_file)
+    print(f"Overall number of successful requests:  {summary.overall_success_count}", file=summary_file)
     print_api_endpoint_summary(
+        title="Journey plan search",
         summary=summary.journey_plan_search_summary,
         thread_count=summary.config.journey_plan_search_threads,
         test_duration_sec=duration_sec,
         summary_file=summary_file
     )
-    print("Station query summary", file=summary_file)
     print_api_endpoint_summary(
+        title="Station query summary",
         summary=summary.station_query_summary,
         thread_count=summary.config.station_query_threads,
         test_duration_sec=duration_sec,
         summary_file=summary_file
     )
-    print("Station filter summary", file=summary_file)
     print_api_endpoint_summary(
+        title="Station filter summary",
         summary=summary.station_filter_summary,
         thread_count=summary.config.station_filter_threads,
         test_duration_sec=duration_sec,
         summary_file=summary_file
     )
-    print("Line query summary", file=summary_file)
     print_api_endpoint_summary(
+        title="Line query summary",
         summary=summary.line_query_summary,
         thread_count=summary.config.line_query_threads,
         test_duration_sec=duration_sec,

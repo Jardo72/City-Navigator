@@ -38,3 +38,10 @@ class TestRunSummary:
     @property
     def duration(self) -> timedelta:
         return self.end_time - self.start_time
+
+    @property
+    def overall_success_count(self) -> int:
+        return (
+            self.journey_plan_search_summary.success_count + self.line_query_summary.success_count +
+            self.station_query_summary.success_count + self.station_filter_summary.success_count
+        )

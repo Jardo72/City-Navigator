@@ -30,6 +30,13 @@ class Config:
     station_query_threads: int
     station_filter_threads: int
 
+    @property
+    def overall_thread_count(self) -> int:
+        return (
+            self.journey_plan_search_threads + self.line_query_threads +
+            self.station_query_threads + self.station_filter_threads
+        )
+
 
 def read_from_file(filename: str) -> Config:
     with open(filename, "r") as json_file:
