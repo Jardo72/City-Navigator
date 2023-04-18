@@ -227,8 +227,9 @@ async def create_line(
     update_line_entity_from_dto(entity=line, dto=request)
     itinerary_one, itinerary_two = create_edges_from_dto(dto=request, line_uuid=line.uuid)
     _logger.debug("%d edges in itinerary one, %d edges in itinerary two", len(itinerary_one), len(itinerary_two))
-    # TODO:
-    # - validate the line - terminal stops should match with the itineraries
+    # TODO: validate the line
+    # - terminal stops should match with the itineraries
+    # - point in time should be increasing 
     db.add(line)
     for single_edge in itinerary_one + itinerary_two:
         db.add(single_edge)
@@ -252,8 +253,9 @@ async def update_line(
         raise line_not_found_exception(uuid)
     update_line_entity_from_dto(entity=record, dto=request)
     itinerary_one, itinerary_two = create_edges_from_dto(dto=request, line_uuid=uuid)
-    # TODO:
-    # - validate the line - terminal stops should match with the itineraries
+    # TODO: validate the line
+    # - terminal stops should match with the itineraries
+    # - point in time should be increasing 
 
     db.query(Edge).filter(Edge.line_uuid == uuid).delete()
     for single_edge in itinerary_one + itinerary_two:

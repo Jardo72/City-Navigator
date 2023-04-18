@@ -17,9 +17,13 @@
 # limitations under the License.
 #
 
+from logging import getLogger
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, root_validator
+
+
+_logger = getLogger("rest")
 
 
 class MeansOfTransportDetails(BaseModel):
@@ -77,3 +81,25 @@ class LineRequest(BaseModel):
     terminal_stop_two_uuid: str = None
     direction_one_itinerary: List[ItineraryEntryRequest] = None
     direction_two_itinerary: List[ItineraryEntryRequest] = None
+
+    @root_validator
+    def line_request_validator(cls, values):
+        _logger.debug("Starting the validation of LineRequest, values = %s", values)
+        terminal_stop_one = values.get("terminal_stop_one_uuid")
+        terminal_stop_two = values.get("terminal_stop_two_uuid")
+        direction_one_itinerary = values.get("direction_one_itinerary")
+        direction_two_itinerary = values.get("direction_two_itinerary")
+
+        if terminal_stop_one != direction_one_itinerary[0].station_uuid:
+            message = "Terminal stop 1 does not match with the starting station of itinerary 1."
+            raise ValueError(message)
+        if terminal_stop_two != direction_one_itinerary[-1].station_uuid:
+            message = "Terminal stop 2 does not match with the end station of itinerary 1."
+            raise ValueError(message)
+        if terminal_stop_one != direction_two_itinerary[-1].station_uuid:
+            message = "Terminal stop 1 does not match with the end station of itinerary 2."
+            raise ValueError(message)
+        if terminal_stop_two != direction_two_itinerary[0].station_uuid:
+            message = "Terminal stop 2 does not match with the starting station of itinerary 2."
+            raise ValueError(message)
+        return values
