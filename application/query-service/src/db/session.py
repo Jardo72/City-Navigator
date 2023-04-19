@@ -28,7 +28,8 @@ _logger = getLogger("db")
 
 _engine = create_engine(
     url="sqlite://",
-    connect_args={"check_same_thread": False}
+    connect_args={"check_same_thread": False},
+    pool_size=20
 )
 _logger.info("DB engine created")
 
@@ -95,10 +96,9 @@ _DDL_STATEMENTS = [
 ]
 
 
-conn = _engine.connect()
-_logger.info("Going to create DB schema")
-for statement in _DDL_STATEMENTS:
-    _logger.debug("Going to execute DDL statement:\n%s", statement)
-    conn.execute(text(statement))
-_logger.info("DB schema created")
-conn.close()
+with _engine.connect() as conn:
+    _logger.info("Going to create DB schema")
+    for statement in _DDL_STATEMENTS:
+        _logger.debug("Going to execute DDL statement:\n%s", statement)
+        conn.execute(text(statement))
+    _logger.info("DB schema created")
