@@ -33,7 +33,7 @@ class MeansOfTransportDetails(BaseModel):
 
 
 class MeansOfTransportRequest(BaseModel):
-    identifier: str = None
+    identifier: str = Field(max_length=20)
     presentation_color: str = None
 
 
@@ -43,7 +43,7 @@ class StationDetails(BaseModel):
 
 
 class StationRequest(BaseModel):
-    name: str = None
+    name: str = Field(max_length=50)
 
 
 class LineInfo(BaseModel):
@@ -71,11 +71,11 @@ class LineDetails(BaseModel):
 
 class ItineraryEntryRequest(BaseModel):
     station_uuid: str = None
-    point_in_time_minutes: int = None
+    point_in_time_minutes: int = Field(ge=0)
 
 
 class LineRequest(BaseModel):
-    label: str = None
+    label: str = Field(min_length=2, max_length=5)
     means_of_transport_uuid: str = None
     terminal_stop_one_uuid: str = None
     terminal_stop_two_uuid: str = None
