@@ -74,6 +74,23 @@ class ItineraryEntryRequest(BaseModel):
     point_in_time_minutes: int = Field(ge=0)
 
 
+def _validate_itinerary(itinerary: List[ItineraryEntryRequest], direction: int) -> None:
+    if itinerary[0].point_in_time_minutes != 0:
+        message = f"Point in time for the first station in itinerary {direction} must be 0."
+        raise ValueError(message)
+    previous_point_in_time_minutes = 0
+    stations = set()
+    for entry in itinerary[1:]:
+        if entry.station_uuid in stations:
+            message = f"Duplicate station (uuid {entry.station_uuid}) in itinerary {direction}."
+            raise ValueError(message)
+        if entry.point_in_time_minutes <= previous_point_in_time_minutes:
+            message = f"Point in time for station {entry.station_uuid} is not greater than point in time for the previous station."
+            raise ValueError(message)
+        stations.add(entry.station_uuid)
+        previous_point_in_time_minutes = entry.point_in_time_minutes
+
+
 class LineRequest(BaseModel):
     label: str = Field(min_length=2, max_length=5)
     means_of_transport_uuid: str = None
@@ -102,4 +119,6 @@ class LineRequest(BaseModel):
         if terminal_stop_two != direction_two_itinerary[0].station_uuid:
             message = "Terminal stop 2 does not match with the starting station of itinerary 2."
             raise ValueError(message)
+        _validate_itinerary(direction_one_itinerary, 1)
+        _validate_itinerary(direction_two_itinerary, 2)
         return values
