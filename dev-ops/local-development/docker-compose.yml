@@ -74,7 +74,6 @@ services:
       - service-network
     deploy:
       mode: replicated
-      replicas: 2
       resources:
         reservations:
           cpus: '0.50'
@@ -111,6 +110,7 @@ services:
       - query-service
     networks:
       - service-network
+      - monitoring-network
     ports:
       - 9090:9090
     deploy:
@@ -119,6 +119,25 @@ services:
         max_attempts: 3
         delay: 5s
 
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus-server
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=GrafanaSecret#37
+    networks:
+      - monitoring-network
+    volumes:
+      - type: bind
+        source: ./grafana
+        target: /etc/grafana/provisioning/datasources
+        read_only: true
+    ports:
+      - 3000:3000
+
 networks:
   service-network:
+    driver: bridge
+  monitoring-network:
     driver: bridge
