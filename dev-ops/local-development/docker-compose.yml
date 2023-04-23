@@ -104,13 +104,18 @@ services:
         delay: 5s
 
   prometheus-server:
-    image: jardo72/city-navigator-prometheus:latest
+    image: prom/prometheus
     depends_on:
       - master-data-server
       - query-service
     networks:
       - service-network
       - monitoring-network
+    volumes:
+      - type: bind
+        source: ./prometheus
+        target: /etc/prometheus/
+        read_only: true
     ports:
       - 9090:9090
     deploy:
