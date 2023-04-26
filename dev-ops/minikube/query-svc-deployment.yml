@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: query-svc-deployment
+  labels:
+    application: city-navigator
+    component: query-service
+    environment: sandbox
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: nginx
+      labels:
+        application: city-navigator
+        component: query-service
+        environment: sandbox
+    spec:
+      containers:
+        - name: query-service
+          image: jardo72/city-navigator-query-service:latest
+  selector:
+    matchLabels:
+      application: city-navigator
+      component: query-service
+      environment: sandbox
+  strategy:
+    type: RollingUpdate
+

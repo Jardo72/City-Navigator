@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: master-data-svc-deployment
+  labels:
+    application: city-navigator
+    component: master-data-service
+    environment: sandbox
+spec:
+  replicas: 2
+  template:
+    metadata:
+      name: nginx
+      labels:
+        application: city-navigator
+        component: master-data-service
+        environment: sandbox
+    spec:
+      containers:
+        - name: master-data-service
+          image: jardo72/city-navigator-master-data-service:latest
+  selector:
+    matchLabels:
+      application: city-navigator
+      component: master-data-service
+      environment: sandbox
+  strategy:
+    type: RollingUpdate
