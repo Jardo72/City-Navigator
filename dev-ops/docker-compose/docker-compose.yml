@@ -87,7 +87,7 @@ services:
         delay: 10s
 
   nginx-http-router:
-    image: jardo72/city-navigator-router:latest
+    image: nginx:1.23.3-alpine
     depends_on:
       - master-data-service
       - query-service
@@ -95,6 +95,11 @@ services:
       - 80
     networks:
       - service-network
+    volumes:
+      - type: bind
+        source: ./nginx
+        target: /etc/nginx
+        read_only: true
     ports:
       - 80:80
     deploy:
