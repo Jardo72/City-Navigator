@@ -14,5 +14,9 @@ https://grafana.com/docs/grafana/latest/setup-grafana/configure-docker/
 # FastAPI, gunicorn
 https://github.com/mikeckennedy/docker-build-fastapi-app-april-2021
 
+# FastAPI Swagger Doc + Proxy
+https://fastapi.tiangolo.com/advanced/behind-a-proxy/#about-proxies-with-a-stripped-path-prefix
+https://fastapi.tiangolo.com/tutorial/metadata/
+
 # Docker Compose (Prometheus + Grafana)
 https://github.com/docker/awesome-compose/tree/master/prometheus-grafana

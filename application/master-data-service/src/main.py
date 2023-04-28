@@ -24,6 +24,7 @@ from fastapi import FastAPI
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
+from config import Config
 from rest import router
 
 
@@ -34,7 +35,10 @@ APPLICATION_NAME = "City Navigator - Master Data Service"
 APPLICATION_VERSION = "0.1.0"
 
 
-app = FastAPI(title=APPLICATION_NAME)
+if Config.is_api_doc_enabled():
+    app = FastAPI(title=APPLICATION_NAME, root_path=Config.get_root_path())
+else:
+    app = FastAPI(title=APPLICATION_NAME, openapi_url=None, redoc_url=None)
 app.include_router(router)
 Instrumentator().instrument(app).expose(app)
 
