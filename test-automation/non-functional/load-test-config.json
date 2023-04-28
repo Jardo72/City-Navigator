@@ -1,8 +1,8 @@
 {
     "query_service_base_url": "http://localhost/city-navigator/api/query",
-    "test_duration_minutes": 5,
-    "journey_plan_search_threads": 5,
-    "line_query_threads": 2,
+    "test_duration_minutes": 20,
+    "journey_plan_search_threads": 4,
+    "line_query_threads": 1,
     "station_query_threads": 2,
-    "station_filter_threads": 2
+    "station_filter_threads": 1
 }
