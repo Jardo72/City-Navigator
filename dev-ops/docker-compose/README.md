@@ -15,3 +15,7 @@ TODO:
 ```
 docker compose up -d --wait
 ```
+
+```
+docker compose down
+```

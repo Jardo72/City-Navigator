@@ -20,3 +20,6 @@ https://fastapi.tiangolo.com/tutorial/metadata/
 
 # Docker Compose (Prometheus + Grafana)
 https://github.com/docker/awesome-compose/tree/master/prometheus-grafana
+
+# Prometheus & Multi-Process Setups
+https://shiriev.ru/prometheus-multiprocessing/

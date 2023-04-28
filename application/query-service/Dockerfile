@@ -13,4 +13,4 @@ USER 1000:1000
 
 EXPOSE 8000
 
-CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--log-config", "logging.ini" ]
+CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "5", "--log-config", "logging.ini" ]
