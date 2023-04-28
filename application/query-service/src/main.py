@@ -26,6 +26,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel
 
 from db import get_db_session
+from config import Config
 from master_data import init_db_from_master_data
 from notifications import subscribe_master_data_notifications
 from rest import router
@@ -50,7 +51,10 @@ APPLICATION_NAME = "City Navigator - Query Service"
 APPLICATION_VERSION = "0.1.0"
 
 
-app = FastAPI(title=APPLICATION_NAME, lifespan=lifespan)
+if Config.is_api_doc_enabled():
+    app = FastAPI(title=APPLICATION_NAME, root_path=Config.get_root_path(), lifespan=lifespan)
+else:
+    app = FastAPI(title=APPLICATION_NAME, openapi_url=None, redoc_url=None, lifespan=lifespan)
 app.include_router(router)
 Instrumentator().instrument(app).expose(app)
 

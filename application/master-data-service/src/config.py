@@ -28,12 +28,12 @@ class Config:
 
     @staticmethod
     def is_api_doc_enabled() -> bool:
-        value = Config._get_environment_variable("API_DOC_ENABLED", "NO")
+        value = Config._get_environment_variable("API_DOC_ENABLED", default_value="NO")
         return value.upper() in {"YES", "TRUE", "1"}
 
     @staticmethod
     def get_root_path() -> str:
-        return Config._get_environment_variable("ROOT_PATH")
+        return Config._get_environment_variable("ROOT_PATH", default_value="")
 
     @staticmethod
     def get_database_url() -> str:
