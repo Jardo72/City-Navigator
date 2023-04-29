@@ -77,13 +77,12 @@ services:
     networks:
       - service-network
     deploy:
-      mode: replicated
       resources:
         reservations:
-          cpus: '1.0'
+          cpus: '1.5'
           memory: 1G
         limits:
-          cpus: '2.5'
+          cpus: '3.5'
           memory: 3G
       restart_policy:
         condition: on-failure

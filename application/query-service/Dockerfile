@@ -16,6 +16,6 @@ EXPOSE 8000
 
 ENTRYPOINT /usr/local/bin/gunicorn \
     -b 0.0.0.0:8000 \
-    -w 5 \
+    -w 6 \
     -k uvicorn.workers.UvicornWorker main:app \
     --log-config logging.ini
