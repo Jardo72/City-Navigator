@@ -10,6 +10,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir gunicorn uvloop
 RUN rm requirements.txt
 
+ENV PROMETHEUS_MULTIPROC_DIR=/prometheus/multiproc
+RUN mkdir -p ${PROMETHEUS_MULTIPROC_DIR}
+RUN chown -R 1000:1000 ${PROMETHEUS_MULTIPROC_DIR}
+RUN chmod -R u+rwx ${PROMETHEUS_MULTIPROC_DIR}
+
 USER 1000:1000
 
 EXPOSE 8000

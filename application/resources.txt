@@ -23,3 +23,4 @@ https://github.com/docker/awesome-compose/tree/master/prometheus-grafana
 
 # Prometheus & Multi-Process Setups
 https://shiriev.ru/prometheus-multiprocessing/
+https://github.com/prometheus/client_python

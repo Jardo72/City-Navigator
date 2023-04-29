@@ -21,6 +21,7 @@ from logging import getLogger
 from typing import List
 
 from fastapi import Depends, APIRouter
+from prometheus_client import Counter
 from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
@@ -36,6 +37,11 @@ _logger = getLogger("rest")
 
 
 router = APIRouter()
+request_counter = Counter(
+    name="query_service_http_requests_total",
+    documentation="Number of HTTP requests processed by Query Service",
+    labelnames=["method", "path"]
+)
 
 
 @router.get("/means-of-transport", response_model=List[MeansOfTransportDetails])
@@ -43,6 +49,7 @@ async def get_means_of_transport(db: Session = Depends(get_db)):
     """
     Provides a list of all means of transport.
     """
+    request_counter.labels(method="GET", path="/means-of-transport").inc()
     means_of_transport = db.query(MeansOfTransport).all()
     return [as_means_of_transport_details(single_means_of_transport) for single_means_of_transport in means_of_transport]
 
@@ -56,6 +63,7 @@ async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     will be returned.
     """
     _logger.debug("Asked for stations - filter = %s", filter)
+    request_counter.labels(method="GET", path="/stations").inc()
     if filter is None:
         stations = db.query(Station).order_by(Station.name).all()
     else:
@@ -70,6 +78,7 @@ async def get_station_details(name: str, db: Session = Depends(get_db)):
     Provides the details of the station with the given name.
     """
     _logger.debug("Asked for single station - name = %s", name)
+    request_counter.labels(method="GET", path="/station").inc()
     station = db.query(Station).filter(Station.name == name).first()
     if station is None:
         raise station_not_found_exception(name)
@@ -82,6 +91,7 @@ async def get_line_list(means_of_transport: str = None, db: Session = Depends(ge
     Provides a list of lines with the given means of transport. If no filter is specified
     (i.e. if the parameter is omitted), all lines are returned.
     """
+    request_counter.labels(method="GET", path="/lines").inc()
     if means_of_transport is None:
         lines = db.query(Line).order_by(Line.label).all()
     else:
@@ -95,6 +105,7 @@ async def get_line_details(label: str, db: Session = Depends(get_db)):
     """
     Provides the details of the line with the given label.
     """
+    request_counter.labels(method="GET", path="/line").inc()
     line = db.query(Line).filter(Line.label == label).first()
     if not line:
         raise line_not_found_exception(label)
@@ -107,6 +118,7 @@ async def search_journey_plan(start: str, destination: str, db: Session = Depend
     Finds and returns a journey plan with the given start and destination.
     """
     _logger.debug("Asked to search path from %s to %s", start, destination)
+    request_counter.labels(method="GET", path="/journey-plan").inc()
     start_station = db.query(Station).filter(Station.name == start).first()
     if start_station is None:
         raise station_not_found_exception(start)
