@@ -1,15 +1,14 @@
 FROM python:3.11-slim-buster
 
-WORKDIR /db
-COPY ./sqlite.db ./
-
 WORKDIR /usr/src/app
+
 COPY requirements.txt ./
 COPY logging.ini ./
 COPY src ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir gunicorn uvloop
+RUN rm requirements.txt
 
 USER 1000:1000
 
