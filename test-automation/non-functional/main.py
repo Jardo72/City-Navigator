@@ -93,6 +93,7 @@ def print_api_endpoint_summary(
     print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
     print(f"{INDENTATION}Client error count:             {summary.client_error_count}", file=summary_file)
     print(f"{INDENTATION}Server error count:             {summary.server_error_count}", file=summary_file)
+    print(f"{INDENTATION}Exception count:                {summary.exception_count}", file=summary_file)
     print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
 
 

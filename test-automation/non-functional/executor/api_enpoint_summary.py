@@ -27,6 +27,7 @@ class APIEndpointSummary:
     success_count: int
     client_error_count: int
     server_error_count: int
+    exception_count: int
     overall_success_duration_millis: int
     min_success_duration_millis: int
     max_success_duration_millis: int
@@ -41,6 +42,7 @@ class APIEndpointSummary:
             success_count=self.success_count + other.success_count,
             client_error_count=self.client_error_count + other.client_error_count,
             server_error_count=self.server_error_count + other.server_error_count,
+            exception_count=self.exception_count + other.exception_count,
             overall_success_duration_millis=self.overall_success_duration_millis + other.overall_success_duration_millis,
             min_success_duration_millis=min(self.min_success_duration_millis, other.min_success_duration_millis),
             max_success_duration_millis=max(self.max_success_duration_millis, other.max_success_duration_millis)

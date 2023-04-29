@@ -27,6 +27,7 @@ class StatisticsCollector:
         self._success_count: int = 0
         self._client_error_count: int = 0
         self._server_error_count: int = 0
+        self._exception_count = 0
         self._overall_success_duration_millis: int = 0
         self._min_success_duration_millis: int = 1000000
         self._max_success_duration_millis: int = 0
@@ -44,11 +45,15 @@ class StatisticsCollector:
         if 500 <= response.status_code < 600:
             self._server_error_count += 1
 
+    def exception_caught(self) -> None:
+        self._exception_count += 1
+
     def get_summary(self) -> APIEndpointSummary:
         return APIEndpointSummary(
             success_count=self._success_count,
             client_error_count=self._client_error_count,
             server_error_count=self._server_error_count,
+            exception_count=self._exception_count,
             overall_success_duration_millis=self._overall_success_duration_millis,
             min_success_duration_millis=self._min_success_duration_millis,
             max_success_duration_millis=self._max_success_duration_millis
