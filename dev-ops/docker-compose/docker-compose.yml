@@ -81,10 +81,10 @@ services:
       resources:
         reservations:
           cpus: '1.0'
-          memory: 500M
+          memory: 1G
         limits:
-          cpus: '2.0'
-          memory: 2G
+          cpus: '2.5'
+          memory: 3G
       restart_policy:
         condition: on-failure
         max_attempts: 3
