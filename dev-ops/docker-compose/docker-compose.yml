@@ -37,6 +37,7 @@ services:
     environment:
       - API_DOC_ENABLED=yes
       - ROOT_PATH=/city-navigator/api/master-data
+      - ACCESS_LOG=/access-logs/master-data-service-access.log
       - DATABASE_URL=sqlite:////db/sqlite.db
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
@@ -48,6 +49,11 @@ services:
       - type: bind
         source: ./data
         target: /db
+        read_only: false
+      - type: bind
+        source: ./access-logs
+        target: /access-logs
+        read_only: false
     deploy:
       resources:
         reservations:
@@ -71,11 +77,17 @@ services:
     environment:
       - API_DOC_ENABLED=yes
       - ROOT_PATH=/city-navigator/api/query
+      - ACCESS_LOG=/access-logs/query-service-access.log
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
     networks:
       - service-network
+    volumes:
+      - type: bind
+        source: ./access-logs
+        target: /access-logs
+        read_only: false
     deploy:
       resources:
         reservations:
