@@ -21,7 +21,8 @@ from logging import getLogger
 from sys import version as python_version
 
 from fastapi import FastAPI
-from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_client import CollectorRegistry
+from prometheus_client import make_asgi_app, multiprocess
 from pydantic import BaseModel
 
 from config import Config
@@ -35,12 +36,16 @@ APPLICATION_NAME = "City Navigator - Master Data Service"
 APPLICATION_VERSION = "0.1.0"
 
 
+registry = CollectorRegistry()
+multiprocess.MultiProcessCollector(registry)
+metrics_app = make_asgi_app(registry=registry)
+
 if Config.is_api_doc_enabled():
     app = FastAPI(title=APPLICATION_NAME, root_path=Config.get_root_path())
 else:
     app = FastAPI(title=APPLICATION_NAME, openapi_url=None, redoc_url=None)
 app.include_router(router)
-Instrumentator().instrument(app).expose(app)
+app.mount("/metrics", metrics_app)
 
 
 class VersionInfo(BaseModel):

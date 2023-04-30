@@ -22,6 +22,7 @@ from typing import List
 from uuid import uuid4
 
 from fastapi import Depends, APIRouter, status
+from prometheus_client import Counter
 from sqlalchemy.orm import Session
 
 from db import Edge, Line, MeansOfTransport, Station
@@ -41,6 +42,11 @@ _logger = getLogger("rest")
 
 
 router = APIRouter()
+request_counter = Counter(
+    name="master_data_service_http_requests_total",
+    documentation="Number of HTTP requests processed by master data service",
+    labelnames=["method", "path"]
+)
 
 
 @router.get("/means-of-transport", response_model=List[MeansOfTransportDetails])
@@ -48,6 +54,7 @@ async def get_means_of_transport_list(db: Session = Depends(get_db)):
     """
     Provides a list with details of all means of transport.
     """
+    request_counter.labels(method="GET", path="/means-of-transport").inc()
     result_set = db.query(MeansOfTransport).order_by(MeansOfTransport.identifier).all()
     return [as_means_of_transport_dto(record) for record in result_set]
 
@@ -57,6 +64,7 @@ async def get_means_of_transport(uuid: str, db: Session = Depends(get_db)):
     """
     Provides the details of the means of transport with the given UUID.
     """
+    request_counter.labels(method="GET", path="/means-of-transport/{uuid}").inc()
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
         raise means_of_transport_not_found_exception(uuid)
@@ -72,6 +80,7 @@ async def create_means_of_transport(
     """
     Creates a new means of transport using the given request data.
     """
+    request_counter.labels(method="POST", path="/means-of-transport").inc()
     means_of_transport = MeansOfTransport()
     means_of_transport.uuid = str(uuid4())
     means_of_transport.identifier = request.identifier
@@ -92,6 +101,7 @@ async def update_means_of_transport(
     """
     Updates the means of transport with the given UUID, using the given request data.
     """
+    request_counter.labels(method="PUT", path="/means-of-transport/{uuid}").inc()
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
         raise means_of_transport_not_found_exception(uuid)
@@ -111,6 +121,7 @@ async def delete_means_of_transport(
     """
     Deletes the means of transport with the given UUID.
     """
+    request_counter.labels(method="DELETE", path="/means-of-transport/{uuid}").inc()
     record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
     if record is None:
         raise means_of_transport_not_found_exception(uuid)
@@ -126,6 +137,7 @@ async def get_station_list(db: Session = Depends(get_db)):
     Provides a list with details of all stations. The returned stations are sorted by the name,
     the order is ascending.
     """
+    request_counter.labels(method="GET", path="/stations").inc()
     result_set = db.query(Station).order_by(Station.name).all()
     return [as_station_details_dto(record) for record in result_set]
 
@@ -135,6 +147,7 @@ async def get_station(uuid: str, db: Session = Depends(get_db)):
     """
     Provides the details of the station with the given UUID.
     """
+    request_counter.labels(method="GET", path="/station/{uuid}").inc()
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
@@ -150,6 +163,7 @@ async def create_station(
     """
     Creates a new station using the given request data.
     """
+    request_counter.labels(method="POST", path="/station").inc()
     station = Station()
     station.uuid = str(uuid4())
     station.name = request.name
@@ -170,6 +184,7 @@ async def update_station(
     """
     Updates the station with the given UUID, using the given request data.
     """
+    request_counter.labels(method="PUT", path="/station/{uuid}").inc()
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
@@ -188,6 +203,7 @@ async def delete_station(
     """
     Deletes the station with the given UUID.
     """
+    request_counter.labels(method="DELETE", path="/station/{uuid}").inc()
     record = db.query(Station).filter(Station.uuid == uuid).first()
     if record is None:
         raise station_not_found_exception(uuid)
@@ -198,6 +214,7 @@ async def delete_station(
 
 @router.get("/lines", response_model=List[LineInfo])
 async def get_lines(db: Session = Depends(get_db)):
+    request_counter.labels(method="GET", path="/lines").inc()
     result_set = db.query(Line).order_by(Line.label).all()
     return [as_line_info_dto(record) for record in result_set]
 
@@ -207,6 +224,7 @@ async def get_line(uuid: str, db: Session = Depends(get_db)):
     """
     Provides the details of the line with the given UUID.
     """
+    request_counter.labels(method="GET", path="/line/{uuid}").inc()
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
@@ -222,6 +240,7 @@ async def create_line(
     """
     Creates a new line using the given request data.
     """
+    request_counter.labels(method="POST", path="/line").inc()
     line = Line()
     line.uuid = str(uuid4())
     update_line_entity_from_dto(entity=line, dto=request)
@@ -245,6 +264,7 @@ async def update_line(
     """
     Updates the the line with the given UUID, using the given request data.
     """
+    request_counter.labels(method="PUT", path="/line/{uuid}").inc()
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)
@@ -270,6 +290,7 @@ async def delete_line(
     Deletes the line with the given UUID. This operation also deletes the itinerary
     for the concerned line (both directions).
     """
+    request_counter.labels(method="DELETE", path="/line/{uuid}").inc()
     record = db.query(Line).filter(Line.uuid == uuid).first()
     if record is None:
         raise line_not_found_exception(uuid)

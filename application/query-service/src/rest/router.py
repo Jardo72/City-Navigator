@@ -39,7 +39,7 @@ _logger = getLogger("rest")
 router = APIRouter()
 request_counter = Counter(
     name="query_service_http_requests_total",
-    documentation="Number of HTTP requests processed by Query Service",
+    documentation="Number of HTTP requests processed by query service",
     labelnames=["method", "path"]
 )
 
