@@ -21,7 +21,7 @@ from logging import getLogger
 from typing import List
 
 from fastapi import Depends, APIRouter
-from prometheus_client import Counter
+from prometheus_client import Counter, Histogram
 from sqlalchemy.orm import Session
 
 from db import Line, MeansOfTransport, Station
@@ -37,13 +37,20 @@ _logger = getLogger("rest")
 
 
 router = APIRouter()
+
 request_counter = Counter(
     name="query_service_http_requests_total",
     documentation="Number of HTTP requests processed by query service",
     labelnames=["method", "path"]
 )
+request_duration_histogram = Histogram(
+    name="query_service_http_request_duration_seconds",
+    documentation="Duration of HTTP requests processed by query service (in seconds)",
+    labelnames=["method", "path"]
+)
 
 
+@request_duration_histogram.labels(method="GET", path="/means-of-transport").time()
 @router.get("/means-of-transport", response_model=List[MeansOfTransportDetails])
 async def get_means_of_transport(db: Session = Depends(get_db)):
     """
@@ -54,6 +61,7 @@ async def get_means_of_transport(db: Session = Depends(get_db)):
     return [as_means_of_transport_details(single_means_of_transport) for single_means_of_transport in means_of_transport]
 
 
+@request_duration_histogram.labels(method="GET", path="/stations").time()
 @router.get("/stations", response_model=List[StationDetails])
 async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     """
@@ -62,8 +70,8 @@ async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     if the value 'S*' is specified as filter, all stations whose names start with the letter S
     will be returned.
     """
-    _logger.debug("Asked for stations - filter = %s", filter)
     request_counter.labels(method="GET", path="/stations").inc()
+    _logger.debug("Asked for stations - filter = %s", filter)
     if filter is None:
         stations = db.query(Station).order_by(Station.name).all()
     else:
@@ -72,19 +80,21 @@ async def get_station_list(filter: str = None, db: Session = Depends(get_db)):
     return [as_station_details(single_station) for single_station in stations]
 
 
+@request_duration_histogram.labels(method="GET", path="/station").time()
 @router.get("/station", response_model=StationDetails)
 async def get_station_details(name: str, db: Session = Depends(get_db)):
     """
     Provides the details of the station with the given name.
     """
-    _logger.debug("Asked for single station - name = %s", name)
     request_counter.labels(method="GET", path="/station").inc()
+    _logger.debug("Asked for single station - name = %s", name)
     station = db.query(Station).filter(Station.name == name).first()
     if station is None:
         raise station_not_found_exception(name)
     return as_station_details(station)
 
 
+@request_duration_histogram.labels(method="GET", path="/lines").time()
 @router.get("/lines", response_model=List[LineInfo])
 async def get_line_list(means_of_transport: str = None, db: Session = Depends(get_db)):
     """
@@ -100,6 +110,7 @@ async def get_line_list(means_of_transport: str = None, db: Session = Depends(ge
     return [as_line_info(single_line) for single_line in lines]
 
 
+@request_duration_histogram.labels(method="GET", path="/line").time()
 @router.get("/line", response_model=LineDetails)
 async def get_line_details(label: str, db: Session = Depends(get_db)):
     """
@@ -112,6 +123,7 @@ async def get_line_details(label: str, db: Session = Depends(get_db)):
     return as_line_details(line)
 
 
+@request_duration_histogram.labels(method="GET", path="/journey-plan").time()
 @router.get("/journey-plan", response_model=JourneyPlan)
 async def search_journey_plan(start: str, destination: str, db: Session = Depends(get_db)):
     """
