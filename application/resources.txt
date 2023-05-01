@@ -18,6 +18,9 @@ https://github.com/mikeckennedy/docker-build-fastapi-app-april-2021
 https://fastapi.tiangolo.com/advanced/behind-a-proxy/#about-proxies-with-a-stripped-path-prefix
 https://fastapi.tiangolo.com/tutorial/metadata/
 
+# FastAPI Error Handling (incl. central error handlers that can be used to collect error metrics)
+https://fastapi.tiangolo.com/tutorial/handling-errors/
+
 # Docker Compose (Prometheus + Grafana)
 https://github.com/docker/awesome-compose/tree/master/prometheus-grafana
 
