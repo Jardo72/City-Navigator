@@ -21,8 +21,9 @@ from contextlib import asynccontextmanager
 from logging import getLogger
 from sys import version as python_version
 
-from fastapi import FastAPI
-from prometheus_client import CollectorRegistry
+from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi.exception_handlers import http_exception_handler
+from prometheus_client import CollectorRegistry, Counter
 from prometheus_client import make_asgi_app, multiprocess
 from pydantic import BaseModel
 
@@ -62,6 +63,23 @@ else:
     app = FastAPI(title=APPLICATION_NAME, openapi_url=None, redoc_url=None, lifespan=lifespan)
 app.include_router(router)
 app.mount("/metrics", metrics_app)
+
+
+http_error_counter = Counter(
+    name="query_service_http_errors_total",
+    documentation="Number of HTTP errors encountered by query service",
+    labelnames=["method", "path", "status_code"]
+)
+
+
+@app.exception_handler(HTTPException)
+async def custom_http_exception_handler(request: Request, exc: HTTPException) -> Response:
+    path = request.url.path
+    method = request.method
+    status_code = exc.status_code
+    _logger.error("HTTP exception - path = %s, method = %s, status code = %s", path, method, status_code)
+    http_error_counter.labels(method=method, path=path, status_code=status_code).inc()
+    return await http_exception_handler(request, exc)
 
 
 class VersionInfo(BaseModel):
