@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-from dataclasses import astuple, dataclass
+from dataclasses import dataclass, fields
 from datetime import datetime, timedelta
 
 from config import Config
@@ -41,9 +41,10 @@ class TestRunSummary:
 
     @property
     def overall_success_count(self) -> int:
-        summaries = [summary for summary in astuple(self) if isinstance(summary, TestRunSummary)]
         result = 0
-        for summary in summaries:
-            if summary:
-                result += summary.success_count
+        for field in fields(self):
+            if field.type is not APIEndpointSummary:
+                continue
+            summary = getattr(self, field.name)
+            result += summary.success_count if summary else 0
         return result
