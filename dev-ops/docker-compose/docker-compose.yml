@@ -35,7 +35,8 @@ services:
     depends_on:
       - redis-pubsub
     environment:
-      - API_DOC_ENABLED=yes
+      # if API doc is enabled, metrics scraping does not work
+      - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/master-data
       - ACCESS_LOG=/access-logs/master-data-service-access.log
       - DATABASE_URL=sqlite:////db/sqlite.db
@@ -75,7 +76,8 @@ services:
     expose:
       - 8000
     environment:
-      - API_DOC_ENABLED=yes
+      # if API doc is enabled, metrics scraping does not work
+      - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/query
       - ACCESS_LOG=/access-logs/query-service-access.log
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
