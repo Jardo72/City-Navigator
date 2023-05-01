@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-from dataclasses import dataclass
+from dataclasses import astuple, dataclass
 from datetime import datetime, timedelta
 
 from config import Config
@@ -41,7 +41,9 @@ class TestRunSummary:
 
     @property
     def overall_success_count(self) -> int:
-        return (
-            self.journey_plan_search_summary.success_count + self.line_query_summary.success_count +
-            self.station_query_summary.success_count + self.station_filter_summary.success_count
-        )
+        summaries = [summary for summary in astuple(self) if isinstance(summary, TestRunSummary)]
+        result = 0
+        for summary in summaries:
+            if summary:
+                result += summary.success_count
+        return result

@@ -84,17 +84,18 @@ def print_api_endpoint_summary(
         summary_file: TextIOWrapper = None
 ) -> None:
     INDENTATION = 4 * " "
-    throughput = summary.success_count / test_duration_sec
     print(title, file=summary_file)
     print(f"{INDENTATION}Worker thread count:            {thread_count}", file=summary_file)
-    print(f"{INDENTATION}Number of successful requests:  {summary.success_count}", file=summary_file)
-    print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
-    print(f"{INDENTATION}Min. response time:             {summary.min_success_duration_millis} millis", file=summary_file)
-    print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
-    print(f"{INDENTATION}Client error count:             {summary.client_error_count}", file=summary_file)
-    print(f"{INDENTATION}Server error count:             {summary.server_error_count}", file=summary_file)
-    print(f"{INDENTATION}Exception count:                {summary.exception_count}", file=summary_file)
-    print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
+    if thread_count > 0:
+        throughput = summary.success_count / test_duration_sec
+        print(f"{INDENTATION}Number of successful requests:  {summary.success_count}", file=summary_file)
+        print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
+        print(f"{INDENTATION}Min. response time:             {summary.min_success_duration_millis} millis", file=summary_file)
+        print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
+        print(f"{INDENTATION}Client error count:             {summary.client_error_count}", file=summary_file)
+        print(f"{INDENTATION}Server error count:             {summary.server_error_count}", file=summary_file)
+        print(f"{INDENTATION}Exception count:                {summary.exception_count}", file=summary_file)
+        print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
 
 
 def format_duration(duration_sec: float) -> str:
