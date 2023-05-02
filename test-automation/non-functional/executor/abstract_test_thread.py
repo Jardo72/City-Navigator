@@ -44,7 +44,7 @@ class AbstractTestThread(Thread, ABC):
                 try:
                     response = self.send_single_request(client)
                     self._summary_collector.add(response)
-                except Exception as e:
+                except Exception:
                     self._summary_collector.exception_caught()
         self._summary_collector.test_thread_completed()
 
