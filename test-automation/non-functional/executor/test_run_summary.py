@@ -19,6 +19,7 @@
 
 from dataclasses import dataclass, fields
 from datetime import datetime, timedelta
+from typing import List
 
 from config import Config
 
@@ -28,8 +29,6 @@ from .api_enpoint_summary import APIEndpointSummary
 @dataclass(frozen=True, slots=True)
 class TestRunSummary:
     config: Config
-    start_time: datetime
-    end_time: datetime
     journey_plan_search_summary: APIEndpointSummary
     station_query_summary: APIEndpointSummary
     station_filter_summary: APIEndpointSummary
@@ -40,11 +39,24 @@ class TestRunSummary:
         return self.end_time - self.start_time
 
     @property
+    def start_time(self) -> datetime:
+        return min(map(lambda s: s.start_time, self._endpoint_summaries))
+
+    @property
+    def end_time(self) -> datetime:
+        return max(map(lambda s: s.end_time, self._endpoint_summaries))
+
+    @property
     def overall_success_count(self) -> int:
-        result = 0
+        return sum(map(lambda s: s.success_count, self._endpoint_summaries))
+
+    @property
+    def _endpoint_summaries(self) -> List[APIEndpointSummary]:
+        result = []
         for field in fields(self):
             if field.type is not APIEndpointSummary:
                 continue
             summary = getattr(self, field.name)
-            result += summary.success_count if summary else 0
+            if summary:
+                result.append(summary)
         return result

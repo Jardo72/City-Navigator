@@ -20,10 +20,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 
 
 @dataclass(frozen=True, slots=True)
 class APIEndpointSummary:
+    start_time: datetime
+    end_time: datetime
     success_count: int
     client_error_count: int
     server_error_count: int
@@ -39,6 +42,8 @@ class APIEndpointSummary:
     def __add__(self, other: APIEndpointSummary) -> APIEndpointSummary:
         assert isinstance(other, APIEndpointSummary)
         return APIEndpointSummary(
+            start_time=min(self.start_time, other.start_time),
+            end_time=max(self.end_time, other.end_time),
             success_count=self.success_count + other.success_count,
             client_error_count=self.client_error_count + other.client_error_count,
             server_error_count=self.server_error_count + other.server_error_count,

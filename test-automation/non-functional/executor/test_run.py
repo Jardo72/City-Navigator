@@ -62,7 +62,6 @@ class TestRun:
             self._station_filter_threads +
             self._line_query_threads
         )
-        start_time = datetime.now()
         for single_thread in all_threads:
             single_thread.start()
 
@@ -70,7 +69,6 @@ class TestRun:
 
         for single_thread in all_threads:
             single_thread.join()
-        end_time=datetime.now()
 
         journey_plan_search_summary = self._calculate_summary(self._journey_plan_search_threads)
         station_query_summary = self._calculate_summary(self._station_query_threads)
@@ -79,8 +77,6 @@ class TestRun:
 
         return TestRunSummary(
             config=self._config,
-            start_time=start_time,
-            end_time=end_time,
             journey_plan_search_summary=journey_plan_search_summary,
             station_query_summary=station_query_summary,
             station_filter_summary=station_filter_summary,

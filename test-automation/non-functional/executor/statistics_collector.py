@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+from datetime import datetime
+
 from rest import Response
 
 from .api_enpoint_summary import APIEndpointSummary
@@ -45,11 +47,19 @@ class StatisticsCollector:
         if 500 <= response.status_code < 600:
             self._server_error_count += 1
 
+    def test_thread_started(self) -> None:
+        self._start_time = datetime.now()
+
+    def test_thread_completed(self) -> None:
+        self._end_time = datetime.now()
+
     def exception_caught(self) -> None:
         self._exception_count += 1
 
     def get_summary(self) -> APIEndpointSummary:
         return APIEndpointSummary(
+            start_time=self._start_time,
+            end_time=self._end_time,
             success_count=self._success_count,
             client_error_count=self._client_error_count,
             server_error_count=self._server_error_count,

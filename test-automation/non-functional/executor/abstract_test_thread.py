@@ -38,6 +38,7 @@ class AbstractTestThread(Thread, ABC):
     def run(self) -> None:
         client = QueryServiceClient(self._config.query_service_base_url)
         timeout = Timeout(self._config.test_duration_minutes)
+        self._summary_collector.test_thread_started()
         while timeout.has_not_expired_yet():
             for _ in range(5):
                 try:
@@ -45,6 +46,7 @@ class AbstractTestThread(Thread, ABC):
                     self._summary_collector.add(response)
                 except Exception as e:
                     self._summary_collector.exception_caught()
+        self._summary_collector.test_thread_completed()
 
     @abstractmethod
     def send_single_request(self, client: QueryServiceClient) -> Response:
