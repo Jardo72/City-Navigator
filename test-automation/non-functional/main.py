@@ -108,6 +108,7 @@ def format_duration(duration_sec: float) -> str:
 def print_test_run_summary(summary: TestRunSummary, summary_file: TextIOWrapper = None) -> None:
     FORMAT = "%Y-%m-%d %H:%M:%S"
     duration_sec = summary.duration.total_seconds()
+    print()
     print(f"Query service base URL:                 {summary.config.query_service_base_url}", file=summary_file)
     print(f"Test run start time:                    {summary.start_time.strftime(FORMAT)}", file=summary_file)
     print(f"Test run end time:                      {summary.end_time.strftime(FORMAT)}", file=summary_file)

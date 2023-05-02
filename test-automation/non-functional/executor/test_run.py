@@ -18,7 +18,12 @@
 #
 
 from datetime import datetime
+from time import sleep
 from typing import List
+
+
+from rich.progress import track
+
 
 from config import Config
 from util import DataCollections
@@ -61,6 +66,8 @@ class TestRun:
         for single_thread in all_threads:
             single_thread.start()
 
+        self._display_progress()
+
         for single_thread in all_threads:
             single_thread.join()
         end_time=datetime.now()
@@ -79,6 +86,13 @@ class TestRun:
             station_filter_summary=station_filter_summary,
             line_query_summary=line_query_summary,
         )
+
+    def _display_progress(self) -> None:
+        print()
+        overall_duration_seconds = self._config.test_duration_minutes * 60
+        sleep_duration_seconds = overall_duration_seconds / 20
+        for _ in track(range(20)):
+            sleep(sleep_duration_seconds)
 
     @staticmethod
     def _calculate_summary(thread_list: List[AbstractTestThread]) -> APIEndpointSummary:
