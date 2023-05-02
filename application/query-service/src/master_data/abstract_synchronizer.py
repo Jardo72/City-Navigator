@@ -17,8 +17,19 @@
 # limitations under the License.
 #
 
-from .abstract_synchronizer import AbstractSynchronizer
-from .initialization import init_db_from_master_data
-from .line_synchronizer import LineSynchronizer
-from .means_of_transport_synchronizer import MeansOfTransportSynchronizer
-from .station_synchronizer import StationSynchronizer
+from abc import ABC, abstractmethod
+
+
+class AbstractSynchronizer(ABC):
+
+    @abstractmethod
+    def create_entity(self, uuid: str) -> None:
+        ...
+
+    @abstractmethod
+    def update_entity(self, uuid: str) -> None:
+        ...
+
+    @abstractmethod
+    def delete_entity(self, uuid: str) -> None:
+        ...

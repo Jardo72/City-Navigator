@@ -17,8 +17,21 @@
 # limitations under the License.
 #
 
+from logging import getLogger
+
 from .abstract_synchronizer import AbstractSynchronizer
-from .initialization import init_db_from_master_data
-from .line_synchronizer import LineSynchronizer
-from .means_of_transport_synchronizer import MeansOfTransportSynchronizer
-from .station_synchronizer import StationSynchronizer
+
+
+_logger = getLogger("master-data")
+
+
+class StationSynchronizer(AbstractSynchronizer):
+
+    def create_entity(self, uuid: str) -> None:
+        ...
+
+    def update_entity(self, uuid: str) -> None:
+        ...
+
+    def delete_entity(self, uuid: str) -> None:
+        ...

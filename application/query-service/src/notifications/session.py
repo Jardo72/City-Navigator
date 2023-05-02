@@ -25,6 +25,7 @@ from typing import Any, Dict
 from redis import Redis
 
 from config import Config
+from master_data import AbstractSynchronizer, LineSynchronizer, MeansOfTransportSynchronizer, StationSynchronizer
 
 from .dto import Entity, Event, EventType
 
@@ -42,6 +43,18 @@ def _is_irrelevant(message: Dict[str, Any]) -> bool:
     return False
 
 
+def _normalize(value: str) -> str:
+    result = ""
+    for index, ch in enumerate(value):
+        if index != 0 and ch.isupper():
+            result += "_" + ch
+        elif ch.islower():
+            result += ch.upper()
+        else:
+            result += ch
+    return result
+
+
 def _extract_event_details(message: Dict[str, Any]) -> Event:
     try:
         json_data = loads(message["data"])
@@ -50,13 +63,37 @@ def _extract_event_details(message: Dict[str, Any]) -> Event:
         uuid = json_data["uuid"]
         return Event(
             event_type=EventType[event_type.upper()],
-            entity=Entity[entity.upper()],
+            entity=Entity[_normalize(entity)],
             uuid=uuid
         )
     except Exception as e:
         _logger.error("Failed to extract event details from %s", message)
         _logger.error(str(e))
         return None
+
+
+def _create_synchronizer(entity: Entity) -> AbstractSynchronizer:
+    if entity is Entity.LINE:
+        return LineSynchronizer()
+    if entity is Entity.MEANS_OF_TRANSPORT:
+        return MeansOfTransportSynchronizer()
+    if entity is Entity.STATION:
+        return StationSynchronizer()
+
+
+def _process_event(event: Event) -> None:
+    # TODO:
+    # - connection management should be handled centrally
+    # - dispatching to proper function/method should be handled centrally
+    # - it might make sense to use functionality from master_data package here
+    synchronizer = _create_synchronizer(event.entity)
+    _logger.debug("Going to use %s to synchronize data", type(synchronizer))
+    if event.event_type == EventType.CREATED:
+        synchronizer.create_entity(event.uuid)
+    elif event.event_type == EventType.UPDATED:
+        synchronizer.update_entity(event.uuid)
+    elif event.event_type == EventType.DELETED:
+        synchronizer.delete_entity(event.uuid)
 
 
 def _consume_master_data_notifications(redis: Redis) -> None:
@@ -74,12 +111,7 @@ def _consume_master_data_notifications(redis: Redis) -> None:
         _logger.debug("Event = %s", event)
         if event is None:
             continue
-        if event.entity == Entity.MEANS_OF_TRANSPORT:
-            ...
-        elif event.entity == Entity.STATION:
-            ...
-        elif event.entity == Entity.LINE:
-            ...
+        _process_event(event)
 
 
 def subscribe_master_data_notifications() -> None:
