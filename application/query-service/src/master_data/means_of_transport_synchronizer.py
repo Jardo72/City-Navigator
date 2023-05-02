@@ -19,6 +19,8 @@
 
 from logging import getLogger
 
+from db import MeansOfTransport
+
 from .abstract_synchronizer import AbstractSynchronizer
 
 
@@ -31,7 +33,22 @@ class MeansOfTransportSynchronizer(AbstractSynchronizer):
         ...
 
     def update_entity(self, uuid: str) -> None:
+        # TODO:
+        # record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
+        # if record:
+        #     _logger.debug("Means of transport with uuid %s updated", uuid)
+        # else:
+        #     _logger.warn("Means of transport with uuid %s not found", uuid)
         ...
 
     def delete_entity(self, uuid: str) -> None:
+        # TODO:
+        # record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
+        # if record:
+        #     db.delete(record)
+        #     db.commit()
+        #     _logger.debug("Means of transport with uuid %s deleted", uuid)
+        # else:
+        #     _logger.warn("Means of transport with uuid %s not found", uuid)
         ...
+

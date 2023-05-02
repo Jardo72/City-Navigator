@@ -19,6 +19,8 @@
 
 from logging import getLogger
 
+from db import Station
+
 from .abstract_synchronizer import AbstractSynchronizer
 
 
@@ -31,7 +33,21 @@ class StationSynchronizer(AbstractSynchronizer):
         ...
 
     def update_entity(self, uuid: str) -> None:
+        # TODO:
+        # record = db.query(Station).filter(Station.uuid == uuid).first()
+        # if record:
+        #     _logger.debug("Station with uuid %s updated", uuid)
+        # else:
+        #     _logger.warn("Station with uuid %s not found", uuid)
         ...
 
     def delete_entity(self, uuid: str) -> None:
+        # TODO:
+        # record = db.query(Station).filter(Station.uuid == uuid).first()
+        # if record:
+        #     db.delete(record)
+        #     db.commit()
+        #     _logger.debug("Station with uuid %s deleted", uuid)
+        # else:
+        #     _logger.warn("Station with uuid %s not found", uuid)
         ...
