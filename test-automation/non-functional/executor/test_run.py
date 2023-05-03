@@ -17,7 +17,6 @@
 # limitations under the License.
 #
 
-from datetime import datetime
 from time import sleep
 from typing import List
 
