@@ -113,8 +113,11 @@ def print_test_run_summary(summary: TestRunSummary, summary_file: TextIOWrapper 
     print(f"Test run start time:                    {summary.start_time.strftime(FORMAT)}", file=summary_file)
     print(f"Test run end time:                      {summary.end_time.strftime(FORMAT)}", file=summary_file)
     print(f"Overall duration:                       {format_duration(duration_sec)}", file=summary_file)
-    print(f"Overall number of successful requests:  {summary.overall_success_count}", file=summary_file)
     print(f"Overall thread count:                   {summary.config.overall_thread_count}", file=summary_file)
+    print(f"Overall number of successful requests:  {summary.overall_success_count}", file=summary_file)
+    print(f"Overall number of client errors:        {summary.overall_client_error_count}", file=summary_file)
+    print(f"Overall number of server errors:        {summary.overall_server_error_count}", file=summary_file)
+    print(f"Overall number of exceptions:           {summary.overall_exception_count}", file=summary_file)
     print_api_endpoint_summary(
         title="Journey plan search",
         summary=summary.journey_plan_search_summary,

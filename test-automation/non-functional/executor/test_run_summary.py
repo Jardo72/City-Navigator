@@ -51,6 +51,18 @@ class TestRunSummary:
         return sum(map(lambda s: s.success_count, self._endpoint_summaries))
 
     @property
+    def overall_client_error_count(self) -> int:
+        return sum(map(lambda s: s.client_error_count, self._endpoint_summaries))
+
+    @property
+    def overall_server_error_count(self) -> int:
+        return sum(map(lambda s: s.server_error_count, self._endpoint_summaries))
+
+    @property
+    def overall_exception_count(self) -> int:
+        return sum(map(lambda s: s.exception_count, self._endpoint_summaries))
+
+    @property
     def _endpoint_summaries(self) -> List[APIEndpointSummary]:
         result = []
         for field in fields(self):
