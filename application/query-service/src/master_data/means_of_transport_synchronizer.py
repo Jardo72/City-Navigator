@@ -19,9 +19,10 @@
 
 from logging import getLogger
 
-from db import MeansOfTransport
+from db import MeansOfTransport, SessionLocal
 
 from .abstract_synchronizer import AbstractSynchronizer
+from .client import MasterDataClient
 
 
 _logger = getLogger("master-data")
@@ -29,27 +30,26 @@ _logger = getLogger("master-data")
 
 class MeansOfTransportSynchronizer(AbstractSynchronizer):
 
+    def __init__(self, db: SessionLocal, client: MasterDataClient) -> None:
+        super().__init__(db, client)
+
     def create_entity(self, uuid: str) -> None:
         ...
 
     def update_entity(self, uuid: str) -> None:
-        # TODO:
-        # client.get_means_of_transport()
-        # record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
-        # if record:
-        #     _logger.debug("Means of transport with uuid %s updated", uuid)
-        # else:
-        #     _logger.warn("Means of transport with uuid %s not found", uuid)
-        ...
+        record = self.db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
+        if record:
+            # TODO: update and commit the record
+            self.client.get_means_of_transport()
+            _logger.debug("Means of transport with uuid %s updated", uuid)
+        else:
+            _logger.warn("Means of transport with uuid %s not found", uuid)
 
     def delete_entity(self, uuid: str) -> None:
-        # TODO:
-        # record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
-        # if record:
-        #     db.delete(record)
-        #     db.commit()
-        #     _logger.debug("Means of transport with uuid %s deleted", uuid)
-        # else:
-        #     _logger.warn("Means of transport with uuid %s not found", uuid)
-        ...
-
+        record = self.db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
+        if record:
+            self.db.delete(record)
+            self.db.commit()
+            _logger.debug("Means of transport with uuid %s deleted", uuid)
+        else:
+            _logger.warn("Means of transport with uuid %s not found", uuid)

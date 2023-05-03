@@ -19,9 +19,10 @@
 
 from logging import getLogger
 
-from db import Station
+from db import SessionLocal, Station
 
 from .abstract_synchronizer import AbstractSynchronizer
+from .client import MasterDataClient
 
 
 _logger = getLogger("master-data")
@@ -29,26 +30,26 @@ _logger = getLogger("master-data")
 
 class StationSynchronizer(AbstractSynchronizer):
 
+    def __init__(self, db: SessionLocal, client: MasterDataClient) -> None:
+        super().__init__(db, client)
+
     def create_entity(self, uuid: str) -> None:
         ...
 
     def update_entity(self, uuid: str) -> None:
-        # TODO:
-        # record = db.query(Station).filter(Station.uuid == uuid).first()
-        # if record:
-        #      station_dto = client.get_station(uuid)
-        #     _logger.debug("Station with uuid %s updated", uuid)
-        # else:
-        #     _logger.warn("Station with uuid %s not found", uuid)
-        ...
+        record = self.db.query(Station).filter(Station.uuid == uuid).first()
+        if record:
+            # TODO: update and commit the record
+            station_dto = self.client.get_station(uuid)
+            _logger.debug("Station with uuid %s updated", uuid)
+        else:
+            _logger.warn("Station with uuid %s not found", uuid)
 
     def delete_entity(self, uuid: str) -> None:
-        # TODO:
-        # record = db.query(Station).filter(Station.uuid == uuid).first()
-        # if record:
-        #     db.delete(record)
-        #     db.commit()
-        #     _logger.debug("Station with uuid %s deleted", uuid)
-        # else:
-        #     _logger.warn("Station with uuid %s not found", uuid)
-        ...
+        record = self.db.query(Station).filter(Station.uuid == uuid).first()
+        if record:
+            self.db.delete(record)
+            self.db.commit()
+            _logger.debug("Station with uuid %s deleted", uuid)
+        else:
+            _logger.warn("Station with uuid %s not found", uuid)

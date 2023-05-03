@@ -18,4 +18,5 @@
 #
 
 from .entities import Edge, Line, MeansOfTransport, Station
+from .session import SessionLocal
 from .session import get_db, get_db_session

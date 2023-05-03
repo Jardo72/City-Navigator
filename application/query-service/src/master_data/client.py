@@ -138,3 +138,6 @@ class MasterDataClient:
                 raise MasterDataClientException(response)
             json_data = response.json()
             return _as_line_details(json_data)
+
+    def close(self) -> None:
+        self._session.close()

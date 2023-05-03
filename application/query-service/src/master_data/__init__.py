@@ -18,6 +18,7 @@
 #
 
 from .abstract_synchronizer import AbstractSynchronizer
+from .client import MasterDataClient
 from .initialization import init_db_from_master_data
 from .line_synchronizer import LineSynchronizer
 from .means_of_transport_synchronizer import MeansOfTransportSynchronizer

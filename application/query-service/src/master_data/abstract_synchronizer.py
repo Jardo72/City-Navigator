@@ -17,10 +17,34 @@
 # limitations under the License.
 #
 
+from __future__ import annotations
 from abc import ABC, abstractmethod
+
+from db import SessionLocal
+
+from .client import MasterDataClient
 
 
 class AbstractSynchronizer(ABC):
+
+    def __init__(self, db: SessionLocal, client: MasterDataClient) -> None:
+        self._db = db
+        self._client = client
+
+    def __enter__(self) -> AbstractSynchronizer:
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback) -> None:
+        self._db.close()
+        self._client.close()
+
+    @property
+    def db(self) -> SessionLocal:
+        return self._db
+
+    @property
+    def client(self) -> MasterDataClient:
+        return self._client
 
     @abstractmethod
     def create_entity(self, uuid: str) -> None:
