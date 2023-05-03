@@ -86,8 +86,13 @@ class TestRun:
     def _display_progress(self) -> None:
         print()
         overall_duration_seconds = self._config.test_duration_minutes * 60
-        sleep_duration_seconds = overall_duration_seconds / 20
-        for _ in track(range(20)):
+        if overall_duration_seconds > 600:
+            sleep_duration_seconds = overall_duration_seconds / 100
+            steps = 100
+        else:
+            sleep_duration_seconds = overall_duration_seconds / 20
+            steps = 20
+        for _ in track(range(steps)):
             sleep(sleep_duration_seconds)
 
     @staticmethod
