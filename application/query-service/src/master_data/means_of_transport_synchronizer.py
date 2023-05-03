@@ -34,6 +34,7 @@ class MeansOfTransportSynchronizer(AbstractSynchronizer):
 
     def update_entity(self, uuid: str) -> None:
         # TODO:
+        # client.get_means_of_transport()
         # record = db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
         # if record:
         #     _logger.debug("Means of transport with uuid %s updated", uuid)

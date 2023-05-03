@@ -36,6 +36,7 @@ class StationSynchronizer(AbstractSynchronizer):
         # TODO:
         # record = db.query(Station).filter(Station.uuid == uuid).first()
         # if record:
+        #      station_dto = client.get_station(uuid)
         #     _logger.debug("Station with uuid %s updated", uuid)
         # else:
         #     _logger.warn("Station with uuid %s not found", uuid)
