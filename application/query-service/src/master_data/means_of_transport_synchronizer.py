@@ -23,6 +23,7 @@ from db import MeansOfTransport, SessionLocal
 
 from .abstract_synchronizer import AbstractSynchronizer
 from .client import MasterDataClient
+from .mapping import as_means_of_transport
 
 
 _logger = getLogger("master-data")
@@ -35,12 +36,17 @@ class MeansOfTransportSynchronizer(AbstractSynchronizer):
 
     def create_entity(self, uuid: str) -> None:
         means_of_transport_master = self.client.get_means_of_transport(uuid)
+        means_of_transport = as_means_of_transport(means_of_transport_master)
+        self.db.add(means_of_transport)
+        self.db.commit()
+        _logger.debug("Means of transport with uuid %s inserted", means_of_transport_master.uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
         if record:
-            # TODO: update and commit the record
             means_of_transport_master = self.client.get_means_of_transport(uuid)
+            record.identifier = means_of_transport_master.identifier
+            self.db.commit()
             _logger.debug("Means of transport with uuid %s updated", uuid)
         else:
             _logger.warn("Means of transport with uuid %s not found", uuid)

@@ -26,10 +26,11 @@ from uuid import uuid4
 from sqlalchemy.orm import Session
 
 from config import Config
-from db import Edge, Line, MeansOfTransport, Station
+from db import Edge, Line
 
 from .client import MasterDataClient
 from .dto import ItineraryEntryMaster, LineDetailsMaster, LineMaster, MeansOfTransportMaster, StationMaster
+from .mapping import as_means_of_transport, as_station
 
 
 _logger = getLogger("master-data")
@@ -81,22 +82,16 @@ def _retrieve_from_master_data_service() -> RetrievalResult:
 
 def _import_means_of_transport(db: Session, means_of_transport_list: List[MeansOfTransportMaster]) -> None:
     _logger.info("%d means of transport retrieved from master data", len(means_of_transport_list))
-    for means_of_transport in means_of_transport_list:
-        db.add(MeansOfTransport(
-            uuid=means_of_transport.uuid,
-            identifier=means_of_transport.identifier
-        ))
+    for means_of_transport_master in means_of_transport_list:
+        db.add(as_means_of_transport(means_of_transport_master))
     db.commit()
     _logger.info("Means of transport imported into the database")
 
 
 def _import_stations(db: Session, station_list: List[StationMaster]) -> None:
     _logger.info("%d stations retrieved from master data", len(station_list))
-    for station in station_list:
-        db.add(Station(
-            uuid=station.uuid,
-            name=station.name
-        ))
+    for station_master in station_list:
+        db.add(as_station(station_master))
     db.commit()
     _logger.info("Stations imported into the database")
 

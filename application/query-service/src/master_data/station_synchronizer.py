@@ -23,6 +23,7 @@ from db import SessionLocal, Station
 
 from .abstract_synchronizer import AbstractSynchronizer
 from .client import MasterDataClient
+from .mapping import as_station
 
 
 _logger = getLogger("master-data")
@@ -35,6 +36,10 @@ class StationSynchronizer(AbstractSynchronizer):
 
     def create_entity(self, uuid: str) -> None:
         station_master = self.client.get_station(uuid)
+        station = as_station(station_master)
+        self.db.add(station)
+        self.db.commit()
+        _logger.debug("Station with uuid %s inserted", station_master.uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(Station).filter(Station.uuid == uuid).first()
