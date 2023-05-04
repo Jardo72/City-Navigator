@@ -34,13 +34,13 @@ class LineSynchronizer(AbstractSynchronizer):
         super().__init__(db, client)
 
     def create_entity(self, uuid: str) -> None:
-        line_dto = self.client.get_line(uuid)
+        line_master = self.client.get_line(uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(Line).filter(Line.uuid == uuid).first()
         if record:
             # TODO: update and commit the record
-            line_dto = self.client.get_line(uuid)
+            line_master = self.client.get_line(uuid)
             _logger.debug("Line with uuid %s updated", uuid)
         else:
             _logger.warn("Line with uuid %s not found", uuid)

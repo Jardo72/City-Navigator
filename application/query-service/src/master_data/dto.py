@@ -22,13 +22,13 @@ from typing import List
 
 
 @dataclass(frozen=True)
-class MeansOfTransport:
+class MeansOfTransportMaster:
     uuid: str
     identifier: str
 
 
 @dataclass(frozen=True)
-class Line:
+class LineMaster:
     uuid: str
     label: str
     means_of_transport: str
@@ -37,23 +37,23 @@ class Line:
 
 
 @dataclass(frozen=True)
-class Station:
+class StationMaster:
     uuid: str
     name: str
 
 
 @dataclass(frozen=True)
-class ItineraryEntry:
-    station: Station = None
+class ItineraryEntryMaster:
+    station: StationMaster
     point_in_time_minutes: int = None
 
 
 @dataclass(frozen=True)
-class LineDetails:
+class LineDetailsMaster:
     uuid: str
     label: str
-    means_of_transport: MeansOfTransport
-    terminal_stop_one: Station
-    terminal_stop_two: Station
-    direction_one_itinerary: List[ItineraryEntry] = None
-    direction_two_itinerary: List[ItineraryEntry] = None
+    means_of_transport: MeansOfTransportMaster
+    terminal_stop_one: StationMaster
+    terminal_stop_two: StationMaster
+    direction_one_itinerary: List[ItineraryEntryMaster] = None
+    direction_two_itinerary: List[ItineraryEntryMaster] = None

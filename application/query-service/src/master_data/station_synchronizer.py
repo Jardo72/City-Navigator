@@ -34,13 +34,13 @@ class StationSynchronizer(AbstractSynchronizer):
         super().__init__(db, client)
 
     def create_entity(self, uuid: str) -> None:
-        station_dto = self.client.get_station(uuid)
+        station_master = self.client.get_station(uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(Station).filter(Station.uuid == uuid).first()
         if record:
             # TODO: update and commit the record
-            station_dto = self.client.get_station(uuid)
+            station_master = self.client.get_station(uuid)
             _logger.debug("Station with uuid %s updated", uuid)
         else:
             _logger.warn("Station with uuid %s not found", uuid)

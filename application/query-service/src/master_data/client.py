@@ -21,7 +21,7 @@ from typing import Any, Dict, List
 
 import requests
 
-from .dto import ItineraryEntry, Line, LineDetails, MeansOfTransport, Station
+from .dto import ItineraryEntryMaster, LineMaster, LineDetailsMaster, MeansOfTransportMaster, StationMaster
 
 
 def _message_from(response: requests.Response) -> str:
@@ -34,8 +34,8 @@ def _message_from(response: requests.Response) -> str:
     )
 
 
-def _as_line(dict: Dict[str, str]) -> Line:
-    return Line(
+def _as_line(dict: Dict[str, str]) -> LineMaster:
+    return LineMaster(
         uuid=dict["uuid"],
         label=dict["label"],
         means_of_transport=dict["means_of_transport"],
@@ -44,18 +44,18 @@ def _as_line(dict: Dict[str, str]) -> Line:
     )
 
 
-def _as_itinerary(entries: List[Dict[str, Any]]) -> List[ItineraryEntry]:
+def _as_itinerary(entries: List[Dict[str, Any]]) -> List[ItineraryEntryMaster]:
     result = []
     for current_entry in entries:
-        result.append(ItineraryEntry(
+        result.append(ItineraryEntryMaster(
             station=_as_station(current_entry["station"]),
             point_in_time_minutes=current_entry["point_in_time_minutes"]
         ))
     return result
 
 
-def _as_line_details(dict: Dict[str, str]) -> LineDetails:
-    return LineDetails(
+def _as_line_details(dict: Dict[str, str]) -> LineDetailsMaster:
+    return LineDetailsMaster(
         uuid=dict["uuid"],
         label=dict["label"],
         means_of_transport=_as_means_of_transport(dict["means_of_transport"]),
@@ -66,14 +66,14 @@ def _as_line_details(dict: Dict[str, str]) -> LineDetails:
     )
 
 
-def _as_means_of_transport(dict: Dict[str, str]) -> MeansOfTransport:
-    return MeansOfTransport(
+def _as_means_of_transport(dict: Dict[str, str]) -> MeansOfTransportMaster:
+    return MeansOfTransportMaster(
         uuid=dict["uuid"],
         identifier=dict["identifier"]
     )
 
-def _as_station(dict: Dict[str, str]) -> Station:
-    return Station(
+def _as_station(dict: Dict[str, str]) -> StationMaster:
+    return StationMaster(
         uuid=dict["uuid"],
         name=dict["name"]
     )
@@ -99,7 +99,7 @@ class MasterDataClient:
         self._session.mount("http://", adapter)
         self._session.mount("https://", adapter)
 
-    def get_means_of_transport_list(self) -> List[MeansOfTransport]:
+    def get_means_of_transport_list(self) -> List[MeansOfTransportMaster]:
         with self._session:
             response = self._session.get(f"{self._base_url}/means-of-transport")
             if response.status_code != 200:
@@ -107,7 +107,7 @@ class MasterDataClient:
             json_array = response.json()
             return [_as_means_of_transport(element) for element in json_array]
 
-    def get_means_of_transport(self, uuid: str) -> MeansOfTransport:
+    def get_means_of_transport(self, uuid: str) -> MeansOfTransportMaster:
         with self._session:
             response = self._session.get(f"{self._base_url}/means-of-transport/{uuid}")
             if response.status_code != 200:
@@ -115,7 +115,7 @@ class MasterDataClient:
             json_data = response.json()
             return _as_means_of_transport(json_data)
 
-    def get_station_list(self) -> List[Station]:
+    def get_station_list(self) -> List[StationMaster]:
         with self._session:
             response = self._session.get(f"{self._base_url}/stations")
             if response.status_code != 200:
@@ -123,7 +123,7 @@ class MasterDataClient:
             json_array = response.json()
             return [_as_station(element) for element in json_array]
 
-    def get_station(self, uuid: str) -> Station:
+    def get_station(self, uuid: str) -> StationMaster:
         with self._session:
             response = self._session.get(f"{self._base_url}/station/{uuid}")
             if response.status_code != 200:
@@ -131,7 +131,7 @@ class MasterDataClient:
             json_data = response.json()
             return _as_station(json_data)
 
-    def get_line_list(self) -> List[Line]:
+    def get_line_list(self) -> List[LineMaster]:
         with self._session:
             response = self._session.get(f"{self._base_url}/lines")
             if response.status_code != 200:
@@ -139,7 +139,7 @@ class MasterDataClient:
             json_array = response.json()
             return [_as_line(element) for element in json_array]
 
-    def get_line(self, uuid: str) -> LineDetails:
+    def get_line(self, uuid: str) -> LineDetailsMaster:
         with self._session:
             response = requests.get(f"{self._base_url}/line/{uuid}")
             if response.status_code != 200:

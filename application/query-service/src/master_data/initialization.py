@@ -29,7 +29,7 @@ from config import Config
 from db import Edge, Line, MeansOfTransport, Station
 
 from .client import MasterDataClient
-from .dto import ItineraryEntry, LineDetails
+from .dto import ItineraryEntryMaster, LineDetailsMaster, LineMaster, MeansOfTransportMaster, StationMaster
 
 
 _logger = getLogger("master-data")
@@ -37,27 +37,27 @@ _logger = getLogger("master-data")
 
 @dataclass(frozen=True)
 class RetrievalResult:
-    means_of_transport: List[MeansOfTransport]
-    stations: List[Station]
-    lines: List[LineDetails]
+    means_of_transport: List[MeansOfTransportMaster]
+    stations: List[StationMaster]
+    lines: List[LineDetailsMaster]
 
 
-def _retrieve_means_of_transport() -> List[MeansOfTransport]:
+def _retrieve_means_of_transport() -> List[MeansOfTransportMaster]:
     client = MasterDataClient(Config.get_master_data_service_base_url())
     return client.get_means_of_transport_list()
 
 
-def _retrieve_stations() -> List[Station]:
+def _retrieve_stations() -> List[StationMaster]:
     client = MasterDataClient(Config.get_master_data_service_base_url())
     return client.get_station_list()
 
 
-def _retrieve_lines() -> List[Line]:
+def _retrieve_lines() -> List[LineMaster]:
     client = MasterDataClient(Config.get_master_data_service_base_url())
     return client.get_line_list()
 
 
-def _retrieve_line_details(uuid: str) -> LineDetails:
+def _retrieve_line_details(uuid: str) -> LineDetailsMaster:
     client = MasterDataClient(Config.get_master_data_service_base_url())
     return client.get_line(uuid)
 
@@ -79,7 +79,7 @@ def _retrieve_from_master_data_service() -> RetrievalResult:
         )
 
 
-def _import_means_of_transport(db: Session, means_of_transport_list: List[MeansOfTransport]) -> None:
+def _import_means_of_transport(db: Session, means_of_transport_list: List[MeansOfTransportMaster]) -> None:
     _logger.info("%d means of transport retrieved from master data", len(means_of_transport_list))
     for means_of_transport in means_of_transport_list:
         db.add(MeansOfTransport(
@@ -90,7 +90,7 @@ def _import_means_of_transport(db: Session, means_of_transport_list: List[MeansO
     _logger.info("Means of transport imported into the database")
 
 
-def _import_stations(db: Session, station_list: List[Station]) -> None:
+def _import_stations(db: Session, station_list: List[StationMaster]) -> None:
     _logger.info("%d stations retrieved from master data", len(station_list))
     for station in station_list:
         db.add(Station(
@@ -101,7 +101,7 @@ def _import_stations(db: Session, station_list: List[Station]) -> None:
     _logger.info("Stations imported into the database")
 
 
-def _import_itinerary(db: Session, line_uuid: str, entries: List[ItineraryEntry]) -> None:
+def _import_itinerary(db: Session, line_uuid: str, entries: List[ItineraryEntryMaster]) -> None:
     previous_station_uuid = entries[0].station.uuid
     previous_point_in_time_minutes = 0
     for current_entry in entries[1:]:
@@ -118,7 +118,7 @@ def _import_itinerary(db: Session, line_uuid: str, entries: List[ItineraryEntry]
         previous_station_uuid = current_entry.station.uuid
 
 
-def _import_single_line(db: Session, line_details: LineDetails) -> None:
+def _import_single_line(db: Session, line_details: LineDetailsMaster) -> None:
     line = Line()
     line.uuid = line_details.uuid
     line.label = line_details.label
@@ -131,7 +131,7 @@ def _import_single_line(db: Session, line_details: LineDetails) -> None:
     db.commit()
 
 
-def _import_lines(db: Session, line_list: List[LineDetails]) -> None:
+def _import_lines(db: Session, line_list: List[LineDetailsMaster]) -> None:
     _logger.info("%d lines retrieved from master data", len(line_list))
     for line_details in line_list:
         _import_single_line(db, line_details)
