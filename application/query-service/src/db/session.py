@@ -21,6 +21,7 @@ from logging import getLogger
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 
 _logger = getLogger("db")
@@ -29,7 +30,8 @@ _logger = getLogger("db")
 _engine = create_engine(
     url="sqlite://",
     connect_args={"check_same_thread": False},
-    pool_size=20
+    poolclass=StaticPool,
+    # pool_size=20
 )
 _logger.info("DB engine created")
 
@@ -41,7 +43,7 @@ _logger.info("DB session maker created")
 def get_db() -> SessionLocal:
     db = SessionLocal()
     try:
-        _logger.debug("DB session created")
+        _logger.debug("DB session created (get_db)")
         yield db
     finally:
         db.close()
@@ -49,7 +51,9 @@ def get_db() -> SessionLocal:
 
 
 def get_db_session() -> SessionLocal:
-    return SessionLocal()
+    result = SessionLocal()
+    _logger.debug("DB session created (get_db_session)")
+    return result
 
 
 _DDL_STATEMENTS = [
@@ -101,4 +105,5 @@ with _engine.connect() as conn:
     for statement in _DDL_STATEMENTS:
         _logger.debug("Going to execute DDL statement:\n%s", statement)
         conn.execute(text(statement))
+    conn.commit()
     _logger.info("DB schema created")
