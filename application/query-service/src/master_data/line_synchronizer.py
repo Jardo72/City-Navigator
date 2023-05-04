@@ -34,7 +34,7 @@ class LineSynchronizer(AbstractSynchronizer):
         super().__init__(db, client)
 
     def create_entity(self, uuid: str) -> None:
-        ...
+        line_dto = self.client.get_line(uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(Line).filter(Line.uuid == uuid).first()

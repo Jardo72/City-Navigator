@@ -34,13 +34,13 @@ class MeansOfTransportSynchronizer(AbstractSynchronizer):
         super().__init__(db, client)
 
     def create_entity(self, uuid: str) -> None:
-        ...
+        means_of_transport_dto = self.client.get_means_of_transport(uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
         if record:
             # TODO: update and commit the record
-            self.client.get_means_of_transport()
+            means_of_transport_dto = self.client.get_means_of_transport(uuid)
             _logger.debug("Means of transport with uuid %s updated", uuid)
         else:
             _logger.warn("Means of transport with uuid %s not found", uuid)

@@ -99,7 +99,7 @@ class MasterDataClient:
         self._session.mount("http://", adapter)
         self._session.mount("https://", adapter)
 
-    def get_means_of_transport(self) -> List[MeansOfTransport]:
+    def get_means_of_transport_list(self) -> List[MeansOfTransport]:
         with self._session:
             response = self._session.get(f"{self._base_url}/means-of-transport")
             if response.status_code != 200:
@@ -107,7 +107,15 @@ class MasterDataClient:
             json_array = response.json()
             return [_as_means_of_transport(element) for element in json_array]
 
-    def get_stations(self) -> List[Station]:
+    def get_means_of_transport(self, uuid: str) -> MeansOfTransport:
+        with self._session:
+            response = self._session.get(f"{self._base_url}/means-of-transport/{uuid}")
+            if response.status_code != 200:
+                raise MasterDataClientException(response)
+            json_data = response.json()
+            return _as_means_of_transport(json_data)
+
+    def get_station_list(self) -> List[Station]:
         with self._session:
             response = self._session.get(f"{self._base_url}/stations")
             if response.status_code != 200:
@@ -123,7 +131,7 @@ class MasterDataClient:
             json_data = response.json()
             return _as_station(json_data)
 
-    def get_lines(self) -> List[Line]:
+    def get_line_list(self) -> List[Line]:
         with self._session:
             response = self._session.get(f"{self._base_url}/lines")
             if response.status_code != 200:

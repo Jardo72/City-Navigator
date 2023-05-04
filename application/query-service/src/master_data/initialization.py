@@ -44,17 +44,17 @@ class RetrievalResult:
 
 def _retrieve_means_of_transport() -> List[MeansOfTransport]:
     client = MasterDataClient(Config.get_master_data_service_base_url())
-    return client.get_means_of_transport()
+    return client.get_means_of_transport_list()
 
 
 def _retrieve_stations() -> List[Station]:
     client = MasterDataClient(Config.get_master_data_service_base_url())
-    return client.get_stations()
+    return client.get_station_list()
 
 
 def _retrieve_lines() -> List[Line]:
     client = MasterDataClient(Config.get_master_data_service_base_url())
-    return client.get_lines()
+    return client.get_line_list()
 
 
 def _retrieve_line_details(uuid: str) -> LineDetails:

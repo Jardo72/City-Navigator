@@ -34,7 +34,7 @@ class StationSynchronizer(AbstractSynchronizer):
         super().__init__(db, client)
 
     def create_entity(self, uuid: str) -> None:
-        ...
+        station_dto = self.client.get_station(uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(Station).filter(Station.uuid == uuid).first()
