@@ -76,6 +76,18 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
     )
 
 
+def print_test_run_preview(config: Config, data_collections: DataCollections) -> None:
+    print()
+    print("Test configuration")
+    print(f"Duration:             {config.test_duration_minutes} minutes")
+    print(f"Overall thread count: {config.overall_thread_count}")
+    print()
+    print("Test data summary")
+    print(f"Overall number of stations: {len(data_collections.stations)}")
+    print(f"Overall number of lines:    {len(data_collections.lines)}")
+    print()
+
+
 def print_api_endpoint_summary(
         title: str,
         summary: APIEndpointSummary,
@@ -152,6 +164,7 @@ def main() -> None:
     command_line_arguments = parse_command_line_arguments()
     config = read_from_file(command_line_arguments.config_file)
     data_collections = read_lists_from_master_data(config)
+    print_test_run_preview(config, data_collections)
     test_run = TestRun(config, data_collections)
     summary = test_run.run()
     print_test_run_summary(summary)
