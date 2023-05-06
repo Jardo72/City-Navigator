@@ -22,6 +22,7 @@ from logging import getLogger
 from threading import Thread
 from typing import Any, Dict
 
+from prometheus_client import Counter
 from redis import Redis
 
 from config import Config
@@ -34,6 +35,12 @@ from .dto import Entity, Event, EventType
 
 _logger = getLogger("notifications")
 
+
+error_counter = Counter(
+    name="query_service_notification_errors_total",
+    documentation="Number of errors encountered by query service when processing notifications from master data service",
+    labelnames=["event_type", "entity"]
+)
 
 def _is_irrelevant(message: Dict[str, Any]) -> bool:
     if message is None:
@@ -69,6 +76,7 @@ def _extract_event_details(message: Dict[str, Any]) -> Event:
             uuid=uuid
         )
     except Exception as e:
+        error_counter.labels(event_type="unknown", entity="unknown").inc()
         _logger.error("Failed to extract event details from %s", message)
         _logger.error(str(e))
         return None
@@ -88,18 +96,18 @@ def _create_synchronizer(entity: Entity) -> AbstractSynchronizer:
 
 
 def _process_event(event: Event) -> None:
-    # TODO:
-    # - connection management should be handled centrally
-    # - dispatching to proper function/method should be handled centrally
-    # - it might make sense to use functionality from master_data package here
-    with _create_synchronizer(event.entity) as synchronizer:
-        _logger.debug("Going to use %s to synchronize data", type(synchronizer))
-        if event.event_type == EventType.CREATED:
-            synchronizer.create_entity(event.uuid)
-        elif event.event_type == EventType.UPDATED:
-            synchronizer.update_entity(event.uuid)
-        elif event.event_type == EventType.DELETED:
-            synchronizer.delete_entity(event.uuid)
+    try:
+        with _create_synchronizer(event.entity) as synchronizer:
+            _logger.debug("Going to use %s to synchronize data", type(synchronizer))
+            if event.event_type == EventType.CREATED:
+                synchronizer.create_entity(event.uuid)
+            elif event.event_type == EventType.UPDATED:
+                synchronizer.update_entity(event.uuid)
+            elif event.event_type == EventType.DELETED:
+                synchronizer.delete_entity(event.uuid)
+    except Exception as e:
+        error_counter.labels(event_type=event.event_type, entity=event.entity).inc()
+        _logger.error("Failed to process notification from master data: %s", event, e)
 
 
 def _consume_master_data_notifications(redis: Redis) -> None:
