@@ -27,7 +27,7 @@ from db import Edge, Line
 from .dto import ItineraryEntryMaster, LineDetailsMaster
 
 
-def _import_itinerary(db: Session, line_uuid: str, entries: List[ItineraryEntryMaster]) -> None:
+def import_itinerary(db: Session, line_uuid: str, entries: List[ItineraryEntryMaster]) -> None:
     previous_station_uuid = entries[0].station.uuid
     previous_point_in_time_minutes = 0
     for current_entry in entries[1:]:
@@ -52,7 +52,7 @@ def import_single_line(db: Session, line_details: LineDetailsMaster) -> None:
     line.terminal_stop_one_uuid = line_details.terminal_stop_one.uuid
     line.terminal_stop_two_uuid = line_details.terminal_stop_two.uuid
     db.add(line)
-    _import_itinerary(db, line_details.uuid, line_details.direction_one_itinerary)
-    _import_itinerary(db, line_details.uuid, line_details.direction_two_itinerary)
+    import_itinerary(db, line_details.uuid, line_details.direction_one_itinerary)
+    import_itinerary(db, line_details.uuid, line_details.direction_two_itinerary)
     db.commit()
 
