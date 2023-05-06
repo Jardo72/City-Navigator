@@ -23,6 +23,7 @@ from db import Line, SessionLocal
 
 from .abstract_synchronizer import AbstractSynchronizer
 from .client import MasterDataClient
+from .util import import_single_line
 
 
 _logger = getLogger("master-data")
@@ -35,6 +36,8 @@ class LineSynchronizer(AbstractSynchronizer):
 
     def create_entity(self, uuid: str) -> None:
         line_master = self.client.get_line(uuid)
+        import_single_line(self.db, line_master)
+        _logger.debug("Line with uuid %s inserted", line_master.uuid)
 
     def update_entity(self, uuid: str) -> None:
         record = self.db.query(Line).filter(Line.uuid == uuid).first()
