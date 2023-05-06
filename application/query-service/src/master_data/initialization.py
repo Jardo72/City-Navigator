@@ -21,16 +21,15 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from logging import getLogger
 from typing import List
-from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
 from config import Config
-from db import Edge, Line
 
 from .client import MasterDataClient
-from .dto import ItineraryEntryMaster, LineDetailsMaster, LineMaster, MeansOfTransportMaster, StationMaster
+from .dto import LineDetailsMaster, LineMaster, MeansOfTransportMaster, StationMaster
 from .mapping import as_means_of_transport, as_station
+from .util import import_single_line
 
 
 _logger = getLogger("master-data")
@@ -96,40 +95,10 @@ def _import_stations(db: Session, station_list: List[StationMaster]) -> None:
     _logger.info("Stations imported into the database")
 
 
-def _import_itinerary(db: Session, line_uuid: str, entries: List[ItineraryEntryMaster]) -> None:
-    previous_station_uuid = entries[0].station.uuid
-    previous_point_in_time_minutes = 0
-    for current_entry in entries[1:]:
-        distance_minutes = current_entry.point_in_time_minutes - previous_point_in_time_minutes
-        current_station_uuid = current_entry.station.uuid
-        db.add(Edge(
-            uuid=str(uuid4()),
-            distance_min=distance_minutes,
-            start_station_uuid=previous_station_uuid,
-            end_station_uuid=current_station_uuid,
-            line_uuid=line_uuid
-        ))
-        previous_point_in_time_minutes = current_entry.point_in_time_minutes
-        previous_station_uuid = current_entry.station.uuid
-
-
-def _import_single_line(db: Session, line_details: LineDetailsMaster) -> None:
-    line = Line()
-    line.uuid = line_details.uuid
-    line.label = line_details.label
-    line.means_of_transport_uuid = line_details.means_of_transport.uuid
-    line.terminal_stop_one_uuid = line_details.terminal_stop_one.uuid
-    line.terminal_stop_two_uuid = line_details.terminal_stop_two.uuid
-    db.add(line)
-    _import_itinerary(db, line_details.uuid, line_details.direction_one_itinerary)
-    _import_itinerary(db, line_details.uuid, line_details.direction_two_itinerary)
-    db.commit()
-
-
 def _import_lines(db: Session, line_list: List[LineDetailsMaster]) -> None:
     _logger.info("%d lines retrieved from master data", len(line_list))
     for line_details in line_list:
-        _import_single_line(db, line_details)
+        import_single_line(db, line_details)
     _logger.info("Lines imported into the database")
 
 
