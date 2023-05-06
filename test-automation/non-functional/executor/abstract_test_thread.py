@@ -40,7 +40,7 @@ class AbstractTestThread(Thread, ABC):
         timeout = Timeout(self._config.test_duration_minutes)
         self._summary_collector.test_thread_started()
         while timeout.has_not_expired_yet():
-            for _ in range(5):
+            for _ in range(4):
                 try:
                     response = self.send_single_request(client)
                     self._summary_collector.add(response)
