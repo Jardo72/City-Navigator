@@ -42,9 +42,9 @@ multiprocess.MultiProcessCollector(registry)
 metrics_app = make_asgi_app(registry=registry)
 
 if Config.is_api_doc_enabled():
-    app = FastAPI(title=APPLICATION_NAME, root_path=Config.get_root_path())
+    app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, root_path=Config.get_root_path())
 else:
-    app = FastAPI(title=APPLICATION_NAME, openapi_url=None, redoc_url=None)
+    app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, openapi_url=None, redoc_url=None)
 app.include_router(router)
 app.mount("/metrics", metrics_app)
 
