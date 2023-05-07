@@ -34,6 +34,7 @@ services:
     image: jardo72/city-navigator-master-data-service:latest
     depends_on:
       - redis-pubsub
+      - prometheus-http-discovery
     environment:
       # if API doc is enabled, metrics scraping does not work
       - API_DOC_ENABLED=no
@@ -42,6 +43,7 @@ services:
       - DATABASE_URL=sqlite:////db/sqlite.db
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
+      - PROMETHEUS_DISCOVERY_BASE_URL=http://prometheus-http-discovery:8000
     expose:
       - 8000
     networks:
@@ -73,8 +75,7 @@ services:
     depends_on:
       - redis-pubsub
       - master-data-service
-    expose:
-      - 8000
+      - prometheus-http-discovery
     environment:
       # if API doc is enabled, metrics scraping does not work
       - API_DOC_ENABLED=no
@@ -83,6 +84,9 @@ services:
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
+      - PROMETHEUS_DISCOVERY_BASE_URL=http://prometheus-http-discovery:8000
+    expose:
+      - 8000
     networks:
       - service-network
     volumes:
@@ -140,6 +144,26 @@ services:
         read_only: true
     ports:
       - 9090:9090
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
+  prometheus-http-discovery:
+    image: jardo72/city-navigator-http-service-discovery:latest
+    environment:
+      - ACCESS_LOG=/access-logs/http-service-discovery-access.log
+    expose:
+      - 8000
+    networks:
+      - service-network
+      - monitoring-network
+    volumes:
+      - type: bind
+        source: ./access-logs
+        target: /access-logs
+        read_only: false
     deploy:
       restart_policy:
         condition: on-failure
