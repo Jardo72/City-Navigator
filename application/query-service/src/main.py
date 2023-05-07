@@ -19,6 +19,7 @@
 
 from contextlib import asynccontextmanager
 from logging import getLogger
+from socket import gethostname
 from sys import version as python_version
 
 from fastapi import FastAPI, HTTPException, Request, Response
@@ -86,6 +87,7 @@ class VersionInfo(BaseModel):
     application_name: str = None
     application_version: str = None
     python_version: str = None
+    hostname: str
 
 
 @app.get("/version", response_model=VersionInfo)
@@ -94,5 +96,6 @@ async def get_version_info() -> VersionInfo:
     return VersionInfo(
         application_name=APPLICATION_NAME,
         application_version=APPLICATION_VERSION,
-        python_version=python_version
+        python_version=python_version,
+        hostname=gethostname()
     )
