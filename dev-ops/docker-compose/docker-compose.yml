@@ -164,6 +164,8 @@ services:
         source: ./access-logs
         target: /access-logs
         read_only: false
+    ports:
+      - 9099:8000
     deploy:
       restart_policy:
         condition: on-failure

@@ -30,3 +30,4 @@ https://github.com/prometheus/client_python
 
 # Prometheus & HTTP Service Discovery
 https://prometheus.io/docs/prometheus/latest/http_sd
+https://o11y.eu/blog/prometheus-http-service-discovery/
