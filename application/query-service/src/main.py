@@ -29,6 +29,7 @@ from prometheus_client import make_asgi_app, multiprocess
 from pydantic import BaseModel
 
 from db import get_db_session
+from discovery import DiscoveryServiceClient
 from config import Config
 from master_data import init_db_from_master_data
 from notifications import subscribe_master_data_notifications
@@ -45,6 +46,10 @@ async def lifespan(app: FastAPI) -> None:
 
     _logger.info("Going to subscribe Redis notifications")
     subscribe_master_data_notifications()
+
+    _logger.debug("Going to register service instance with Prometheus discovery")
+    client = DiscoveryServiceClient(Config.get_prometheus_discovery_base_url())
+    client.register()
 
     yield
     ...

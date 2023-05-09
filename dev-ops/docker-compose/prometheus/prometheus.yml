@@ -12,18 +12,8 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ["localhost:9090"]
-  # - job_name: master-data-service
-  #   scheme: http
-  #   metrics_path: /metrics
-  #   static_configs:
-  #     - targets: ["master-data-service:8000"]
-  # - job_name: query-service
-  #   scheme: http
-  #   metrics_path: /metrics
-  #   static_configs:
-  #     - targets: ["query-service:8000"]
   - job_name: http-discovery
     http_sd_configs:
       - url: http://prometheus-http-discovery:8000/targets
-        refresh_interval: "20s"
+        refresh_interval: "30s"
         follow_redirects: true

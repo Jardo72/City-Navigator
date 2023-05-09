@@ -95,6 +95,8 @@ services:
         target: /access-logs
         read_only: false
     deploy:
+      mode: replicated
+      replicas: 2
       resources:
         reservations:
           cpus: '1.5'
