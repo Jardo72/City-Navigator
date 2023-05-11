@@ -34,7 +34,7 @@ def create_command_line_arguments_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "sql_alchemy_db_url",
-        help="the name of the SQLite database file the data is to be imported to"
+        help="SQLAlchemy URL of the target database (mariadb+mariadbconnector://<usr>:<pwd>@<host>:<port>/<db-name>)"
     )
 
     return parser
