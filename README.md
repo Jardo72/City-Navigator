@@ -15,7 +15,7 @@ In addition, the query service also collects the number of notifications from ma
 
 
 ## Tech Stack
-Both microservices are implemented in Python using FastAPI and SQLAlchemy. SQLite is used to implement the in-memory database for the query service. For the master data database, more or less any RDBMS supported by SQLAlchemy could be used. The deployments which are part of the project use MariaDB or SQLite (local development with Docker compose). As mentioned before, Redis is used as pub/sub for the notifications sent by the master data service to the query service instance(s). At runtime, [Gunicorn (Green Unicorn)](https://gunicorn.org/) is used as application server. The Dockerfiles which are part of the project configure the server to run in multi-process mode. The above mentioned Prometheus instrumentation is implemented in a way able to deal with the multi-process model properly.
+Both microservices are implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and [SQLAlchemy](./https://www.sqlalchemy.org/). SQLite is used to implement the in-memory database for the query service. For the master data database, more or less any RDBMS supported by SQLAlchemy could be used. The deployments which are part of the project use MariaDB or SQLite (local development with Docker compose). As mentioned before, Redis is used as pub/sub for the notifications sent by the master data service to the query service instance(s). At runtime, [Gunicorn (Green Unicorn)](https://gunicorn.org/) is used as application server. The Dockerfiles which are part of the project configure the server to run in multi-process mode. The above mentioned Prometheus instrumentation is implemented in a way able to deal with the multi-process model properly.
 
 
 ## DevOps
