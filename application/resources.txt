@@ -40,3 +40,4 @@ https://hub.docker.com/_/mariadb
 - /docker-entrypoint-initdb.d (execute files with extensions .sh, .sql)
 - /var/lib/mysql (where MariaDB by default will write its data files)
 - default port = 3306
+- docker run --detach --name mariadb --env MARIADB_DATABASE=city-navigator --env MARIADB_USER=jardo --env MARIADB_PASSWORD=heslo --env MARIADB_ROOT_PASSWORD=my-secret-pw -p 3306:3306 mariadb:10.10
