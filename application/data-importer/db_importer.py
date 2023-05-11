@@ -45,8 +45,7 @@ class _Importer:
         engine = create_engine(
             url=sql_alchemy_db_url,
             echo=False,
-            future=True,
-            connect_args={"check_same_thread": False}
+            future=True
         )
         self._connection = engine.connect()
 
@@ -77,7 +76,7 @@ class _Importer:
         uuid = str(uuid4())
         self._means_of_transport[identifier] = uuid
         self._connection.execute(
-            text("insert into MEANS_OF_TRANSPORT (UUID, IDENTIFIER) values (:uuid, :identifier)"),
+            text("insert into T_MEANS_OF_TRANSPORT (UUID, IDENTIFIER) values (:uuid, :identifier)"),
             {"uuid": uuid, "identifier": identifier}
         )
 
@@ -85,7 +84,7 @@ class _Importer:
         uuid = str(uuid4())
         self._stations[name] = uuid
         self._connection.execute(
-            text("insert into STATIONS (UUID, NAME) values(:uuid, :name)"),
+            text("insert into T_STATIONS (UUID, NAME) values(:uuid, :name)"),
             {"uuid": uuid, "name": name}
         )
 
@@ -97,7 +96,7 @@ class _Importer:
         self._connection.execute(
             text(
                 """
-                insert into LINES (UUID, LABEL, MEANS_OF_TRANSPORT_UUID, TERMINAL_STOP_ONE_UUID, TERMINAL_STOP_TWO_UUID)
+                insert into T_LINES (UUID, LABEL, MEANS_OF_TRANSPORT_UUID, TERMINAL_STOP_ONE_UUID, TERMINAL_STOP_TWO_UUID)
                 values (:uuid, :label, :means_of_transport, :terminal_stop_one, :terminal_stop_two)
                 """
             ),
@@ -127,7 +126,7 @@ class _Importer:
         self._connection.execute(
             text(
                 """
-                insert into EDGES (UUID, START_STATION_UUID, END_STATION_UUID, LINE_UUID, DISTANCE_MIN)
+                insert into T_EDGES (UUID, START_STATION_UUID, END_STATION_UUID, LINE_UUID, DISTANCE_MIN)
                 values (:uuid, :start_station, :end_station, :line, :distance)
                 """
             ),
