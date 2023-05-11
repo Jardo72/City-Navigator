@@ -31,3 +31,12 @@ https://github.com/prometheus/client_python
 # Prometheus & HTTP Service Discovery
 https://prometheus.io/docs/prometheus/latest/http_sd
 https://o11y.eu/blog/prometheus-http-service-discovery/
+
+# MariaDB & Docker
+https://hub.docker.com/_/mariadb
+- MARIADB_ROOT_PASSWORD
+- MARIADB_DATABASE
+- MARIADB_USER/MARIADB_PASSWORD
+- /docker-entrypoint-initdb.d (execute files with extensions .sh, .sql)
+- /var/lib/mysql (where MariaDB by default will write its data files)
+- default port = 3306
