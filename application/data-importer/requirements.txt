@@ -1,2 +1,2 @@
-mariadb==1.1.6
+psycopg2==2.9.6
 sqlalchemy==2.0.6

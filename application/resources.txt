@@ -32,8 +32,9 @@ https://github.com/prometheus/client_python
 https://prometheus.io/docs/prometheus/latest/http_sd
 https://o11y.eu/blog/prometheus-http-service-discovery/
 
-# MariaDB & Docker
+# MySQL/MariaDB & Docker
 https://hub.docker.com/_/mariadb
+https://hub.docker.com/_/mysql/
 - MARIADB_ROOT_PASSWORD
 - MARIADB_DATABASE
 - MARIADB_USER/MARIADB_PASSWORD
@@ -41,3 +42,11 @@ https://hub.docker.com/_/mariadb
 - /var/lib/mysql (where MariaDB by default will write its data files)
 - default port = 3306
 - docker run --detach --name mariadb --env MARIADB_DATABASE=city-navigator --env MARIADB_USER=jardo --env MARIADB_PASSWORD=heslo --env MARIADB_ROOT_PASSWORD=my-secret-pw -p 3306:3306 mariadb:10.10
+- docker run --detach --name mysql --env MYSQL_DATABASE=city-navigator --env MYSQL_USER=jardo --env MYSQL_PASSWORD=heslo --env MYSQL_ROOT_PASSWORD=my-secret-pw -p 3306:3306 mysql:5.7.42
+- https://wiki.alpinelinux.org/wiki/MariaDB
+- https://dbarrerap.github.io/getting-started-with-mariadb-using-docker-python-and-flask.html
+
+
+# PostgreSQL
+- https://stackoverflow.com/questions/49325745/how-do-i-access-postgresql-within-docker-with-sqlalchemy
+- https://hub.docker.com/_/postgres/
