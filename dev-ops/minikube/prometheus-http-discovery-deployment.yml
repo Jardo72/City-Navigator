@@ -1,29 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: query-svc-deployment
+  name: prometheus-http-discovery-deployment
   labels:
     application: city-navigator
-    component: query-service
+    component: prometheus-http-discovery
     environment: sandbox
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
-      name: query-service
+      name: prometheus-http-discovery
       labels:
         application: city-navigator
-        component: query-service
+        component: prometheus-http-discovery
         environment: sandbox
     spec:
       containers:
-        - name: query-service
-          image: jardo72/city-navigator-query-service:latest
+        - name: prometheus-http-discovery
+          image: jardo72/city-navigator-http-service-discovery:latest
   selector:
     matchLabels:
       application: city-navigator
-      component: query-service
+      component: prometheus-http-discovery
       environment: sandbox
   strategy:
     type: RollingUpdate
-
