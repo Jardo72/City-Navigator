@@ -19,6 +19,13 @@ spec:
       containers:
         - name: postgres
           image: jardo72/city-navigator-postgres:latest
+          env:
+            - name: POSTGRES_DB
+              value: city-navigator
+            - name: POSTGRES_USER
+              value: jardo
+            - name: POSTGRES_PASSWORD
+              value: heslo
   selector:
     matchLabels:
       application: city-navigator

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  labels:
+    application: city-navigator
+    component: redis
+    environment: sandbox
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: redis
+      labels:
+        application: city-navigator
+        component: redis
+        environment: sandbox
+    spec:
+      containers:
+        - name: redis
+          image: redis:6.2.11-alpine
+  selector:
+    matchLabels:
+      application: city-navigator
+      component: redis
+      environment: sandbox
+  strategy:
+    type: RollingUpdate
