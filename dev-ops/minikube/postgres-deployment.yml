@@ -1,31 +1,28 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mariadb-deployment
+  name: postgres-deployment
   labels:
     application: city-navigator
-    component: mariadb
+    component: postgres
     environment: sandbox
 spec:
   replicas: 1
   template:
     metadata:
-      name: mariadb
+      name: postgres
       labels:
         application: city-navigator
-        component: mariadb
+        component: postgres
         environment: sandbox
     spec:
       containers:
-        - name: mariadb
-          image: jardo72/city-navigator-mariadb:latest
-      initContainers:
-        - name: data-importer
-          image: jardo72/city-navigator-data-importer:latest
+        - name: postgres
+          image: jardo72/city-navigator-postgres:latest
   selector:
     matchLabels:
       application: city-navigator
-      component: mariadb
+      component: postgres
       environment: sandbox
   strategy:
     type: RollingUpdate
