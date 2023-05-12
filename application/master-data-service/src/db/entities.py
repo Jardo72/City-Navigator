@@ -26,20 +26,20 @@ Base = declarative_base()
 
 
 class MeansOfTransport(Base):
-    __tablename__ = "MEANS_OF_TRANSPORT"
+    __tablename__ = "T_MEANS_OF_TRANSPORT"
     uuid = Column("UUID", String, primary_key=True)
     identifier = Column("IDENTIFIER", String(length=20), nullable=False)
 
 
 class Station(Base):
-    __tablename__ = "STATIONS"
+    __tablename__ = "T_STATIONS"
     uuid = Column("UUID", String, primary_key=True)
     name = Column("NAME", String(length=50), nullable=False)
     outbound_edges = relationship("Edge", foreign_keys="Edge.start_station_uuid", back_populates="start_station")
 
 
 class Line(Base):
-    __tablename__ = "LINES"
+    __tablename__ = "T_LINES"
     uuid = Column("UUID", String, primary_key=True, index=True)
     label = Column("LABEL", String, nullable=False)
     means_of_transport_uuid = Column("MEANS_OF_TRANSPORT_UUID", String, ForeignKey("MEANS_OF_TRANSPORT.UUID"), nullable=False)
@@ -51,7 +51,7 @@ class Line(Base):
 
 
 class Edge(Base):
-    __tablename__ = "EDGES"
+    __tablename__ = "T_EDGES"
     uuid = Column("UUID", String, primary_key=True)
     distance_min = Column("DISTANCE_MIN", Integer, nullable=False)
     start_station_uuid = Column("START_STATION_UUID", String, ForeignKey("STATIONS.UUID"), nullable=False)
