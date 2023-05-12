@@ -51,3 +51,6 @@ https://hub.docker.com/_/mysql/
 - https://stackoverflow.com/questions/49325745/how-do-i-access-postgresql-within-docker-with-sqlalchemy
 - https://hub.docker.com/_/postgres/
 - docker run --detach --name postgres --env POSTGRES_DB=city-navigator --env POSTGRES_USER=jardo --env POSTGRES_PASSWORD=heslo -p 5432:5432 postgres:15.3
+- docker run --detach --name postgres --env POSTGRES_DB=city-navigator --env POSTGRES_USER=jardo --env POSTGRES_PASSWORD=heslo -p 5432:5432 jardo72/city-navigator-postgres:latest
+
+postgresql+psycopg2://jardo:heslo@localhost/city-navigator
