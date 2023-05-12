@@ -1,28 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: master-data-svc-deployment
+  name: mariadb-deployment
   labels:
     application: city-navigator
-    component: master-data-service
+    component: mariadb
     environment: sandbox
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
-      name: master-data-svc
+      name: mariadb
       labels:
         application: city-navigator
-        component: master-data-service
+        component: mariadb
         environment: sandbox
     spec:
       containers:
-        - name: master-data-service
-          image: jardo72/city-navigator-master-data-service:latest
+        - name: mariadb
+          image: jardo72/city-navigator-mariadb:latest
+      initContainers:
+        - name: data-importer
+          image: jardo72/city-navigator-data-importer:latest
   selector:
     matchLabels:
       application: city-navigator
-      component: master-data-service
+      component: mariadb
       environment: sandbox
   strategy:
     type: RollingUpdate
