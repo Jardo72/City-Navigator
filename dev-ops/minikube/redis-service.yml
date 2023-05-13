@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-service
+  namespace: city-navigator
   labels:
     application: city-navigator
     component: redis

@@ -54,3 +54,6 @@ https://hub.docker.com/_/mysql/
 - docker run --detach --name postgres --env POSTGRES_DB=city-navigator --env POSTGRES_USER=jardo --env POSTGRES_PASSWORD=heslo -p 5432:5432 jardo72/city-navigator-postgres:latest
 
 postgresql+psycopg2://jardo:heslo@localhost/city-navigator
+
+# Kubernetes Service
+- <service-name>.<namespace>.svc.cluster.local:<service-port>

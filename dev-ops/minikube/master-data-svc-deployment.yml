@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: master-data-svc-deployment
+  namespace: city-navigator
   labels:
     application: city-navigator
     component: master-data-service
@@ -19,6 +20,19 @@ spec:
       containers:
         - name: master-data-service
           image: jardo72/city-navigator-master-data-service:latest
+          env:
+            - name: API_DOC_ENABLED
+              value: "no"
+            - name: ROOT_PATH
+              value: /city-navigator/api/master-data
+            - name: DATABASE_URL
+              value: postgres-service
+            - name: REDIS_HOST
+              value: redis-service.city-navigator.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PROMETHEUS_DISCOVERY_BASE_URL
+              value: http://prometheus-http-discovery-service.city-navigator.svc.cluster.local:8000
   selector:
     matchLabels:
       application: city-navigator

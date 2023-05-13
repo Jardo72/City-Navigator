@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus-http-discovery-deployment
+  namespace: city-navigator
   labels:
     application: city-navigator
     component: prometheus-http-discovery

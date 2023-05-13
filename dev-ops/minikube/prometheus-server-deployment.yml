@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-deployment
+  name: prometheus-server-deployment
   namespace: city-navigator
   labels:
     application: city-navigator
-    component: redis
+    component: prometheus-server
     environment: sandbox
 spec:
   replicas: 1
   template:
     metadata:
-      name: redis
+      name: prometheus-server
       labels:
         application: city-navigator
-        component: redis
+        component: prometheus-server
         environment: sandbox
     spec:
       containers:
-        - name: redis
-          image: redis:6.2.11-alpine
+        - name: prometheus-server
+          image: prom/prometheus
   selector:
     matchLabels:
       application: city-navigator
-      component: redis
+      component: prometheus-server
       environment: sandbox
   strategy:
     type: RollingUpdate
