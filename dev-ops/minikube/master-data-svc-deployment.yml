@@ -26,7 +26,7 @@ spec:
             - name: ROOT_PATH
               value: /city-navigator/api/master-data
             - name: DATABASE_URL
-              value: postgres-service
+              value: postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator.svc.cluster.local/city-navigator
             - name: REDIS_HOST
               value: redis-service.city-navigator.svc.cluster.local
             - name: REDIS_PORT

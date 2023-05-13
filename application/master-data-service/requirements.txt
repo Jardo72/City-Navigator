@@ -6,7 +6,7 @@ h11==0.14.0
 httptools==0.5.0
 idna==3.4
 prometheus-client==0.16.0
-psycopg2==2.9.6
+psycopg2-binary==2.9.6
 pydantic==1.10.6
 python-dotenv==1.0.0
 PyYAML==6.0
