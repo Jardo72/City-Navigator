@@ -20,6 +20,19 @@ spec:
       containers:
         - name: query-service
           image: jardo72/city-navigator-query-service:latest
+          env:
+            - name: API_DOC_ENABLED
+              value: "no"
+            - name: ROOT_PATH
+              value: /city-navigator/api/query
+            - name: MASTER_DATA_SERVICE_BASE_URL
+              value: http://master-data-svc-service.city-navigator.svc.cluster.local:8000
+            - name: REDIS_HOST
+              value: redis-service.city-navigator.svc.cluster.local
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PROMETHEUS_DISCOVERY_BASE_URL
+              value: http://prometheus-http-discovery-service.city-navigator.svc.cluster.local:8000
   selector:
     matchLabels:
       application: city-navigator
@@ -27,4 +40,3 @@ spec:
       environment: sandbox
   strategy:
     type: RollingUpdate
-
