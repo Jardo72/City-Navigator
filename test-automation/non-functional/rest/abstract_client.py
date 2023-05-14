@@ -29,13 +29,15 @@ from .response import Response
 
 class AbstractClient(ABC):
 
+    _TIMEOUT = (15, 15)
+
     def __init__(self, base_url: str) -> None:
         self._base_url = base_url
         self._session = requests.Session()
 
     def _get_request(self, path: str, params: Dict[str, str] = None) -> Response:
         start_time = perf_counter()
-        response = self._session.get(url=f"{self._base_url}{path}", params=params)
+        response = self._session.get(url=f"{self._base_url}{path}", params=params, timeout=self._TIMEOUT)
         duration_sec = perf_counter() - start_time
         return Response(
             url=response.request.url,

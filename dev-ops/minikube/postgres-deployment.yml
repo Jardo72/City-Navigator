@@ -20,6 +20,7 @@ spec:
       containers:
         - name: postgres
           image: jardo72/city-navigator-postgres:latest
+          imagePullPolicy: Always
           env:
             - name: POSTGRES_DB
               value: city-navigator

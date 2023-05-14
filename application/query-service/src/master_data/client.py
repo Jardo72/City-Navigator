@@ -17,11 +17,15 @@
 # limitations under the License.
 #
 
+from logging import getLogger
 from typing import Any, Dict, List
 
 import requests
 
 from .dto import ItineraryEntryMaster, LineMaster, LineDetailsMaster, MeansOfTransportMaster, StationMaster
+
+
+_logger = getLogger("master-data")
 
 
 def _message_from(response: requests.Response) -> str:
@@ -87,61 +91,69 @@ class MasterDataClientException(Exception):
 
 class MasterDataClient:
 
+    _TIMEOUT = (15, 15)
+
     def __init__(self, base_url: str) -> None:
         self._base_url = base_url
         adapter = requests.adapters.HTTPAdapter(
-            pool_connections=10,
+            pool_connections=20,
             pool_maxsize=20,
             max_retries=3,
-            pool_block=True
+            pool_block=False
         )
         self._session = requests.Session()
         self._session.mount("http://", adapter)
         self._session.mount("https://", adapter)
 
     def get_means_of_transport_list(self) -> List[MeansOfTransportMaster]:
+        _logger.debug("Going to retrieve list of means of transport from master data service")
         with self._session:
-            response = self._session.get(f"{self._base_url}/means-of-transport")
+            response = self._session.get(f"{self._base_url}/means-of-transport", timeout=self._TIMEOUT)
             if response.status_code != 200:
                 raise MasterDataClientException(response)
             json_array = response.json()
             return [_as_means_of_transport(element) for element in json_array]
 
     def get_means_of_transport(self, uuid: str) -> MeansOfTransportMaster:
+        _logger.debug("Going to retrieve means of transport (uuid = %s) from master data service", uuid)
         with self._session:
-            response = self._session.get(f"{self._base_url}/means-of-transport/{uuid}")
+            response = self._session.get(f"{self._base_url}/means-of-transport/{uuid}", timeout=self._TIMEOUT)
             if response.status_code != 200:
                 raise MasterDataClientException(response)
             json_data = response.json()
             return _as_means_of_transport(json_data)
 
     def get_station_list(self) -> List[StationMaster]:
+        _logger.debug("Going to retrieve list of stations from master data service")
         with self._session:
-            response = self._session.get(f"{self._base_url}/stations")
+            response = self._session.get(f"{self._base_url}/stations", timeout=self._TIMEOUT)
             if response.status_code != 200:
                 raise MasterDataClientException(response)
             json_array = response.json()
             return [_as_station(element) for element in json_array]
 
     def get_station(self, uuid: str) -> StationMaster:
+        _logger.debug("Going to retrieve station (uuid = %s) from master data service", uuid)
         with self._session:
-            response = self._session.get(f"{self._base_url}/station/{uuid}")
+            response = self._session.get(f"{self._base_url}/station/{uuid}", timeout=self._TIMEOUT)
             if response.status_code != 200:
                 raise MasterDataClientException(response)
             json_data = response.json()
             return _as_station(json_data)
 
     def get_line_list(self) -> List[LineMaster]:
+        _logger.debug("Going to retrieve list of lines from master data service")
         with self._session:
-            response = self._session.get(f"{self._base_url}/lines")
+            response = self._session.get(f"{self._base_url}/lines", timeout=self._TIMEOUT)
             if response.status_code != 200:
                 raise MasterDataClientException(response)
             json_array = response.json()
             return [_as_line(element) for element in json_array]
 
     def get_line(self, uuid: str) -> LineDetailsMaster:
+        _logger.debug("Going to retrieve line (uuid = %s) from master data service", uuid)
         with self._session:
-            response = requests.get(f"{self._base_url}/line/{uuid}")
+            response = requests.get(f"{self._base_url}/line/{uuid}", timeout=self._TIMEOUT)
             if response.status_code != 200:
                 raise MasterDataClientException(response)
             json_data = response.json()

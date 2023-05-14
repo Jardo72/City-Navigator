@@ -20,6 +20,7 @@ spec:
       containers:
         - name: prometheus-server
           image: prom/prometheus
+          imagePullPolicy: Always
   selector:
     matchLabels:
       application: city-navigator

@@ -20,6 +20,7 @@ spec:
       containers:
         - name: query-service
           image: jardo72/city-navigator-query-service:latest
+          imagePullPolicy: Always
           env:
             - name: API_DOC_ENABLED
               value: "no"

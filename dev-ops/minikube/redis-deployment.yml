@@ -20,6 +20,7 @@ spec:
       containers:
         - name: redis
           image: redis:6.2.11-alpine
+          imagePullPolicy: Always
   selector:
     matchLabels:
       application: city-navigator

@@ -20,6 +20,7 @@ spec:
       containers:
         - name: prometheus-http-discovery
           image: jardo72/city-navigator-http-service-discovery:latest
+          imagePullPolicy: Always
   selector:
     matchLabels:
       application: city-navigator
