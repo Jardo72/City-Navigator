@@ -75,10 +75,9 @@ def _extract_event_details(message: Dict[str, Any]) -> Event:
             entity=Entity[_normalize(entity)],
             uuid=uuid
         )
-    except Exception as e:
+    except Exception:
         error_counter.labels(event_type="unknown", entity="unknown").inc()
-        _logger.error("Failed to extract event details from %s", message)
-        _logger.error(str(e))
+        _logger.exception("Failed to extract event details from %s", message)
         return None
 
 
@@ -105,9 +104,9 @@ def _process_event(event: Event) -> None:
                 synchronizer.update_entity(event.uuid)
             elif event.event_type == EventType.DELETED:
                 synchronizer.delete_entity(event.uuid)
-    except Exception as e:
+    except Exception:
         error_counter.labels(event_type=event.event_type, entity=event.entity).inc()
-        _logger.error("Failed to process notification from master data: %s", event, e)
+        _logger.exception("Failed to process notification from master data: %s", event)
 
 
 def _consume_master_data_notifications(redis: Redis) -> None:

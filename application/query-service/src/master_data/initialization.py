@@ -103,8 +103,12 @@ def _import_lines(db: Session, line_list: List[LineDetailsMaster]) -> None:
 
 
 def init_db_from_master_data(db: Session) -> None:
-    retrieval_result = _retrieve_from_master_data_service()
-    _logger.info("All data retrieved from master data service")
-    _import_means_of_transport(db, retrieval_result.means_of_transport)
-    _import_stations(db, retrieval_result.stations)
-    _import_lines(db, retrieval_result.lines)
+    try:
+        retrieval_result = _retrieve_from_master_data_service()
+        _logger.info("All data retrieved from master data service")
+        _import_means_of_transport(db, retrieval_result.means_of_transport)
+        _import_stations(db, retrieval_result.stations)
+        _import_lines(db, retrieval_result.lines)
+    except Exception as e:
+        _logger.exception("Failed to initialize in-memory database with data from master data service")
+        raise e
