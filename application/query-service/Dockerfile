@@ -26,4 +26,5 @@ ENTRYPOINT /usr/local/bin/gunicorn \
     -w 6 \
     -k uvicorn.workers.UvicornWorker main:app \
     --log-config logging.ini \
-    --access-logfile ${ACCESS_LOG}
+    --access-logfile ${ACCESS_LOG} \
+    --timeout 150
