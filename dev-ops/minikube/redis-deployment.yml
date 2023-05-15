@@ -21,6 +21,9 @@ spec:
         - name: redis
           image: redis:6.2.11-alpine
           imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
+              protocol: TCP
   selector:
     matchLabels:
       application: city-navigator

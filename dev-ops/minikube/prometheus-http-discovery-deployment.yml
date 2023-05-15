@@ -21,6 +21,9 @@ spec:
         - name: prometheus-http-discovery
           image: jardo72/city-navigator-http-service-discovery:latest
           imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              protocol: TCP
   selector:
     matchLabels:
       application: city-navigator

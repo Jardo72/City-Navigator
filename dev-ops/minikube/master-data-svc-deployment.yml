@@ -8,7 +8,7 @@ metadata:
     component: master-data-service
     environment: sandbox
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       name: master-data-svc
@@ -21,13 +21,16 @@ spec:
         - name: master-data-service
           image: jardo72/city-navigator-master-data-service:latest
           imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              protocol: TCP
           env:
             - name: API_DOC_ENABLED
               value: "no"
             - name: ROOT_PATH
               value: /city-navigator/api/master-data
             - name: DATABASE_URL
-              value: postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator.svc.cluster.local/city-navigator
+              value: postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator.svc.cluster.local:5432/city-navigator
             - name: REDIS_HOST
               value: redis-service.city-navigator.svc.cluster.local
             - name: REDIS_PORT

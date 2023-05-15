@@ -21,6 +21,9 @@ spec:
         - name: query-service
           image: jardo72/city-navigator-query-service:latest
           imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              protocol: TCP
           env:
             - name: API_DOC_ENABLED
               value: "no"
