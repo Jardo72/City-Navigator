@@ -23,10 +23,12 @@ This deployment involves a single instance of each of the two microservices comp
 
 
 ## Commands
+Start the services:
 ```
 docker compose up -d --wait
 ```
 
+Stop the services:
 ```
 docker compose down
 ```
