@@ -28,12 +28,13 @@ from config import Config
 _logger = getLogger("db")
 
 
+database_url = Config.get_database_url()
 engine = create_engine(
-    url=Config.get_database_url(),
-    connect_args={"check_same_thread": False},
+    url=database_url,
+    connect_args={"check_same_thread": False} if database_url.startswith("sqlite") else {},
     pool_size=20
 )
-_logger.info("DB engine created, URL = '%s'", Config.get_database_url())
+_logger.info("DB engine created, URL = '%s'", database_url)
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -41,6 +42,7 @@ _logger.info("DB session maker created")
 
 
 def get_db() -> SessionLocal:
+    _logger.debug("Entering get_db()")
     db = SessionLocal()
     try:
         _logger.debug("DB session created")
