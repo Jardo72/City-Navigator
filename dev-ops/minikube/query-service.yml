@@ -8,7 +8,7 @@ metadata:
     component: query-service
     environment: sandbox
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       name: query-service
