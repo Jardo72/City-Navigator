@@ -30,13 +30,13 @@ spec:
             - name: ROOT_PATH
               value: /city-navigator/api/master-data
             - name: DATABASE_URL
-              value: postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator.svc.cluster.local:5432/city-navigator
+              value: postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator:5432/city-navigator
             - name: REDIS_HOST
-              value: redis-service.city-navigator.svc.cluster.local
+              value: redis-service.city-navigator
             - name: REDIS_PORT
               value: "6379"
             - name: PROMETHEUS_DISCOVERY_BASE_URL
-              value: http://prometheus-http-discovery-service.city-navigator.svc.cluster.local:8000
+              value: http://prometheus-http-discovery-service.city-navigator:8000
   selector:
     matchLabels:
       application: city-navigator
@@ -44,3 +44,24 @@ spec:
       environment: sandbox
   strategy:
     type: RollingUpdate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: master-data-svc-service
+  namespace: city-navigator
+  labels:
+    application: city-navigator
+    component: master-data-service
+    environment: sandbox
+spec:
+  type: ClusterIP
+  selector:
+    application: city-navigator
+    component: master-data-service
+    environment: sandbox
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
