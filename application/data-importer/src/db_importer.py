@@ -76,7 +76,7 @@ class _Importer:
         uuid = str(uuid4())
         self._means_of_transport[identifier] = uuid
         self._connection.execute(
-            text("insert into T_MEANS_OF_TRANSPORT (UUID, IDENTIFIER) values (:uuid, :identifier)"),
+            text("insert into t_means_of_transport (uuid, identifier) values (:uuid, :identifier)"),
             {"uuid": uuid, "identifier": identifier}
         )
 
@@ -84,7 +84,7 @@ class _Importer:
         uuid = str(uuid4())
         self._stations[name] = uuid
         self._connection.execute(
-            text("insert into T_STATIONS (UUID, NAME) values(:uuid, :name)"),
+            text("insert into t_stations (uuid, name) values(:uuid, :name)"),
             {"uuid": uuid, "name": name}
         )
 
@@ -96,7 +96,7 @@ class _Importer:
         self._connection.execute(
             text(
                 """
-                insert into T_LINES (UUID, LABEL, MEANS_OF_TRANSPORT_UUID, TERMINAL_STOP_ONE_UUID, TERMINAL_STOP_TWO_UUID)
+                insert into t_lines (uuid, label, means_of_transport_uuid, terminal_stop_one_uuid, terminal_stop_two_uuid)
                 values (:uuid, :label, :means_of_transport, :terminal_stop_one, :terminal_stop_two)
                 """
             ),
@@ -126,7 +126,7 @@ class _Importer:
         self._connection.execute(
             text(
                 """
-                insert into T_EDGES (UUID, START_STATION_UUID, END_STATION_UUID, LINE_UUID, DISTANCE_MIN)
+                insert into t_edges (uuid, start_station_uuid, end_station_uuid, line_uuid, distance_min)
                 values (:uuid, :start_station, :end_station, :line, :distance)
                 """
             ),

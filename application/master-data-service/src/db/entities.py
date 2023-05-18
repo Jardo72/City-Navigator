@@ -26,37 +26,37 @@ Base = declarative_base()
 
 
 class MeansOfTransport(Base):
-    __tablename__ = "T_MEANS_OF_TRANSPORT"
-    uuid = Column("UUID", String, primary_key=True)
-    identifier = Column("IDENTIFIER", String(length=20), nullable=False)
+    __tablename__ = "t_means_of_transport"
+    uuid = Column("uuid", String, primary_key=True)
+    identifier = Column("identifier", String(length=20), nullable=False)
 
 
 class Station(Base):
-    __tablename__ = "T_STATIONS"
-    uuid = Column("UUID", String, primary_key=True)
-    name = Column("NAME", String(length=50), nullable=False)
+    __tablename__ = "t_stations"
+    uuid = Column("uuid", String, primary_key=True)
+    name = Column("name", String(length=50), nullable=False)
     outbound_edges = relationship("Edge", foreign_keys="Edge.start_station_uuid", back_populates="start_station")
 
 
 class Line(Base):
-    __tablename__ = "T_LINES"
-    uuid = Column("UUID", String, primary_key=True, index=True)
-    label = Column("LABEL", String, nullable=False)
-    means_of_transport_uuid = Column("MEANS_OF_TRANSPORT_UUID", String, ForeignKey("T_MEANS_OF_TRANSPORT.UUID"), nullable=False)
+    __tablename__ = "t_lines"
+    uuid = Column("uuid", String, primary_key=True, index=True)
+    label = Column("label", String, nullable=False)
+    means_of_transport_uuid = Column("means_of_transport_uuid", String, ForeignKey("t_means_of_transport.uuid"), nullable=False)
     means_of_transport = relationship("MeansOfTransport", foreign_keys="Line.means_of_transport_uuid")
-    terminal_stop_one_uuid = Column("TERMINAL_STOP_ONE_UUID", String, ForeignKey("T_STATIONS.UUID"), nullable=False)
-    terminal_stop_two_uuid = Column("TERMINAL_STOP_TWO_UUID", String, ForeignKey("T_STATIONS.UUID"), nullable=False)
+    terminal_stop_one_uuid = Column("terminal_stop_one_uuid", String, ForeignKey("t_stations.uuid"), nullable=False)
+    terminal_stop_two_uuid = Column("terminal_stop_two_uuid", String, ForeignKey("t_stations.uuid"), nullable=False)
     terminal_stop_one = relationship("Station", foreign_keys="Line.terminal_stop_one_uuid")
     terminal_stop_two = relationship("Station", foreign_keys="Line.terminal_stop_two_uuid")
 
 
 class Edge(Base):
-    __tablename__ = "T_EDGES"
-    uuid = Column("UUID", String, primary_key=True)
-    distance_min = Column("DISTANCE_MIN", Integer, nullable=False)
-    start_station_uuid = Column("START_STATION_UUID", String, ForeignKey("T_STATIONS.UUID"), nullable=False)
-    end_station_uuid = Column("END_STATION_UUID", String, ForeignKey("T_STATIONS.UUID"), nullable=False)
-    line_uuid = Column("LINE_UUID", String, ForeignKey("T_LINES.UUID"), nullable=False)
+    __tablename__ = "t_edges"
+    uuid = Column("uuid", String, primary_key=True)
+    distance_min = Column("distance_min", Integer, nullable=False)
+    start_station_uuid = Column("start_station_uuid", String, ForeignKey("t_stations.uuid"), nullable=False)
+    end_station_uuid = Column("end_station_uuid", String, ForeignKey("t_stations.uuid"), nullable=False)
+    line_uuid = Column("line_uuid", String, ForeignKey("t_lines.uuid"), nullable=False)
     start_station = relationship("Station", foreign_keys="Edge.start_station_uuid", back_populates="outbound_edges")
     end_station = relationship("Station", foreign_keys="Edge.end_station_uuid")
     line = relationship("Line", foreign_keys="Edge.line_uuid")
