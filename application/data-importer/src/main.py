@@ -34,7 +34,7 @@ def create_command_line_arguments_parser() -> ArgumentParser:
     )
     parser.add_argument(
         "sql_alchemy_db_url",
-        help="SQLAlchemy URL of the target database (mariadb+mariadbconnector://<usr>:<pwd>@<host>:<port>/<db-name>)"
+        help="SQLAlchemy URL of the target database (e.g. postgresql+psycopg2://jardo:heslo@localhost:5432/city-navigator)"
     )
 
     return parser

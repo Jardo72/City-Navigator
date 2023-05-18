@@ -31,3 +31,24 @@ spec:
       environment: sandbox
   strategy:
     type: RollingUpdate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: city-navigator
+  labels:
+    application: city-navigator
+    component: redis
+    environment: sandbox
+spec:
+  type: ClusterIP
+  selector:
+    application: city-navigator
+    component: redis
+    environment: sandbox
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
