@@ -28,3 +28,24 @@ spec:
       environment: sandbox
   strategy:
     type: RollingUpdate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-server-service
+  namespace: city-navigator
+  labels:
+    application: city-navigator
+    component: prometheus-server
+    environment: sandbox
+spec:
+  type: ClusterIP
+  selector:
+    application: city-navigator
+    component: prometheus-server
+    environment: sandbox
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
