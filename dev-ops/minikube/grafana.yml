@@ -20,46 +20,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: query-svc-deployment
+  name: grafana-deployment
   namespace: city-navigator
   labels:
     application: city-navigator
-    component: query-service
+    component: grafana
     environment: sandbox
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
-      name: query-service
+      name: grafana
       labels:
         application: city-navigator
-        component: query-service
+        component: grafana
         environment: sandbox
     spec:
       containers:
-        - name: query-service
-          image: jardo72/city-navigator-query-service:latest
+        - name: grafana
+          image: grafana/grafana
           imagePullPolicy: Always
           ports:
-            - containerPort: 8000
+            - containerPort: 3000
               protocol: TCP
           env:
-            - name: API_DOC_ENABLED
-              value: "no"
-            - name: ROOT_PATH
-              value: /city-navigator/api/query
-            - name: MASTER_DATA_SERVICE_BASE_URL
-              value: http://master-data-svc-service.city-navigator:8000
-            - name: REDIS_HOST
-              value: redis-service.city-navigator
-            - name: REDIS_PORT
-              value: "6379"
-            - name: PROMETHEUS_DISCOVERY_BASE_URL
-              value: http://prometheus-http-discovery-service.city-navigator:8000
+            - name: GF_SECURITY_ADMIN_USER
+              value: admin
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: GrafanaSecret#37
   selector:
     matchLabels:
       application: city-navigator
-      component: query-service
+      component: postgres
       environment: sandbox
   strategy:
     type: RollingUpdate
@@ -68,19 +60,19 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: query-svc-service
+  name: grafana-service
   namespace: city-navigator
   labels:
     application: city-navigator
-    component: query-service
+    component: grafana
     environment: sandbox
 spec:
   type: ClusterIP
   selector:
     application: city-navigator
-    component: query-service
+    component: grafana
     environment: sandbox
   ports:
     - protocol: TCP
-      port: 8000
-      targetPort: 8000
+      port: 3000
+      targetPort: 3000

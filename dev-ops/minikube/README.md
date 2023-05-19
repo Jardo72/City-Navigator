@@ -13,6 +13,7 @@ kubectl apply -f postgres.yml
 kubectl apply -f redis.yml
 kubectl apply -f prometheus-http-discovery.yml
 kubectl apply -f prometheus-server.yml
+kubectl apply -f grafana.yml
 kubectl apply -f master-data-service.yml
 kubectl apply -f query-service.yml
 ```
@@ -21,6 +22,7 @@ Stop the services:
 ```
 kubectl delete -f query-service.yml
 kubectl delete -f master-data-service.yml
+kubectl delete -f grafana.yml
 kubectl delete -f prometheus-server.yml
 kubectl delete -f prometheus-http-discovery.yml
 kubectl delete -f redis.yml
