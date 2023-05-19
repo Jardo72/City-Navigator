@@ -17,6 +17,28 @@
 # limitations under the License.
 #
 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-data-sources
+  namespace: city-navigator
+  labels:
+    application: city-navigator
+    component: grafana
+    environment: sandbox
+data:
+  datasource.yml: |
+    apiVersion: 1
+
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.city-navigator:9090 
+      isDefault: true
+      access: proxy
+      editable: true
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -40,6 +62,10 @@ spec:
         - name: grafana
           image: grafana/grafana
           imagePullPolicy: Always
+          volumeMounts:
+            - name: grafana-data-sources
+              mountPath: /etc/grafana/provisioning/datasources
+              readOnly: true
           ports:
             - containerPort: 3000
               protocol: TCP
@@ -48,10 +74,14 @@ spec:
               value: admin
             - name: GF_SECURITY_ADMIN_PASSWORD
               value: GrafanaSecret#37
+      volumes:
+        - name: grafana-data-sources
+          configMap:
+            name: grafana-data-sources
   selector:
     matchLabels:
       application: city-navigator
-      component: postgres
+      component: grafana
       environment: sandbox
   strategy:
     type: RollingUpdate
