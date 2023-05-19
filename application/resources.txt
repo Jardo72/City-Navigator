@@ -64,3 +64,5 @@ postgresql+psycopg2://jardo:heslo@localhost/city-navigator
 # WORKER TIMEOUT
 - https://github.com/tiangolo/uvicorn-gunicorn-fastapi-docker/issues/145
 
+# Ingress & Minikube 
+- https://iceburn.medium.com/use-ingress-in-minikube-ae5e87ea858c
