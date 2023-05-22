@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+from dataclasses import dataclass
+from datetime import datetime
 from logging import getLogger
 from socket import gethostname
 from sys import version as python_version
@@ -54,6 +56,12 @@ class TargetInfo(BaseModel):
     service: str
 
 
+@dataclass(frozen=True, slots=True)
+class TargetRegistryEntry:
+    hostname: str
+    timestamp: datetime
+
+
 class TargetRegistry:
 
     def __init__(self) -> None:
@@ -65,11 +73,17 @@ class TargetRegistry:
             _logger.debug("Hostname %s added to or updated in the registry (service = %s)", hostname, service)
             if service not in self._entries:
                 self._entries[service] = set()
-            self._entries[service].add(hostname)
+            entry = TargetRegistryEntry(hostname=hostname, timestamp=datetime.now())
+            self._entries[service].add(entry)
 
     def get_targets_grouped_by_service(self) -> Dict[str, str]:
         with self._lock:
-            return dict(self._entries)
+            result = {}
+            for service, entries in self._entries.items():
+                hostnames = list(map(lambda host: host.hostname, entries))
+                distinct_hostnames = set(hostnames)
+                result[service] = list(distinct_hostnames)
+            return result
 
 
 target_registry = TargetRegistry()

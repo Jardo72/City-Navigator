@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+from contextlib import asynccontextmanager
 from logging import getLogger
 from socket import gethostname
 from sys import version as python_version
@@ -28,10 +29,21 @@ from prometheus_client import make_asgi_app, multiprocess
 from pydantic import BaseModel
 
 from config import Config
+from discovery import DiscoveryServiceClient
 from rest import router
 
 
 _logger = getLogger("main")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> None:
+    _logger.debug("Going to register service instance with Prometheus discovery")
+    client = DiscoveryServiceClient(Config.get_prometheus_discovery_base_url())
+    client.register()
+
+    yield
+    ...
 
 
 APPLICATION_NAME = "City Navigator - Master Data Service"
@@ -43,9 +55,9 @@ multiprocess.MultiProcessCollector(registry)
 metrics_app = make_asgi_app(registry=registry)
 
 if Config.is_api_doc_enabled():
-    app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, root_path=Config.get_root_path())
+    app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, root_path=Config.get_root_path(), lifespan=lifespan)
 else:
-    app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, openapi_url=None, redoc_url=None)
+    app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, openapi_url=None, redoc_url=None, lifespan=lifespan)
 app.include_router(router)
 app.mount("/metrics", metrics_app)
 
