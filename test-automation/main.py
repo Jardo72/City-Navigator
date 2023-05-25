@@ -100,13 +100,18 @@ def print_api_endpoint_summary(
     print(f"{INDENTATION}Worker thread count:            {thread_count}", file=summary_file)
     if thread_count > 0:
         throughput = summary.success_count / test_duration_sec
+        print(f"{INDENTATION}Overall number of requests:     {summary.overall_request_count}", file=summary_file)
         print(f"{INDENTATION}Number of successful requests:  {summary.success_count}", file=summary_file)
+        print(f"{INDENTATION}Success percentage:             {summary.success_percentage} %", file=summary_file)
+        print(f"{INDENTATION}Client error count:             {summary.client_error_count}", file=summary_file)
+        print(f"{INDENTATION}Client error percentage:        {summary.client_error_percentage} %", file=summary_file)
+        print(f"{INDENTATION}Server error count:             {summary.server_error_count}", file=summary_file)
+        print(f"{INDENTATION}Server error percentage:        {summary.server_error_percentage} %", file=summary_file)
+        print(f"{INDENTATION}Exception count:                {summary.exception_count}", file=summary_file)
+        print(f"{INDENTATION}Exception percentage:           {summary.exception_percentage} %", file=summary_file)
         print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
         print(f"{INDENTATION}Min. response time:             {summary.min_success_duration_millis} millis", file=summary_file)
         print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
-        print(f"{INDENTATION}Client error count:             {summary.client_error_count}", file=summary_file)
-        print(f"{INDENTATION}Server error count:             {summary.server_error_count}", file=summary_file)
-        print(f"{INDENTATION}Exception count:                {summary.exception_count}", file=summary_file)
         print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
 
 

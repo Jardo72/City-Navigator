@@ -36,6 +36,26 @@ class APIEndpointSummary:
     max_success_duration_millis: int
 
     @property
+    def overall_request_count(self) -> int:
+        return self.success_count + self.client_error_count + self.server_error_count + self.exception_count
+
+    @property
+    def success_percentage(self) -> float:
+        return round(100 * (self.success_count / self.overall_request_count), 1)
+
+    @property
+    def client_error_percentage(self) -> float:
+        return round(100 * (self.client_error_count / self.overall_request_count), 1)
+
+    @property
+    def server_error_percentage(self) -> float:
+        return round(100 * (self.server_error_count / self.overall_request_count), 1)
+
+    @property
+    def exception_percentage(self) -> float:
+        return round(100 * (self.exception_count / self.overall_request_count), 1)
+
+    @property
     def avg_success_duration_millis(self) -> int:
         return round(self.overall_success_duration_millis / self.success_count)
 
