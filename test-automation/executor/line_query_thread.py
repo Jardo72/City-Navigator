@@ -28,9 +28,9 @@ from .abstract_test_thread import AbstractTestThread
 
 class LineQueryThread(AbstractTestThread):
 
-    def __init__(self, config: Config, lines: Tuple[str]) -> None:
+    def __init__(self, config: Config, lines: Tuple[str], error_percentage: int) -> None:
         super().__init__(config)
-        self._lines = RandomSelector(lines)
+        self._lines = RandomSelector(lines, error_percentage)
 
     def send_single_request(self, client: QueryServiceClient) -> Response:
         label = self._lines.random_value()

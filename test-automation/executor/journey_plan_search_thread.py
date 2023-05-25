@@ -28,9 +28,9 @@ from .abstract_test_thread import AbstractTestThread
 
 class JourneyPlanSearchThread(AbstractTestThread):
 
-    def __init__(self, config: Config, stations: Tuple[str]) -> None:
+    def __init__(self, config: Config, stations: Tuple[str], error_percentage: int) -> None:
         super().__init__(config)
-        self._stations = RandomSelector(stations)
+        self._stations = RandomSelector(stations, error_percentage)
 
     def send_single_request(self, client: QueryServiceClient) -> Response:
         start, destination = self._stations.random_pair()

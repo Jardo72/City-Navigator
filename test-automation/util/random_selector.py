@@ -22,7 +22,7 @@ from typing import Tuple
 
 class RandomSelector:
 
-    def __init__(self, values: Tuple[str]) -> None:
+    def __init__(self, values: Tuple[str], error_percentage: int = 0) -> None:
         self._values = values
         self._max_index = len(values) - 1
 

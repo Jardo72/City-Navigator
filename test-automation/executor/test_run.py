@@ -42,16 +42,30 @@ class TestRun:
         self._data_collections = data_collections
         self._config = config
         self._journey_plan_search_threads = [
-            JourneyPlanSearchThread(config, data_collections.stations) for _ in range(config.journey_plan_search_threads)
+            JourneyPlanSearchThread(
+                config,
+                data_collections.stations,
+                config.journey_plan_error_percentage
+            ) for _ in range(config.journey_plan_search_threads)
         ]
         self._station_query_threads = [
-            StationQueryThread(config, data_collections.stations) for _ in range(config.station_query_threads)
+            StationQueryThread(
+                config,
+                data_collections.stations,
+                config.station_query_error_percentage
+            ) for _ in range(config.station_query_threads)
         ]
         self._station_filter_threads = [
-            StationFilterThread(config) for _ in range(config.station_filter_threads)
+            StationFilterThread(
+                config
+            ) for _ in range(config.station_filter_threads)
         ]
         self._line_query_threads = [
-            LineQueryThread(config, data_collections.lines) for _ in range(config.line_query_threads)
+            LineQueryThread(
+                config,
+                data_collections.lines,
+                config.line_query_error_percentage
+            ) for _ in range(config.line_query_threads)
         ]
 
     def run(self) -> TestRunSummary:
