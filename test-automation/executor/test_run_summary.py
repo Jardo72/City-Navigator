@@ -47,20 +47,40 @@ class TestRunSummary:
         return max(map(lambda s: s.end_time, self._endpoint_summaries))
 
     @property
+    def overall_request_count(self) -> int:
+        return sum(map(lambda s: s.overall_request_count, self._endpoint_summaries))
+
+    @property
     def overall_success_count(self) -> int:
         return sum(map(lambda s: s.success_count, self._endpoint_summaries))
+
+    @property
+    def overall_success_percentage(self) -> float:
+        return round(100 * (self.overall_success_count / self.overall_request_count), 1)
 
     @property
     def overall_client_error_count(self) -> int:
         return sum(map(lambda s: s.client_error_count, self._endpoint_summaries))
 
     @property
+    def overall_client_error_percentage(self) -> float:
+        return round(100 * (self.overall_client_error_count / self.overall_request_count), 1)
+
+    @property
     def overall_server_error_count(self) -> int:
         return sum(map(lambda s: s.server_error_count, self._endpoint_summaries))
 
     @property
+    def overall_server_error_percentage(self) -> float:
+        return round(100 * (self.overall_server_error_count / self.overall_request_count), 1)
+
+    @property
     def overall_exception_count(self) -> int:
         return sum(map(lambda s: s.exception_count, self._endpoint_summaries))
+
+    @property
+    def overall_exception_percentage(self) -> float:
+        return round(100 * (self.overall_exception_count / self.overall_request_count), 1)
 
     @property
     def _endpoint_summaries(self) -> List[APIEndpointSummary]:

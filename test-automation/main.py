@@ -95,24 +95,20 @@ def print_api_endpoint_summary(
         test_duration_sec: float,
         summary_file: TextIOWrapper = None
 ) -> None:
-    INDENTATION = 4 * " "
+    TAB = 4 * " "
     print(title, file=summary_file)
-    print(f"{INDENTATION}Worker thread count:            {thread_count}", file=summary_file)
+    print(f"{TAB}Worker thread count:            {thread_count}", file=summary_file)
     if thread_count > 0:
         throughput = summary.success_count / test_duration_sec
-        print(f"{INDENTATION}Overall number of requests:     {summary.overall_request_count}", file=summary_file)
-        print(f"{INDENTATION}Number of successful requests:  {summary.success_count}", file=summary_file)
-        print(f"{INDENTATION}Success percentage:             {summary.success_percentage} %", file=summary_file)
-        print(f"{INDENTATION}Client error count:             {summary.client_error_count}", file=summary_file)
-        print(f"{INDENTATION}Client error percentage:        {summary.client_error_percentage} %", file=summary_file)
-        print(f"{INDENTATION}Server error count:             {summary.server_error_count}", file=summary_file)
-        print(f"{INDENTATION}Server error percentage:        {summary.server_error_percentage} %", file=summary_file)
-        print(f"{INDENTATION}Exception count:                {summary.exception_count}", file=summary_file)
-        print(f"{INDENTATION}Exception percentage:           {summary.exception_percentage} %", file=summary_file)
-        print(f"{INDENTATION}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
-        print(f"{INDENTATION}Min. response time:             {summary.min_success_duration_millis} millis", file=summary_file)
-        print(f"{INDENTATION}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
-        print(f"{INDENTATION}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
+        print(f"{TAB}Overall number of requests:     {summary.overall_request_count}", file=summary_file)
+        print(f"{TAB}Number of successful requests:  {summary.success_count} ({summary.success_percentage} %)", file=summary_file)
+        print(f"{TAB}Client error count:             {summary.client_error_count} ({summary.client_error_percentage} %)", file=summary_file)
+        print(f"{TAB}Server error count:             {summary.server_error_count} ({summary.server_error_percentage} %)", file=summary_file)
+        print(f"{TAB}Exception count:                {summary.exception_count} ({summary.exception_percentage} %)", file=summary_file)
+        print(f"{TAB}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
+        print(f"{TAB}Min. response time:             {summary.min_success_duration_millis} millis", file=summary_file)
+        print(f"{TAB}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
+        print(f"{TAB}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
 
 
 def format_duration(duration_sec: float) -> str:
@@ -131,10 +127,11 @@ def print_test_run_summary(summary: TestRunSummary, summary_file: TextIOWrapper 
     print(f"Test run end time:                      {summary.end_time.strftime(FORMAT)}", file=summary_file)
     print(f"Overall duration:                       {format_duration(duration_sec)}", file=summary_file)
     print(f"Overall thread count:                   {summary.config.overall_thread_count}", file=summary_file)
-    print(f"Overall number of successful requests:  {summary.overall_success_count}", file=summary_file)
-    print(f"Overall number of client errors:        {summary.overall_client_error_count}", file=summary_file)
-    print(f"Overall number of server errors:        {summary.overall_server_error_count}", file=summary_file)
-    print(f"Overall number of exceptions:           {summary.overall_exception_count}", file=summary_file)
+    print(f"Overall number of requests:             {summary.overall_request_count}", file=summary_file)
+    print(f"Overall number of successful requests:  {summary.overall_success_count} ({summary.overall_success_percentage} %)", file=summary_file)
+    print(f"Overall number of client errors:        {summary.overall_client_error_count} ({summary.overall_client_error_percentage} %)", file=summary_file)
+    print(f"Overall number of server errors:        {summary.overall_server_error_count} ({summary.overall_server_error_percentage} %)", file=summary_file)
+    print(f"Overall number of exceptions:           {summary.overall_exception_count} ({summary.overall_exception_percentage} %)", file=summary_file)
     print_api_endpoint_summary(
         title="Journey plan search",
         summary=summary.journey_plan_search_summary,
