@@ -38,7 +38,23 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [],
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 1,
+                  "text": "down"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 0,
+                  "text": "up"
+                }
+              },
+              "type": "value"
+            }
+          ],
           "thresholds": {
             "mode": "percentage",
             "steps": [
@@ -79,9 +95,9 @@
           },
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "up{instance=~\"(master-data-service|query-service):8000\"}",
+          "expr": "up{service=~\"(master-data-service|query-service)\"}",
           "instant": true,
-          "legendFormat": "{{instance}}",
+          "legendFormat": "{{service}}",
           "range": false,
           "refId": "A"
         }
@@ -382,6 +398,6 @@
   "timezone": "",
   "title": "City Navigator",
   "uid": "9thcR9y4k",
-  "version": 3,
+  "version": 2,
   "weekStart": ""
 }
