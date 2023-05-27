@@ -42,3 +42,6 @@ postgresql+psycopg2://jardo:heslo@localhost/city-navigator
 
 # Ingress & Minikube 
 - https://iceburn.medium.com/use-ingress-in-minikube-ae5e87ea858c
+
+# Grafana Dashboards (CaC)
+- https://grafana.com/tutorials/provision-dashboards-and-data-sources/

@@ -7,9 +7,14 @@ This deployment involves a single instance of each of the two microservices comp
 - Redis serving as pub/sub messaging used to deliver notifications from the master data service to all query service instances.
 
 ## Commands
+```
+minikube addons enable ingress
+```
+
 Start the services:
 ```
 kubectl apply -f namespace.yml
+kubectl apply -f ingress.yml
 kubectl apply -f postgres.yml
 kubectl apply -f redis.yml
 kubectl apply -f prometheus-http-discovery.yml
@@ -28,5 +33,6 @@ kubectl delete -f prometheus-server.yml
 kubectl delete -f prometheus-http-discovery.yml
 kubectl delete -f redis.yml
 kubectl delete -f postgres.yml
+kubectl delete -f ingress.yml
 kubectl delete -f namespace.yml
 ```
