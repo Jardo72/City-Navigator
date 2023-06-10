@@ -42,6 +42,11 @@ postgresql+psycopg2://jardo:heslo@localhost/city-navigator
 
 # Ingress & Minikube 
 - https://iceburn.medium.com/use-ingress-in-minikube-ae5e87ea858c
+- https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/
+- https://stackoverflow.com/questions/58561682/minikube-with-ingress-example-not-working
 
 # Grafana Dashboards (CaC)
 - https://grafana.com/tutorials/provision-dashboards-and-data-sources/
+
+# minikube ingress DNS
+- https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/
