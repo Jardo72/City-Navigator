@@ -10,16 +10,35 @@ This deployment involves a single instance of each of the two microservices comp
 - Grafana configured to use the Prometheus server as a data source.
 
 
-## Nginx HTTP Router
-
-
 ## SQLite Database for Master-Data Service
+TODO
+* database file in the [./data](./data) directory
+* use the sqlite command line utility to create the database
+* use the [](../../application/postgres/init-scripts/create-schema.sql) DDL script to create the database schema
+* use the [Data Importer](../../application/data-importer) application to insert the city plan data into the database
+
+
+## Redis Pub/Sub
+
+
+## Nginx HTTP Router
+TODO:
+* configuration in the [./nginx](./nginx) directory
 
 
 ## Prometheus Server
+TODO
+* configuration in the [./prometheus](./prometheus) directory
+
+## Prometheus HTTP Service Discovery
 
 
 ## Grafana
+
+
+## HTTP Access Logs for the City Navigator Microservices
+TODO
+* [access-logs](./access-logs) directory
 
 
 ## Commands
