@@ -186,8 +186,12 @@ services:
       - monitoring-network
     volumes:
       - type: bind
-        source: ./grafana
+        source: ./grafana/datasources
         target: /etc/grafana/provisioning/datasources
+        read_only: true
+      - type: bind
+        source: ./grafana/dashboards
+        target: /etc/grafana/provisioning/dashboards
         read_only: true
     ports:
       - 3000:3000
