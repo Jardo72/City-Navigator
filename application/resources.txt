@@ -10,6 +10,8 @@ https://docs.python.org/3/library/logging.config.html#configuration-file-format
 # Grafana
 https://grafana.com/docs/grafana/latest/administration/provisioning/
 https://grafana.com/docs/grafana/latest/setup-grafana/configure-docker/
+https://grafana.com/tutorials/provision-dashboards-and-data-sources/
+https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
 
 # FastAPI, gunicorn
 https://github.com/mikeckennedy/docker-build-fastapi-app-april-2021
@@ -44,9 +46,6 @@ postgresql+psycopg2://jardo:heslo@localhost/city-navigator
 - https://iceburn.medium.com/use-ingress-in-minikube-ae5e87ea858c
 - https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/
 - https://stackoverflow.com/questions/58561682/minikube-with-ingress-example-not-working
-
-# Grafana Dashboards (CaC)
-- https://grafana.com/tutorials/provision-dashboards-and-data-sources/
 
 # minikube ingress DNS
 - https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/
