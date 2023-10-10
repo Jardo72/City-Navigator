@@ -34,6 +34,15 @@ class AbstractClient(ABC):
     def __init__(self, base_url: str) -> None:
         self._base_url = base_url
         self._session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(
+            pool_connections=20,
+            pool_maxsize=20,
+            max_retries=3,
+            pool_block=False
+        )
+        self._session = requests.Session()
+        self._session.mount("http://", adapter)
+        self._session.mount("https://", adapter)
 
     def _get_request(self, path: str, params: Dict[str, str] = None) -> Response:
         start_time = perf_counter()
