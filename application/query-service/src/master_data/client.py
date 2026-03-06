@@ -153,7 +153,7 @@ class MasterDataClient:
     def get_line(self, uuid: str) -> LineDetailsMaster:
         _logger.debug("Going to retrieve line (uuid = %s) from master data service", uuid)
         with self._session:
-            response = requests.get(f"{self._base_url}/line/{uuid}", timeout=self._TIMEOUT)
+            response = self._session.get(f"{self._base_url}/line/{uuid}", timeout=self._TIMEOUT)
             if response.status_code != 200:
                 raise MasterDataClientException(response)
             json_data = response.json()

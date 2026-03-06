@@ -135,7 +135,7 @@ services:
   prometheus-server:
     image: prom/prometheus
     depends_on:
-      - master-data-server
+      - master-data-service
       - query-service
     networks:
       - service-network
