@@ -168,7 +168,6 @@ async def get_station(uuid: str, db: Session = Depends(get_db)):
         return as_station_details_dto(record)
 
 
-@request_duration_histogram.labels(method="POST", path="/station").time()
 @router.post("/station", response_model=StationDetails, status_code=status.HTTP_201_CREATED)
 async def create_station(
     request: StationRequest,
