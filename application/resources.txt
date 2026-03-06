@@ -1,0 +1,51 @@
+# Nginx
+https://blog.devgenius.io/how-to-use-redis-pub-sub-in-your-python-application-b6d5e11fc8de
+https://www.nginx.com/blog/deploying-nginx-plus-as-an-api-gateway-part-1/
+
+
+# Uvicorn logging
+https://www.uvicorn.org/settings/#logging
+https://docs.python.org/3/library/logging.config.html#configuration-file-format
+
+# Grafana
+https://grafana.com/docs/grafana/latest/administration/provisioning/
+https://grafana.com/docs/grafana/latest/setup-grafana/configure-docker/
+https://grafana.com/tutorials/provision-dashboards-and-data-sources/
+https://grafana.com/docs/grafana/latest/administration/provisioning/#dashboards
+
+# FastAPI, gunicorn
+https://github.com/mikeckennedy/docker-build-fastapi-app-april-2021
+
+# FastAPI Swagger Doc + Proxy
+https://fastapi.tiangolo.com/advanced/behind-a-proxy/#about-proxies-with-a-stripped-path-prefix
+https://fastapi.tiangolo.com/tutorial/metadata/
+
+# FastAPI Error Handling (incl. central error handlers that can be used to collect error metrics)
+https://fastapi.tiangolo.com/tutorial/handling-errors/
+
+# Docker Compose (Prometheus + Grafana)
+https://github.com/docker/awesome-compose/tree/master/prometheus-grafana
+
+# Prometheus & Multi-Process Setups
+https://shiriev.ru/prometheus-multiprocessing/
+https://github.com/prometheus/client_python
+
+# Prometheus & HTTP Service Discovery
+https://prometheus.io/docs/prometheus/latest/http_sd
+https://o11y.eu/blog/prometheus-http-service-discovery/
+
+# PostgreSQL
+- https://stackoverflow.com/questions/49325745/how-do-i-access-postgresql-within-docker-with-sqlalchemy
+- https://hub.docker.com/_/postgres/
+- docker run --detach --name postgres --env POSTGRES_DB=city-navigator --env POSTGRES_USER=jardo --env POSTGRES_PASSWORD=heslo -p 5432:5432 postgres:15.3
+- docker run --detach --name postgres --env POSTGRES_DB=city-navigator --env POSTGRES_USER=jardo --env POSTGRES_PASSWORD=heslo -p 5432:5432 jardo72/city-navigator-postgres:latest
+
+postgresql+psycopg2://jardo:heslo@localhost/city-navigator
+
+# Ingress & Minikube 
+- https://iceburn.medium.com/use-ingress-in-minikube-ae5e87ea858c
+- https://kubernetes.io/docs/tasks/access-application-cluster/ingress-minikube/
+- https://stackoverflow.com/questions/58561682/minikube-with-ingress-example-not-working
+
+# minikube ingress DNS
+- https://minikube.sigs.k8s.io/docs/handbook/addons/ingress-dns/

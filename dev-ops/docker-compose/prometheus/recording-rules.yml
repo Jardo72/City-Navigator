@@ -1,0 +1,9 @@
+groups:
+  - name: City-Navigator-Requests
+    interval: 15s
+    rules:
+      - record: "job_handler:master_data_service_http_requests_total:rate1m"
+        expr: rate(master_data_service_http_requests_total{job="master-data-service", handler!~"/(version|metrics)"}[1m])
+      - record: "job_handler:query_service_http_requests_total:rate1m"
+        expr: rate(query_service_http_requests_total{job="query-service", handler!~"/(version|metrics)"}[1m])
+
