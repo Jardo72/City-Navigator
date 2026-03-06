@@ -18,7 +18,6 @@
 #
 
 from abc import ABC
-from dataclasses import dataclass
 from time import perf_counter
 from typing import Dict
 
@@ -52,5 +51,38 @@ class AbstractClient(ABC):
             url=response.request.url,
             status_code=response.status_code,
             duration_millis=round(1000 * duration_sec),
-            json_data=response.json()
+            json_data=response.json() if response.content else None
+        )
+
+    def _post_request(self, path: str, body: Dict) -> Response:
+        start_time = perf_counter()
+        response = self._session.post(url=f"{self._base_url}{path}", json=body, timeout=self._TIMEOUT)
+        duration_sec = perf_counter() - start_time
+        return Response(
+            url=response.request.url,
+            status_code=response.status_code,
+            duration_millis=round(1000 * duration_sec),
+            json_data=response.json() if response.content else None
+        )
+
+    def _put_request(self, path: str, body: Dict) -> Response:
+        start_time = perf_counter()
+        response = self._session.put(url=f"{self._base_url}{path}", json=body, timeout=self._TIMEOUT)
+        duration_sec = perf_counter() - start_time
+        return Response(
+            url=response.request.url,
+            status_code=response.status_code,
+            duration_millis=round(1000 * duration_sec),
+            json_data=response.json() if response.content else None
+        )
+
+    def _delete_request(self, path: str) -> Response:
+        start_time = perf_counter()
+        response = self._session.delete(url=f"{self._base_url}{path}", timeout=self._TIMEOUT)
+        duration_sec = perf_counter() - start_time
+        return Response(
+            url=response.request.url,
+            status_code=response.status_code,
+            duration_millis=round(1000 * duration_sec),
+            json_data=response.json() if response.content else None
         )

@@ -1,5 +1,49 @@
 # Test Automation
 
+## API Tests
+
+The `tests/` directory contains pytest-based functional API tests that run against a live deployment. They require the Docker Compose stack to be up with the city plan data loaded (see the [docker-compose README](../dev-ops/docker-compose/README.md)).
+
+### What is tested
+
+**Master Data Service** (`test_master_data_service.py`):
+- Full CRUD lifecycle for stations: create → read → update → read → delete → 404
+- Full CRUD lifecycle for means of transport
+- Line creation with itinerary, read, and delete (with prerequisite entity setup and cleanup)
+- 404 on non-existent UUIDs for all entity types
+
+**Query Service** (`test_query_service.py`):
+- Means of transport list contains all four types (U-Bahn, S-Bahn, Tram, Bus)
+- Station list and wildcard filter (`Karl*`)
+- Station detail by name; 404 for unknown station
+- Line list, filter by means of transport, line detail by label
+- Journey plan: `Karlsplatz → Stephansplatz` via U1 (2 min)
+- Journey plan: `Westbahnhof → Stephansplatz` via U3 (7 min)
+- 404 for unknown start or destination
+
+### Prerequisites
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # on Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Running the tests
+
+From the `test-automation/` directory:
+```bash
+pytest tests/
+```
+
+By default the tests connect to `http://localhost/city-navigator/api/...` (the Docker Compose Nginx). Override with environment variables:
+```bash
+MASTER_DATA_BASE_URL=http://localhost/city-navigator/api/master-data \
+QUERY_SERVICE_BASE_URL=http://localhost/city-navigator/api/query \
+pytest tests/
+```
+
+
 ## Load Test
 
 The `main.py` script is a custom multi-threaded load test for the Query Service. It spawns configurable numbers of worker threads, each continuously calling one Query Service endpoint for a specified duration, then prints a summary of throughput, response times, and error rates per endpoint.
