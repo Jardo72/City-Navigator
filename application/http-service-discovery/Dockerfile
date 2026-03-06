@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-FROM python:3.11-slim-buster
+FROM python:3.13-slim-bookworm
 
 WORKDIR /usr/src/app
 

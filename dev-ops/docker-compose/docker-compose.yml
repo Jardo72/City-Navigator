@@ -19,7 +19,7 @@
 
 services:
   redis-pubsub:
-    image: redis:6.2.11-alpine
+    image: redis:7-alpine
     expose:
       - 6379
     networks:
@@ -111,7 +111,7 @@ services:
         delay: 10s
 
   nginx-http-router:
-    image: nginx:1.23.3-alpine
+    image: nginx:1.27-alpine
     depends_on:
       - master-data-service
       - query-service
