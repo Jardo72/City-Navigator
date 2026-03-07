@@ -26,25 +26,29 @@ class TestStationCrud:
         resp = master_data_client.create_station("Test Station")
         assert resp.status_code == 201
         uuid = resp.json_data["uuid"]
-        assert resp.json_data["name"] == "Test Station"
+        try:
+            assert resp.json_data["name"] == "Test Station"
 
-        resp = master_data_client.get_station(uuid)
-        assert resp.status_code == 200
-        assert resp.json_data["name"] == "Test Station"
+            resp = master_data_client.get_station(uuid)
+            assert resp.status_code == 200
+            assert resp.json_data["name"] == "Test Station"
 
-        resp = master_data_client.update_station(uuid, "Updated Station")
-        assert resp.status_code == 200
-        assert resp.json_data["name"] == "Updated Station"
+            resp = master_data_client.update_station(uuid, "Updated Station")
+            assert resp.status_code == 200
+            assert resp.json_data["name"] == "Updated Station"
 
-        resp = master_data_client.get_station(uuid)
-        assert resp.status_code == 200
-        assert resp.json_data["name"] == "Updated Station"
+            resp = master_data_client.get_station(uuid)
+            assert resp.status_code == 200
+            assert resp.json_data["name"] == "Updated Station"
 
-        resp = master_data_client.delete_station(uuid)
-        assert resp.status_code == 204
+            resp = master_data_client.delete_station(uuid)
+            assert resp.status_code == 204
 
-        resp = master_data_client.get_station(uuid)
-        assert resp.status_code == 404
+            resp = master_data_client.get_station(uuid)
+            assert resp.status_code == 404
+        except Exception:
+            master_data_client.delete_station(uuid)
+            raise
 
     def test_get_nonexistent_returns_404(self, master_data_client):
         resp = master_data_client.get_station(NON_EXISTENT_UUID)
@@ -57,25 +61,29 @@ class TestMeansOfTransportCrud:
         resp = master_data_client.create_means_of_transport("TestMoT")
         assert resp.status_code == 201
         uuid = resp.json_data["uuid"]
-        assert resp.json_data["identifier"] == "TestMoT"
+        try:
+            assert resp.json_data["identifier"] == "TestMoT"
 
-        resp = master_data_client.get_means_of_transport(uuid)
-        assert resp.status_code == 200
-        assert resp.json_data["identifier"] == "TestMoT"
+            resp = master_data_client.get_means_of_transport(uuid)
+            assert resp.status_code == 200
+            assert resp.json_data["identifier"] == "TestMoT"
 
-        resp = master_data_client.update_means_of_transport(uuid, "TestMoTUpdated")
-        assert resp.status_code == 200
-        assert resp.json_data["identifier"] == "TestMoTUpdated"
+            resp = master_data_client.update_means_of_transport(uuid, "TestMoTUpdated")
+            assert resp.status_code == 200
+            assert resp.json_data["identifier"] == "TestMoTUpdated"
 
-        resp = master_data_client.get_means_of_transport(uuid)
-        assert resp.status_code == 200
-        assert resp.json_data["identifier"] == "TestMoTUpdated"
+            resp = master_data_client.get_means_of_transport(uuid)
+            assert resp.status_code == 200
+            assert resp.json_data["identifier"] == "TestMoTUpdated"
 
-        resp = master_data_client.delete_means_of_transport(uuid)
-        assert resp.status_code == 204
+            resp = master_data_client.delete_means_of_transport(uuid)
+            assert resp.status_code == 204
 
-        resp = master_data_client.get_means_of_transport(uuid)
-        assert resp.status_code == 404
+            resp = master_data_client.get_means_of_transport(uuid)
+            assert resp.status_code == 404
+        except Exception:
+            master_data_client.delete_means_of_transport(uuid)
+            raise
 
     def test_get_nonexistent_returns_404(self, master_data_client):
         resp = master_data_client.get_means_of_transport(NON_EXISTENT_UUID)
@@ -85,23 +93,24 @@ class TestMeansOfTransportCrud:
 class TestLineCrud:
 
     def test_lifecycle(self, master_data_client):
-        mot = master_data_client.create_means_of_transport("TestBus")
-        assert mot.status_code == 201
-        mot_uuid = mot.json_data["uuid"]
-
-        stop_a = master_data_client.create_station("Test Stop Alpha")
-        assert stop_a.status_code == 201
-        stop_a_uuid = stop_a.json_data["uuid"]
-
-        stop_b = master_data_client.create_station("Test Stop Beta")
-        assert stop_b.status_code == 201
-        stop_b_uuid = stop_b.json_data["uuid"]
-
-        stop_c = master_data_client.create_station("Test Stop Gamma")
-        assert stop_c.status_code == 201
-        stop_c_uuid = stop_c.json_data["uuid"]
-
+        mot_uuid = stop_a_uuid = stop_b_uuid = stop_c_uuid = line_uuid = None
         try:
+            mot = master_data_client.create_means_of_transport("TestBus")
+            assert mot.status_code == 201
+            mot_uuid = mot.json_data["uuid"]
+
+            stop_a = master_data_client.create_station("Test Stop Alpha")
+            assert stop_a.status_code == 201
+            stop_a_uuid = stop_a.json_data["uuid"]
+
+            stop_b = master_data_client.create_station("Test Stop Beta")
+            assert stop_b.status_code == 201
+            stop_b_uuid = stop_b.json_data["uuid"]
+
+            stop_c = master_data_client.create_station("Test Stop Gamma")
+            assert stop_c.status_code == 201
+            stop_c_uuid = stop_c.json_data["uuid"]
+
             resp = master_data_client.create_line(
                 label="TX",
                 means_of_transport_uuid=mot_uuid,
@@ -128,14 +137,22 @@ class TestLineCrud:
 
             resp = master_data_client.delete_line(line_uuid)
             assert resp.status_code == 204
+            deleted_line_uuid = line_uuid
+            line_uuid = None
 
-            resp = master_data_client.get_line(line_uuid)
+            resp = master_data_client.get_line(deleted_line_uuid)
             assert resp.status_code == 404
         finally:
-            master_data_client.delete_station(stop_a_uuid)
-            master_data_client.delete_station(stop_b_uuid)
-            master_data_client.delete_station(stop_c_uuid)
-            master_data_client.delete_means_of_transport(mot_uuid)
+            if line_uuid:
+                master_data_client.delete_line(line_uuid)
+            if stop_a_uuid:
+                master_data_client.delete_station(stop_a_uuid)
+            if stop_b_uuid:
+                master_data_client.delete_station(stop_b_uuid)
+            if stop_c_uuid:
+                master_data_client.delete_station(stop_c_uuid)
+            if mot_uuid:
+                master_data_client.delete_means_of_transport(mot_uuid)
 
     def test_get_nonexistent_returns_404(self, master_data_client):
         resp = master_data_client.get_line(NON_EXISTENT_UUID)
