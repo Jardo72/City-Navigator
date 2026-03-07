@@ -18,11 +18,11 @@
 #
 
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 @dataclass(frozen=True, slots=True)
 class Response:
     url: str
     status_code: int
     duration_millis: int
-    json_data: List[Any] | Dict[str, Any]
+    json_data: Optional[List[Any] | Dict[str, Any]] = None

@@ -19,7 +19,7 @@
 
 from abc import ABC
 from time import perf_counter
-from typing import Dict
+from typing import Any, Dict, Optional
 
 import requests
 
@@ -43,6 +43,14 @@ class AbstractClient(ABC):
         self._session.mount("http://", adapter)
         self._session.mount("https://", adapter)
 
+    def _parse_json(self, response: requests.Response) -> Optional[Any]:
+        if not response.content:
+            return None
+        try:
+            return response.json()
+        except Exception:
+            return None
+
     def _get_request(self, path: str, params: Dict[str, str] = None) -> Response:
         start_time = perf_counter()
         response = self._session.get(url=f"{self._base_url}{path}", params=params, timeout=self._TIMEOUT)
@@ -51,7 +59,7 @@ class AbstractClient(ABC):
             url=response.request.url,
             status_code=response.status_code,
             duration_millis=round(1000 * duration_sec),
-            json_data=response.json() if response.content else None
+            json_data=self._parse_json(response)
         )
 
     def _post_request(self, path: str, body: Dict) -> Response:
@@ -62,7 +70,7 @@ class AbstractClient(ABC):
             url=response.request.url,
             status_code=response.status_code,
             duration_millis=round(1000 * duration_sec),
-            json_data=response.json() if response.content else None
+            json_data=self._parse_json(response)
         )
 
     def _put_request(self, path: str, body: Dict) -> Response:
@@ -73,7 +81,7 @@ class AbstractClient(ABC):
             url=response.request.url,
             status_code=response.status_code,
             duration_millis=round(1000 * duration_sec),
-            json_data=response.json() if response.content else None
+            json_data=self._parse_json(response)
         )
 
     def _delete_request(self, path: str) -> Response:
@@ -84,5 +92,5 @@ class AbstractClient(ABC):
             url=response.request.url,
             status_code=response.status_code,
             duration_millis=round(1000 * duration_sec),
-            json_data=response.json() if response.content else None
+            json_data=self._parse_json(response)
         )
