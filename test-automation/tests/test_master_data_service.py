@@ -41,7 +41,7 @@ class TestStationCrud:
         assert resp.json_data["name"] == "Updated Station"
 
         resp = master_data_client.delete_station(uuid)
-        assert resp.status_code == 200
+        assert resp.status_code == 204
 
         resp = master_data_client.get_station(uuid)
         assert resp.status_code == 404
@@ -72,7 +72,7 @@ class TestMeansOfTransportCrud:
         assert resp.json_data["identifier"] == "TestMoTUpdated"
 
         resp = master_data_client.delete_means_of_transport(uuid)
-        assert resp.status_code == 200
+        assert resp.status_code == 204
 
         resp = master_data_client.get_means_of_transport(uuid)
         assert resp.status_code == 404
@@ -127,7 +127,7 @@ class TestLineCrud:
             assert resp.json_data["label"] == "TX"
 
             resp = master_data_client.delete_line(line_uuid)
-            assert resp.status_code == 200
+            assert resp.status_code == 204
 
             resp = master_data_client.get_line(line_uuid)
             assert resp.status_code == 404
