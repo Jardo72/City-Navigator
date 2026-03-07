@@ -21,8 +21,8 @@ services:
   postgres-db:
     image: jardo72/city-navigator-postgres:latest
     environment:
-      - POSTGRES_USER=city_navigator
-      - POSTGRES_PASSWORD=city_navigator
+      - POSTGRES_USER=master_data_svc_tu
+      - POSTGRES_PASSWORD=T0pS3cr3tP8ssw0rd
       - POSTGRES_DB=city_navigator
     expose:
       - 5432
@@ -57,7 +57,7 @@ services:
       - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/master-data
       - ACCESS_LOG=/access-logs/master-data-service-access.log
-      - DATABASE_URL=postgresql://city_navigator:city_navigator@postgres-db:5432/city_navigator
+      - DATABASE_URL=postgresql://master_data_svc_tu:T0pS3cr3tP8ssw0rd@postgres-db:5432/city_navigator
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
       - PROMETHEUS_DISCOVERY_BASE_URL=http://prometheus-http-discovery:8000
