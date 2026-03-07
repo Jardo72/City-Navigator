@@ -17,6 +17,6 @@
 # limitations under the License.
 #
 
-FROM postgres:15.3
+FROM postgres:17-alpine
 
 COPY init-scripts /docker-entrypoint-initdb.d

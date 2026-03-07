@@ -18,6 +18,22 @@
 #
 
 services:
+  postgres-db:
+    image: jardo72/city-navigator-postgres:latest
+    environment:
+      - POSTGRES_USER=city_navigator
+      - POSTGRES_PASSWORD=city_navigator
+      - POSTGRES_DB=city_navigator
+    expose:
+      - 5432
+    networks:
+      - service-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
   redis-pubsub:
     image: redis:7-alpine
     expose:
@@ -34,13 +50,14 @@ services:
     image: jardo72/city-navigator-master-data-service:latest
     depends_on:
       - redis-pubsub
+      - postgres-db
       - prometheus-http-discovery
     environment:
       # if API doc is enabled, metrics scraping does not work
       - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/master-data
       - ACCESS_LOG=/access-logs/master-data-service-access.log
-      - DATABASE_URL=sqlite:////db/sqlite.db
+      - DATABASE_URL=postgresql://city_navigator:city_navigator@postgres-db:5432/city_navigator
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
       - PROMETHEUS_DISCOVERY_BASE_URL=http://prometheus-http-discovery:8000
@@ -49,10 +66,6 @@ services:
     networks:
       - service-network
     volumes:
-      - type: bind
-        source: ./data
-        target: /db
-        read_only: false
       - type: bind
         source: ./access-logs
         target: /access-logs
