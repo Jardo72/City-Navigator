@@ -28,10 +28,29 @@ services:
       - 5432
     networks:
       - service-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U master_data_svc_tu -d city_navigator"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     deploy:
       restart_policy:
         condition: on-failure
         max_attempts: 3
+        delay: 5s
+
+  data-importer:
+    image: jardo72/city-navigator-data-importer:latest
+    command: ["city-plan.json", "postgresql://master_data_svc_tu:T0pS3cr3tP8ssw0rd@postgres-db:5432/city_navigator"]
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+    networks:
+      - service-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
         delay: 5s
 
   redis-pubsub:
@@ -49,9 +68,12 @@ services:
   master-data-service:
     image: jardo72/city-navigator-master-data-service:latest
     depends_on:
-      - redis-pubsub
-      - postgres-db
-      - prometheus-http-discovery
+      redis-pubsub:
+        condition: service_started
+      data-importer:
+        condition: service_completed_successfully
+      prometheus-http-discovery:
+        condition: service_started
     environment:
       # if API doc is enabled, metrics scraping does not work
       - API_DOC_ENABLED=no
@@ -86,9 +108,12 @@ services:
   query-service:
     image: jardo72/city-navigator-query-service:latest
     depends_on:
-      - redis-pubsub
-      - master-data-service
-      - prometheus-http-discovery
+      redis-pubsub:
+        condition: service_started
+      master-data-service:
+        condition: service_started
+      prometheus-http-discovery:
+        condition: service_started
     environment:
       # if API doc is enabled, metrics scraping does not work
       - API_DOC_ENABLED=no

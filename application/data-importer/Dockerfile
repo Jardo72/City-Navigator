@@ -31,5 +31,3 @@ RUN rm requirements.txt
 USER 1000:1000
 
 ENTRYPOINT [ "python", "main.py" ]
-# TODO: target database
-CMD [ "city-plan.json" ] 
