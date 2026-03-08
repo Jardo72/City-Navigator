@@ -37,8 +37,10 @@ class QueryServiceClient(AbstractClient):
     def get_station_details(self, name: str) -> Response:
         return self._get_request("/station", params={"name": name})
 
-    def get_line_list(self) -> Response:
-        return self._get_request("/lines")
+    def get_line_list(self, means_of_transport: str = None) -> Response:
+        if means_of_transport is None:
+            return self._get_request("/lines")
+        return self._get_request("/lines", params={"means_of_transport": means_of_transport})
 
     def get_line_details(self, label: str) -> Response:
         return self._get_request("/line", params={"label": label})

@@ -1,5 +1,5 @@
 #
-# Copyright 2023 Jaroslav Chmurny
+# Copyright 2026 Jaroslav Chmurny
 #
 # This file is part of City Navigator.
 #
@@ -17,12 +17,32 @@
 # limitations under the License.
 #
 
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+import sys
+from os import environ
+from pathlib import Path
 
-@dataclass(frozen=True, slots=True)
-class Response:
-    url: str
-    status_code: int
-    duration_millis: int
-    json_data: Optional[List[Any] | Dict[str, Any]] = None
+import pytest
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from rest import MasterDataClient, QueryServiceClient
+
+
+MASTER_DATA_BASE_URL = environ.get(
+    "MASTER_DATA_BASE_URL",
+    "http://localhost/city-navigator/api/master-data"
+)
+QUERY_SERVICE_BASE_URL = environ.get(
+    "QUERY_SERVICE_BASE_URL",
+    "http://localhost/city-navigator/api/query"
+)
+
+
+@pytest.fixture(scope="session")
+def master_data_client():
+    return MasterDataClient(MASTER_DATA_BASE_URL)
+
+
+@pytest.fixture(scope="session")
+def query_service_client():
+    return QueryServiceClient(QUERY_SERVICE_BASE_URL)

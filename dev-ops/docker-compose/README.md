@@ -4,6 +4,8 @@ The Docker compose deployment is a simple deployment primarily meant for local d
 
 This deployment involves a single instance of each of the two microservices comprising the application. In addition, it involves some additional containers:
 - Nginx server serving as proxy. All REST requests sent to any of the two microservices are sent to the Nginx server. The server is configured with forwaring rules which direct each request to the proper microservice based on the resource path.
+- PostgreSQL database used as the persistent store for the master data service.
+- Data importer, a one-shot container that populates the PostgreSQL database with city plan data on startup.
 - Redis serving as pub/sub messaging used to deliver notifications from the master data service to all query service instances.
 - Prometheus server configured to scrape metrics from both microservices.
 - Prometheus HTTP discovery service allowing Prometheus to discover all instances of the microservices, even in deployments with two or more instances of any of the service.
@@ -13,39 +15,16 @@ This deployment involves a single instance of each of the two microservices comp
 ## Prerequisites
 
 - Docker with the Compose plugin
-- `sqlite3` CLI (for initial database setup)
-
-
-## Initial Setup
-
-The SQLite database must be created and populated before starting the application for the first time. Run the following commands from the repository root:
-
-**Create the database schema:**
-```bash
-sqlite3 dev-ops/docker-compose/data/sqlite.db \
-    < application/postgres/init-scripts/create-schema.sql
-```
-
-**Import the city plan data:**
-```bash
-cd application/data-importer
-python -m venv .venv
-source .venv/bin/activate   # on Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python src/main.py city-plan.json "sqlite:///../../dev-ops/docker-compose/data/sqlite.db"
-deactivate
-cd ../..
-```
-
-This needs to be done only once. The database file is persisted in the [./data](./data) directory (bind-mounted into the master-data-service container at `/db`). The file is gitignored; see [./data/README.md](./data/README.md).
 
 
 ## Starting and Stopping
 
-Start all services (waits until healthy):
+Start all services:
 ```bash
 docker compose up -d --wait
 ```
+
+Docker Compose handles the startup ordering automatically: PostgreSQL starts first and becomes healthy, then the data importer runs and populates the database, and only then the master data service starts. The `--wait` flag makes the command block until all services have started successfully.
 
 Stop all services:
 ```bash
@@ -62,7 +41,7 @@ docker compose down
 | Grafana | 3000 | Dashboards (admin / GrafanaSecret#37) |
 | HTTP Service Discovery | 9099 | Prometheus HTTP SD endpoint |
 
-Redis, the two microservices, and Nginx are on an internal `service-network` and are not directly exposed to the host (except Nginx on port 80). Prometheus and Grafana share a separate `monitoring-network`.
+PostgreSQL, Redis, the data importer, the two microservices, and Nginx are on an internal `service-network` and are not directly exposed to the host (except Nginx on port 80). Prometheus and Grafana share a separate `monitoring-network`.
 
 
 ## Nginx HTTP Router

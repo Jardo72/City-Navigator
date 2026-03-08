@@ -19,7 +19,7 @@
 
 from logging import getLogger
 
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
@@ -34,6 +34,15 @@ _engine = create_engine(
     # pool_size=20
 )
 _logger.info("DB engine created")
+
+
+@event.listens_for(_engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    # without this, cascading deletes won't work for SQLite
+    cursor.execute("PRAGMA foreign_keys=ON")
+    _logger.info("PRAGMA foreign_keys=ON executed for new DB connection")
+    cursor.close()
 
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)

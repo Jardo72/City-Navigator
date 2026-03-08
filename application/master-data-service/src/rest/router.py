@@ -123,7 +123,7 @@ async def update_means_of_transport(
         return as_means_of_transport_dto(record)
 
 
-@router.delete("/means-of-transport/{uuid}")
+@router.delete("/means-of-transport/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_means_of_transport(
     uuid: str,
     db: Session = Depends(get_db),
@@ -210,7 +210,7 @@ async def update_station(
         return as_station_details_dto(record)
 
 
-@router.delete("/station/{uuid}")
+@router.delete("/station/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_station(
     uuid: str,
     db: Session = Depends(get_db),
@@ -301,7 +301,7 @@ async def update_line(
         return as_line_details_dto(record)
 
 
-@router.delete("/line/{uuid}")
+@router.delete("/line/{uuid}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_line(
     uuid: str,
     db: Session = Depends(get_db),

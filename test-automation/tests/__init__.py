@@ -1,5 +1,5 @@
 #
-# Copyright 2023 Jaroslav Chmurny
+# Copyright 2026 Jaroslav Chmurny
 #
 # This file is part of City Navigator.
 #
@@ -16,13 +16,3 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
-
-@dataclass(frozen=True, slots=True)
-class Response:
-    url: str
-    status_code: int
-    duration_millis: int
-    json_data: Optional[List[Any] | Dict[str, Any]] = None
