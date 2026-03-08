@@ -4,6 +4,10 @@
 
 The `tests/` directory contains pytest-based functional API tests that run against a live deployment. They require the Docker Compose stack to be up with the city plan data loaded (see the [docker-compose README](../dev-ops/docker-compose/README.md)).
 
+The diagram below illustrates the structure of the functional API tests — the REST client hierarchy, the pytest fixtures, the test classes, and their relation to the services under test.
+
+![functional-api-tests](./diagrams/functional-API-tests.png)
+
 ### What is tested
 
 **Master Data Service** (`test_master_data_service.py`):
