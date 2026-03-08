@@ -43,6 +43,27 @@ All endpoints are relative to the service root. When deployed via Docker Compose
 When `API_DOC_ENABLED` is active, interactive API documentation is available at `/docs` (Swagger UI) and `/redoc`.
 
 
+## Unit Tests
+
+The journey-plan search algorithm (Dijkstra's implementation) is covered by a suite of pure unit tests that require no running infrastructure. The tests live in the `tests/` directory and are split across three files:
+
+| File | Module under test | What is tested |
+|---|---|---|
+| `test_distance_table.py` | `journey_plan_search.distance_table` | `DistanceTable.update()` (new entry, shorter/longer/equal distance) and `DistanceTable.backtrack_shortest_path()` (single-hop, multi-hop, path after update, result properties) |
+| `test_queue.py` | `journey_plan_search.queue` | `RepriorizablePriorityQueue`: emptiness checks, dequeue order (ascending distance), re-prioritization (lower distance wins, queue size unchanged) |
+| `test_search.py` | `journey_plan_search.search` | `find_shortest_path()`: direct edge, two- and three-hop linear paths, diamond topology, preference of shorter indirect vs. longer direct path and vice versa, unreachable destination raises `ValueError` |
+
+The tests use lightweight `FakeStation` and `FakeEdge` dataclasses (defined in `tests/helpers.py`) instead of SQLAlchemy entities, so they run entirely in-process with no database or network dependencies.
+
+### Running the tests
+
+Install the test dependencies and run pytest from the `query-service` root:
+
+```bash
+pip install -r requirements-test.txt
+pytest tests/
+```
+
 ## Prometheus Metrics
 
 | Metric | Type | Description |
