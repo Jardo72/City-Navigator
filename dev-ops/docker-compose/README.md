@@ -32,6 +32,18 @@ docker compose down
 ```
 
 
+## Service Dependencies
+
+Docker Compose starts services in the order determined by their `depends_on` declarations. The diagram below shows the full dependency graph, including the condition type for each dependency (`service_healthy`, `service_completed_successfully`, or `service_started`).
+
+![dependencies](./dependencies.png)
+
+The most notable aspects of the startup ordering:
+- The data importer waits until PostgreSQL passes its health check before running (`service_healthy`).
+- The master data service waits until the data importer finishes successfully (`service_completed_successfully`), ensuring the database is populated before the service accepts requests.
+- All other dependencies use `service_started`, meaning Docker Compose only waits for the container to be running, not for the application inside to be ready.
+
+
 ## Services and Ports
 
 | Service | Host Port | Description |
