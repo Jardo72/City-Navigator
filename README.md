@@ -16,7 +16,7 @@ In addition, the query service also collects the number of notifications from ma
 
 ## Quick Start
 
-The Docker Compose deployment is the easiest way to run the application locally. Prerequisites: Docker with the Compose plugin, and the `sqlite3` CLI.
+The Docker Compose deployment is the easiest way to run the application locally. The only prerequisite is Docker with the Compose plugin.
 
 **1. Clone the repository**
 ```bash
@@ -24,28 +24,13 @@ git clone <repository-url>
 cd City-Navigator
 ```
 
-**2. Prepare the SQLite database**
-```bash
-sqlite3 dev-ops/docker-compose/data/sqlite.db \
-    < application/postgres/init-scripts/create-schema.sql
-```
-
-**3. Import the city plan data**
-```bash
-cd application/data-importer
-python -m venv .venv
-source .venv/bin/activate   # on Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python src/main.py city-plan.json "sqlite:///../../dev-ops/docker-compose/data/sqlite.db"
-deactivate
-cd ../..
-```
-
-**4. Start the application**
+**2. Start the application**
 ```bash
 cd dev-ops/docker-compose
 docker compose up -d --wait
 ```
+
+Docker Compose automatically initialises the PostgreSQL database, imports the city plan data via the data importer, and starts all services in the correct order.
 
 The REST API is available via Nginx at `http://localhost`:
 - Master Data Service: `http://localhost/city-navigator/api/master-data/`
@@ -53,7 +38,7 @@ The REST API is available via Nginx at `http://localhost`:
 - Prometheus: `http://localhost:9090`
 - Grafana: `http://localhost:3000` (admin / GrafanaSecret#37)
 
-**5. Stop the application**
+**3. Stop the application**
 ```bash
 docker compose down
 ```
@@ -74,7 +59,7 @@ Lines are defined by their itineraries — a sequence of directed Edges connecti
 
 
 ## Tech Stack
-Both microservices are implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and [SQLAlchemy](./https://www.sqlalchemy.org/). SQLite is used to implement the in-memory database for the query service. For the master data database, more or less any RDBMS supported by SQLAlchemy could be used. The deployments which are part of the project use MariaDB or SQLite (local development with Docker compose). As mentioned before, Redis is used as pub/sub for the notifications sent by the master data service to the query service instance(s). At runtime, [Gunicorn (Green Unicorn)](https://gunicorn.org/) is used as application server. The Dockerfiles which are part of the project configure the server to run in multi-process mode. The above mentioned Prometheus instrumentation is implemented in a way able to deal with the multi-process model properly.
+Both microservices are implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and [SQLAlchemy](./https://www.sqlalchemy.org/). SQLite is used to implement the in-memory database for the query service. PostgreSQL is used as the master data database in the Docker Compose deployment. As mentioned before, Redis is used as pub/sub for the notifications sent by the master data service to the query service instance(s). At runtime, [Gunicorn (Green Unicorn)](https://gunicorn.org/) is used as application server. The Dockerfiles which are part of the project configure the server to run in multi-process mode. The above mentioned Prometheus instrumentation is implemented in a way able to deal with the multi-process model properly.
 
 
 ## Building Docker Images
@@ -100,7 +85,7 @@ docker build -t jardo72/city-navigator-http-service-discovery:latest application
 docker build -t jardo72/city-navigator-postgres:latest application/postgres
 ```
 
-On Windows, the `application/build-and-push-images.cmd` script builds and pushes all images in one step.
+On Windows, the [build-and-push-images.cmd](./application/build-and-push-images.cmd) script builds and pushes all images in one step.
 
 
 ## DevOps
