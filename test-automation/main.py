@@ -20,7 +20,11 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-from io import TextIOWrapper
+
+from rich import box
+from rich.console import Console
+from rich.padding import Padding
+from rich.table import Table
 
 from config import Config, read_from_file
 from executor import APIEndpointSummary, TestRun, TestRunSummary
@@ -28,8 +32,39 @@ from rest import QueryServiceClient
 from util import DataCollections
 
 
+def epilog() -> str:
+    return """
+This tool runs a multi-threaded load test against the City Navigator query service. It sends
+concurrent requests to four endpoints (journey plan search, station query, station filter, and
+line query), collects response time and error statistics, and prints a summary table. An optional
+HTML report can be saved via the -s flag.
+
+Configuration file structure (JSON):
+  {
+      "query_service_base_url":        "<base URL of the query service>",
+      "test_duration_minutes":         <test duration in minutes>,
+      "journey_plan_search_threads":   <number of worker threads>,
+      "journey_plan_error_percentage": <percentage of intentionally invalid requests>,
+      "station_query_threads":         <number of worker threads>,
+      "station_query_error_percentage":<percentage of intentionally invalid requests>,
+      "station_filter_threads":        <number of worker threads>,
+      "line_query_threads":            <number of worker threads>,
+      "line_query_error_percentage":   <percentage of intentionally invalid requests>
+  }
+
+Notes:
+  - Setting a thread count to 0 disables testing of that endpoint.
+  - The error percentage controls how many requests use invalid parameters to verify
+    that the service returns the expected 4xx responses.
+"""
+
+
 def create_command_line_arguments_parser() -> ArgumentParser:
-    parser = ArgumentParser(description="City Navigator - Query Service Load Test", formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(
+        description="City Navigator - Query Service Load Test",
+        formatter_class=RawTextHelpFormatter,
+        epilog=epilog(),
+    )
 
     # positional mandatory arguments
     parser.add_argument(
@@ -42,7 +77,7 @@ def create_command_line_arguments_parser() -> ArgumentParser:
         "-s", "--summary-file",
         dest="summary_file",
         default=None,
-        help="the optional name of an output file the test run summary is to be written to"
+        help="the optional name of an HTML file the test run summary is to be written to"
     )
 
     return parser
@@ -88,29 +123,6 @@ def print_test_run_preview(config: Config, data_collections: DataCollections) ->
     print()
 
 
-def print_api_endpoint_summary(
-        title: str,
-        summary: APIEndpointSummary,
-        thread_count: int,
-        test_duration_sec: float,
-        summary_file: TextIOWrapper = None
-) -> None:
-    TAB = 4 * " "
-    print(title, file=summary_file)
-    print(f"{TAB}Worker thread count:            {thread_count}", file=summary_file)
-    if thread_count > 0:
-        throughput = summary.success_count / test_duration_sec
-        print(f"{TAB}Overall number of requests:     {summary.overall_request_count}", file=summary_file)
-        print(f"{TAB}Number of successful requests:  {summary.success_count} ({summary.success_percentage} %)", file=summary_file)
-        print(f"{TAB}Client error count:             {summary.client_error_count} ({summary.client_error_percentage} %)", file=summary_file)
-        print(f"{TAB}Server error count:             {summary.server_error_count} ({summary.server_error_percentage} %)", file=summary_file)
-        print(f"{TAB}Exception count:                {summary.exception_count} ({summary.exception_percentage} %)", file=summary_file)
-        print(f"{TAB}Avg. response time:             {summary.avg_success_duration_millis} millis", file=summary_file)
-        print(f"{TAB}Min. response time:             {summary.min_success_duration_millis} millis", file=summary_file)
-        print(f"{TAB}Max. response time:             {summary.max_success_duration_millis} millis", file=summary_file)
-        print(f"{TAB}Throughput:                     {throughput:.1f} requests/sec", file=summary_file)
-
-
 def format_duration(duration_sec: float) -> str:
     duration_sec = round(duration_sec)
     hours, remainder = divmod(duration_sec, 3600)
@@ -118,48 +130,89 @@ def format_duration(duration_sec: float) -> str:
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 
-def print_test_run_summary(summary: TestRunSummary, summary_file: TextIOWrapper = None) -> None:
+def _overall_summary_table(summary: TestRunSummary) -> Table:
     FORMAT = "%Y-%m-%d %H:%M:%S"
     duration_sec = summary.duration.total_seconds()
-    print()
-    print(f"Query service base URL:                 {summary.config.query_service_base_url}", file=summary_file)
-    print(f"Test run start time:                    {summary.start_time.strftime(FORMAT)}", file=summary_file)
-    print(f"Test run end time:                      {summary.end_time.strftime(FORMAT)}", file=summary_file)
-    print(f"Overall duration:                       {format_duration(duration_sec)}", file=summary_file)
-    print(f"Overall thread count:                   {summary.config.overall_thread_count}", file=summary_file)
-    print(f"Overall number of requests:             {summary.overall_request_count}", file=summary_file)
-    print(f"Overall number of successful requests:  {summary.overall_success_count} ({summary.overall_success_percentage} %)", file=summary_file)
-    print(f"Overall number of client errors:        {summary.overall_client_error_count} ({summary.overall_client_error_percentage} %)", file=summary_file)
-    print(f"Overall number of server errors:        {summary.overall_server_error_count} ({summary.overall_server_error_percentage} %)", file=summary_file)
-    print(f"Overall number of exceptions:           {summary.overall_exception_count} ({summary.overall_exception_percentage} %)", file=summary_file)
-    print_api_endpoint_summary(
-        title="Journey plan search",
-        summary=summary.journey_plan_search_summary,
-        thread_count=summary.config.journey_plan_search_threads,
-        test_duration_sec=duration_sec,
-        summary_file=summary_file
-    )
-    print_api_endpoint_summary(
-        title="Station query summary",
-        summary=summary.station_query_summary,
-        thread_count=summary.config.station_query_threads,
-        test_duration_sec=duration_sec,
-        summary_file=summary_file
-    )
-    print_api_endpoint_summary(
-        title="Station filter summary",
-        summary=summary.station_filter_summary,
-        thread_count=summary.config.station_filter_threads,
-        test_duration_sec=duration_sec,
-        summary_file=summary_file
-    )
-    print_api_endpoint_summary(
-        title="Line query summary",
-        summary=summary.line_query_summary,
-        thread_count=summary.config.line_query_threads,
-        test_duration_sec=duration_sec,
-        summary_file=summary_file
-    )
+    table = Table(box=box.ROUNDED, show_header=False, title="[cyan]Test Run Summary[/cyan]")
+    table.add_column("Parameter", style="bold")
+    table.add_column("Value")
+    table.add_row("Query service base URL", summary.config.query_service_base_url)
+    table.add_row("Start time", summary.start_time.strftime(FORMAT))
+    table.add_row("End time", summary.end_time.strftime(FORMAT))
+    table.add_row("Duration", format_duration(duration_sec))
+    table.add_row("Thread count", str(summary.config.overall_thread_count))
+    table.add_row("Overall requests", str(summary.overall_request_count))
+    table.add_row("Successful", f"{summary.overall_success_count} ({summary.overall_success_percentage} %)")
+    table.add_row("Client errors", f"{summary.overall_client_error_count} ({summary.overall_client_error_percentage} %)")
+    table.add_row("Server errors", f"{summary.overall_server_error_count} ({summary.overall_server_error_percentage} %)")
+    table.add_row("Exceptions", f"{summary.overall_exception_count} ({summary.overall_exception_percentage} %)")
+    return table
+
+
+def _endpoint_details_table(summary: TestRunSummary) -> Table:
+    duration_sec = summary.duration.total_seconds()
+
+    table = Table(box=box.ROUNDED, title="[cyan]Endpoint Details[/cyan]")
+    table.add_column("Metric", style="bold")
+    table.add_column("Journey Plan Search", justify="right")
+    table.add_column("Station Query", justify="right")
+    table.add_column("Station Filter", justify="right")
+    table.add_column("Line Query", justify="right")
+
+    endpoints = [
+        (summary.journey_plan_search_summary, summary.config.journey_plan_search_threads),
+        (summary.station_query_summary, summary.config.station_query_threads),
+        (summary.station_filter_summary, summary.config.station_filter_threads),
+        (summary.line_query_summary, summary.config.line_query_threads),
+    ]
+
+    def fmt(s: APIEndpointSummary, t: int, metric: str) -> str:
+        if t == 0:
+            return "N/A"
+        if metric == "threads":
+            return str(t)
+        if metric == "requests":
+            return str(s.overall_request_count)
+        if metric == "successful":
+            return f"{s.success_count} ({s.success_percentage} %)"
+        if metric == "client_errors":
+            return f"{s.client_error_count} ({s.client_error_percentage} %)"
+        if metric == "server_errors":
+            return f"{s.server_error_count} ({s.server_error_percentage} %)"
+        if metric == "exceptions":
+            return f"{s.exception_count} ({s.exception_percentage} %)"
+        if metric == "avg_response":
+            return f"{s.avg_success_duration_millis} ms"
+        if metric == "min_response":
+            return f"{s.min_success_duration_millis} ms"
+        if metric == "max_response":
+            return f"{s.max_success_duration_millis} ms"
+        if metric == "throughput":
+            return f"{s.success_count / duration_sec:.1f} req/s"
+        return ""
+
+    metrics = [
+        ("threads",       "Worker threads"),
+        ("requests",      "Requests"),
+        ("successful",    "Successful"),
+        ("client_errors", "Client errors"),
+        ("server_errors", "Server errors"),
+        ("exceptions",    "Exceptions"),
+        ("avg_response",  "Avg. response time"),
+        ("min_response",  "Min. response time"),
+        ("max_response",  "Max. response time"),
+        ("throughput",    "Throughput"),
+    ]
+
+    for key, label in metrics:
+        table.add_row(label, *[fmt(s, t, key) for s, t in endpoints])
+
+    return table
+
+
+def print_test_run_summary(summary: TestRunSummary, console: Console) -> None:
+    console.print(Padding(_overall_summary_table(summary), (1, 2)))
+    console.print(Padding(_endpoint_details_table(summary), (1, 2)))
 
 
 def main() -> None:
@@ -169,10 +222,11 @@ def main() -> None:
     print_test_run_preview(config, data_collections)
     test_run = TestRun(config, data_collections)
     summary = test_run.run()
-    print_test_run_summary(summary)
+    console = Console(record=bool(command_line_arguments.summary_file))
+    print_test_run_summary(summary, console)
     if command_line_arguments.summary_file:
-        with open(command_line_arguments.summary_file, mode="w") as summary_file:
-            print_test_run_summary(summary, summary_file)
+        with open(command_line_arguments.summary_file, mode="w") as f:
+            f.write(console.export_html())
 
 
 if __name__ == "__main__":

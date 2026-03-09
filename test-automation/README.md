@@ -80,10 +80,10 @@ python main.py <config-file> [-s <summary-output-file>]
 Example using the provided Docker Compose configuration:
 ```bash
 python main.py docker-compose-load-test-cfg.json
-python main.py docker-compose-load-test-cfg.json -s results.txt
+python main.py docker-compose-load-test-cfg.json -s results.html
 ```
 
-The `-s` option writes the summary to a file in addition to printing it to stdout.
+The `-s` option saves the summary as an HTML file in addition to printing it to stdout. The HTML file preserves the colours and table formatting from the terminal output.
 
 ### Configuration file format
 

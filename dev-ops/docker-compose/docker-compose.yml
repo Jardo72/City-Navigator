@@ -133,9 +133,8 @@ services:
         target: /access-logs
         read_only: false
     deploy:
-      # replicated deployment with 2+ replicas does not seem to provide any performance improvements
-      # mode: replicated
-      # replicas: 2
+      mode: replicated
+      replicas: 2
       resources:
         reservations:
           cpus: '1.5'
