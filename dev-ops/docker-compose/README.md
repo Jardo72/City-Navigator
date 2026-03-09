@@ -85,7 +85,15 @@ A lightweight FastAPI service that maintains a registry of running microservice 
 
 ## Grafana
 
-Grafana is pre-provisioned with a Prometheus data source and a City Navigator dashboard. The provisioning configuration is in [./grafana](./grafana). Default credentials: `admin` / `GrafanaSecret#37`.
+Grafana is pre-provisioned with a Prometheus data source and two dashboards. The provisioning configuration is in [./grafana](./grafana). Default credentials: `admin` / `GrafanaSecret#37`.
+
+**City Navigator - Overview** provides a high-level health view across both microservices: service availability, request rate, and HTTP error rate for each service side by side.
+
+![grafana-overview-dashboard](./screenshots/grafana-overview-dashboard.png)
+
+**City Navigator - Query Service** provides a detailed per-endpoint breakdown intended for use during load tests: throughput, error rate percentage, P50 and P95 response times, HTTP errors broken down by path and status code, and notification errors from the Redis pub/sub channel.
+
+![grafana-query-service-dashboard](./screenshots/grafana-query-service-dashboard.png)
 
 
 ## HTTP Access Logs
