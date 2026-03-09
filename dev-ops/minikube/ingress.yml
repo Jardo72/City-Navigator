@@ -28,35 +28,36 @@ metadata:
     application: city-navigator
     environment: sandbox
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
+  ingressClassName: nginx
   rules:
     - host: city-navigator.jch
       http:
         paths:
-          - path: /api/query
-            pathType: Prefix
+          - path: /api/query(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: query-svc-service
                 port:
                   number: 8000
-          - path: /api/master-data
-            pathType: Prefix
+          - path: /api/master-data(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: master-data-svc-service
                 port:
                   number: 8000
-          - path: /prometheus
-            pathType: Prefix
+          - path: /prometheus(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: prometheus-server-service
                 port:
                   number: 9090
-          - path: /grafana
-            pathType: Prefix
+          - path: /grafana(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: grafana-service

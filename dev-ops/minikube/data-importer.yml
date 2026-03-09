@@ -17,57 +17,37 @@
 # limitations under the License.
 #
 
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
-  name: redis-deployment
+  name: data-importer
   namespace: city-navigator
   labels:
     application: city-navigator
-    component: redis
+    component: data-importer
     environment: sandbox
 spec:
-  replicas: 1
+  backoffLimit: 5
   template:
     metadata:
-      name: redis
       labels:
         application: city-navigator
-        component: redis
+        component: data-importer
         environment: sandbox
     spec:
-      containers:
-        - name: redis
-          image: redis:7-alpine
+      restartPolicy: OnFailure
+      initContainers:
+        - name: wait-for-postgres
+          image: jardo72/city-navigator-postgres:latest
           imagePullPolicy: Always
-          ports:
-            - containerPort: 6379
-              protocol: TCP
-  selector:
-    matchLabels:
-      application: city-navigator
-      component: redis
-      environment: sandbox
-  strategy:
-    type: RollingUpdate
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: redis-service
-  namespace: city-navigator
-  labels:
-    application: city-navigator
-    component: redis
-    environment: sandbox
-spec:
-  type: ClusterIP
-  selector:
-    application: city-navigator
-    component: redis
-    environment: sandbox
-  ports:
-    - protocol: TCP
-      port: 6379
-      targetPort: 6379
+          command:
+            - sh
+            - -c
+            - until pg_isready -h postgres-service.city-navigator -p 5432; do echo "Waiting for PostgreSQL..."; sleep 2; done
+      containers:
+        - name: data-importer
+          image: jardo72/city-navigator-data-importer:latest
+          imagePullPolicy: Always
+          args:
+            - city-plan.json
+            - postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator:5432/city-navigator
