@@ -17,6 +17,15 @@ This deployment involves a single instance of each of the two microservices comp
 - The Minikube Ingress addon enabled (see below)
 
 
+## Local hostname setup
+
+The Ingress is configured for the hostname `city-navigator.jch`. Add the following entry to your `/etc/hosts` file (use `minikube ip` to get the correct IP address):
+
+```
+<minikube-ip>  city-navigator.jch
+```
+
+
 ## Deployment
 
 **Enable the Ingress addon** (one-time setup):
@@ -24,7 +33,7 @@ This deployment involves a single instance of each of the two microservices comp
 minikube addons enable ingress
 ```
 
-**All manifests must be applied from the `dev-ops/minikube/` directory.** The ordering below is required because later resources depend on earlier ones (namespace must exist before other resources, infrastructure services before application services):
+**All manifests must be applied from the `dev-ops/minikube/` directory.** The ordering below is required because later resources depend on earlier ones (namespace must exist before other resources, infrastructure before application services):
 
 ```
 kubectl apply -f namespace.yml
@@ -34,17 +43,25 @@ kubectl apply -f redis.yml
 kubectl apply -f prometheus-http-discovery.yml
 kubectl apply -f prometheus-server.yml
 kubectl apply -f grafana.yml
+kubectl apply -f data-importer.yml
 kubectl apply -f master-data-service.yml
 kubectl apply -f query-service.yml
+```
+
+The `data-importer` is a Kubernetes Job that populates the PostgreSQL database with the city plan data. It uses an init container to wait until PostgreSQL is ready before running. The master data service and query service should only be started after the Job has completed successfully:
+
+```
+kubectl wait --for=condition=complete job/data-importer -n city-navigator --timeout=120s
 ```
 
 **Verify the deployment:**
 ```
 kubectl get pods -n city-navigator
+kubectl get jobs -n city-navigator
 kubectl get ingress -n city-navigator
 ```
 
-Wait until all pods show `Running` status before accessing the application.
+Wait until all pods show `Running` status and the data-importer Job shows `Complete` before accessing the application.
 
 
 ## Teardown
@@ -54,6 +71,7 @@ Resources should be deleted in reverse dependency order:
 ```
 kubectl delete -f query-service.yml
 kubectl delete -f master-data-service.yml
+kubectl delete -f data-importer.yml
 kubectl delete -f grafana.yml
 kubectl delete -f prometheus-server.yml
 kubectl delete -f prometheus-http-discovery.yml
