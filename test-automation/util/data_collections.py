@@ -23,6 +23,6 @@ from typing import Tuple
 
 @dataclass(frozen=True, slots=True)
 class DataCollections:
-    means_of_transport: Tuple[str]
-    stations: Tuple[str]
-    lines: Tuple[str]
+    means_of_transport: Tuple[str, ...]
+    stations: Tuple[str, ...]
+    lines: Tuple[str, ...]
