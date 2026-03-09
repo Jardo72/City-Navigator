@@ -12,9 +12,9 @@ This deployment involves a single instance of each of the two microservices comp
 
 ## Prerequisites
 
-- [Minikube](https://minikube.sigs.k8s.io/) installed and running
-- `kubectl` configured to use the Minikube context
-- The Minikube Ingress addon enabled (see below)
+- A local Kubernetes cluster — either [Minikube](https://minikube.sigs.k8s.io/) or Docker Desktop with Kubernetes enabled
+- `kubectl` configured to point at the local cluster
+- The nginx Ingress controller installed (see below)
 
 
 ## Local hostname setup
@@ -34,9 +34,17 @@ With **Docker Desktop** built-in Kubernetes, the cluster is always reachable at 
 
 ## Deployment
 
-**Enable the Ingress addon** (one-time setup):
+**Install the nginx Ingress controller** (one-time setup):
+
+With **minikube**:
 ```
 minikube addons enable ingress
+```
+
+With **Docker Desktop**:
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.0/deploy/static/provider/cloud/deploy.yaml
+kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=120s
 ```
 
 **All manifests must be applied from the `dev-ops/minikube/` directory.** The ordering below is required because later resources depend on earlier ones (namespace must exist before other resources, infrastructure before application services):
