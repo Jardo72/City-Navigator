@@ -3,10 +3,9 @@
 The Minikube deployment is a simple deployment primarily meant for local development. The deployment is illustrated by the following diagram:
 ![deployment-diagram](./diagram.png)
 
-This deployment involves a single instance of each of the two microservices comprising the application. Unlike the Docker Compose deployment, it uses PostgreSQL (instead of SQLite) as the master data database. In addition, it includes:
+This deployment involves both microservices comprising the application. In addition, it also includes:
 - PostgreSQL server as the RDBMS for the master data service
 - Redis for pub/sub notifications between the master data service and query service instances
-- Nginx Ingress for routing external traffic to the microservices
 - Prometheus and Grafana for metrics and dashboards
 
 
