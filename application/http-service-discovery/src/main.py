@@ -40,9 +40,9 @@ app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, openapi_url=N
 
 
 class VersionInfo(BaseModel):
-    application_name: str = None
-    application_version: str = None
-    python_version: str = None
+    application_name: str
+    application_version: str
+    python_version: str
     hostname: str
 
 
@@ -76,7 +76,7 @@ class TargetRegistry:
             entry = TargetRegistryEntry(hostname=hostname, timestamp=datetime.now())
             self._entries[service].add(entry)
 
-    def get_targets_grouped_by_service(self) -> Dict[str, str]:
+    def get_targets_grouped_by_service(self) -> Dict[str, List[str]]:
         with self._lock:
             result = {}
             for service, entries in self._entries.items():

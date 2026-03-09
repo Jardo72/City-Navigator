@@ -23,7 +23,7 @@ from typing import Any, Dict, List, Tuple
 from model import Line, LineItineraryItem, CityPlan
 
 
-def _read_single_itinerary(json_data: Dict[str, Any]) -> Tuple[LineItineraryItem, ...]:
+def _read_single_itinerary(json_data: List[Dict[str, Any]]) -> Tuple[LineItineraryItem, ...]:
     result = []
     for element in json_data:
         station = element['station']

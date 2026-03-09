@@ -41,22 +41,32 @@ class APIEndpointSummary:
 
     @property
     def success_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.success_count / self.overall_request_count), 1)
 
     @property
     def client_error_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.client_error_count / self.overall_request_count), 1)
 
     @property
     def server_error_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.server_error_count / self.overall_request_count), 1)
 
     @property
     def exception_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.exception_count / self.overall_request_count), 1)
 
     @property
     def avg_success_duration_millis(self) -> int:
+        if self.success_count == 0:
+            return 0
         return round(self.overall_success_duration_millis / self.success_count)
 
     def __add__(self, other: APIEndpointSummary) -> APIEndpointSummary:

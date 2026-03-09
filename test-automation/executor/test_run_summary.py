@@ -56,6 +56,8 @@ class TestRunSummary:
 
     @property
     def overall_success_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.overall_success_count / self.overall_request_count), 1)
 
     @property
@@ -64,6 +66,8 @@ class TestRunSummary:
 
     @property
     def overall_client_error_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.overall_client_error_count / self.overall_request_count), 1)
 
     @property
@@ -72,6 +76,8 @@ class TestRunSummary:
 
     @property
     def overall_server_error_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.overall_server_error_count / self.overall_request_count), 1)
 
     @property
@@ -80,6 +86,8 @@ class TestRunSummary:
 
     @property
     def overall_exception_percentage(self) -> float:
+        if self.overall_request_count == 0:
+            return 0.0
         return round(100 * (self.overall_exception_count / self.overall_request_count), 1)
 
     @property

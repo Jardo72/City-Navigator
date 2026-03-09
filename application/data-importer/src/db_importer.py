@@ -49,7 +49,7 @@ class _Importer:
         )
         self._connection = engine.connect()
 
-    def import_city_plan(self) -> None:
+    def import_city_plan(self) -> ImportSummary:
         try:
             for line in self._city_plan.lines:
                 self._import_line(line)

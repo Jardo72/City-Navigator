@@ -89,9 +89,9 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException) ->
 
 
 class VersionInfo(BaseModel):
-    application_name: str = None
-    application_version: str = None
-    python_version: str = None
+    application_name: str
+    application_version: str
+    python_version: str
     hostname: str
 
 

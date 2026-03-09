@@ -13,11 +13,11 @@ CREATE TABLE t_lines (
     label VARCHAR(5) NOT NULL UNIQUE,
     means_of_transport_uuid VARCHAR(36) NOT NULL,
     terminal_stop_one_uuid VARCHAR(36) NOT NULL,
-	terminal_stop_two_uuid VARCHAR(36) NOT NULL,
+    terminal_stop_two_uuid VARCHAR(36) NOT NULL,
     CONSTRAINT means_of_transport_fk FOREIGN KEY (means_of_transport_uuid) REFERENCES t_means_of_transport(uuid),
     CHECK (terminal_stop_one_uuid <> terminal_stop_two_uuid),
-	CONSTRAINT terminal_stop_one_fk FOREIGN KEY (terminal_stop_one_uuid) REFERENCES t_stations(uuid),
-	CONSTRAINT terminal_stop_two_fk FOREIGN KEY (terminal_stop_two_uuid) REFERENCES t_stations(uuid)
+    CONSTRAINT terminal_stop_one_fk FOREIGN KEY (terminal_stop_one_uuid) REFERENCES t_stations(uuid),
+    CONSTRAINT terminal_stop_two_fk FOREIGN KEY (terminal_stop_two_uuid) REFERENCES t_stations(uuid)
 );
 
 CREATE TABLE t_edges (
