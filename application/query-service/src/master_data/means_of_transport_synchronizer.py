@@ -49,7 +49,7 @@ class MeansOfTransportSynchronizer(AbstractSynchronizer):
             self.db.commit()
             _logger.debug("Means of transport with uuid %s updated", uuid)
         else:
-            _logger.warn("Means of transport with uuid %s not found", uuid)
+            _logger.warning("Means of transport with uuid %s not found", uuid)
 
     def delete_entity(self, uuid: str) -> None:
         record = self.db.query(MeansOfTransport).filter(MeansOfTransport.uuid == uuid).first()
@@ -58,4 +58,4 @@ class MeansOfTransportSynchronizer(AbstractSynchronizer):
             self.db.commit()
             _logger.debug("Means of transport with uuid %s deleted", uuid)
         else:
-            _logger.warn("Means of transport with uuid %s not found", uuid)
+            _logger.warning("Means of transport with uuid %s not found", uuid)

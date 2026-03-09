@@ -53,7 +53,7 @@ class LineSynchronizer(AbstractSynchronizer):
             self.db.commit()
             _logger.debug("Line with uuid %s updated", uuid)
         else:
-            _logger.warn("Line with uuid %s not found", uuid)
+            _logger.warning("Line with uuid %s not found", uuid)
 
     def delete_entity(self, uuid: str) -> None:
         record = self.db.query(Line).filter(Line.uuid == uuid).first()
@@ -62,4 +62,4 @@ class LineSynchronizer(AbstractSynchronizer):
             self.db.commit()
             _logger.debug("Line with uuid %s deleted", uuid)
         else:
-            _logger.warn("Line with uuid %s not found", uuid)
+            _logger.warning("Line with uuid %s not found", uuid)

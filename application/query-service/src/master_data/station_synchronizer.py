@@ -49,7 +49,7 @@ class StationSynchronizer(AbstractSynchronizer):
             self.db.commit()
             _logger.debug("Station with uuid %s updated", uuid)
         else:
-            _logger.warn("Station with uuid %s not found", uuid)
+            _logger.warning("Station with uuid %s not found", uuid)
 
     def delete_entity(self, uuid: str) -> None:
         record = self.db.query(Station).filter(Station.uuid == uuid).first()
@@ -58,4 +58,4 @@ class StationSynchronizer(AbstractSynchronizer):
             self.db.commit()
             _logger.debug("Station with uuid %s deleted", uuid)
         else:
-            _logger.warn("Station with uuid %s not found", uuid)
+            _logger.warning("Station with uuid %s not found", uuid)
