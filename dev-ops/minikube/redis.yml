@@ -38,7 +38,7 @@ spec:
     spec:
       containers:
         - name: redis
-          image: redis:6.2.11-alpine
+          image: redis:7-alpine
           imagePullPolicy: Always
           ports:
             - containerPort: 6379
