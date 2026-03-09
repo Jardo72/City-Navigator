@@ -52,6 +52,10 @@ pytest tests/
 
 The `main.py` script is a custom multi-threaded load test for the Query Service. It spawns configurable numbers of worker threads, each continuously calling one Query Service endpoint for a specified duration, then prints a summary of throughput, response times, and error rates per endpoint.
 
+The diagram below illustrates the structure of the load test — the client and thread class hierarchies, the `TestRun` orchestrator, and how `main.py` ties them together.
+
+![load-test](./diagrams/load-test.png)
+
 ### Endpoints exercised
 
 | Thread pool | Endpoint called |
