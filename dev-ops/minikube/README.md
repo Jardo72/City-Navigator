@@ -58,15 +58,13 @@ kubectl apply -f prometheus-http-discovery.yml
 kubectl apply -f prometheus-server.yml
 kubectl apply -f grafana.yml
 kubectl apply -f data-importer.yml
+kubectl wait --for=condition=complete job/data-importer -n city-navigator --timeout=120s
 kubectl apply -f master-data-service.yml
 kubectl apply -f query-service.yml
 ```
 
 The `data-importer` is a Kubernetes Job that populates the PostgreSQL database with the city plan data. It uses an init container to wait until PostgreSQL is ready before running. The master data service and query service should only be started after the Job has completed successfully:
 
-```
-kubectl wait --for=condition=complete job/data-importer -n city-navigator --timeout=120s
-```
 
 **Verify the deployment:**
 ```
