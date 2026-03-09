@@ -19,10 +19,16 @@ This deployment involves a single instance of each of the two microservices comp
 
 ## Local hostname setup
 
-The Ingress is configured for the hostname `city-navigator.jch`. Add the following entry to your `/etc/hosts` file (use `minikube ip` to get the correct IP address):
+The Ingress is configured for the hostname `city-navigator.jch`. Add the following entry to your `/etc/hosts` file. On Windows, the hosts file resides in the `C:\Windows\System32\drivers\etc` directory.
 
+With **minikube**, use `minikube ip` to get the cluster IP:
 ```
 <minikube-ip>  city-navigator.jch
+```
+
+With **Docker Desktop** built-in Kubernetes, the cluster is always reachable at `localhost`:
+```
+127.0.0.1  city-navigator.jch
 ```
 
 
