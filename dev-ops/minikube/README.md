@@ -3,10 +3,9 @@
 The Minikube deployment is a simple deployment primarily meant for local development. The deployment is illustrated by the following diagram:
 ![deployment-diagram](./diagram.png)
 
-This deployment involves a single instance of each of the two microservices comprising the application. Unlike the Docker Compose deployment, it uses PostgreSQL (instead of SQLite) as the master data database. In addition, it includes:
+This deployment involves both microservices comprising the application. In addition, it also includes:
 - PostgreSQL server as the RDBMS for the master data service
 - Redis for pub/sub notifications between the master data service and query service instances
-- Nginx Ingress for routing external traffic to the microservices
 - Prometheus and Grafana for metrics and dashboards
 
 
@@ -58,15 +57,13 @@ kubectl apply -f prometheus-http-discovery.yml
 kubectl apply -f prometheus-server.yml
 kubectl apply -f grafana.yml
 kubectl apply -f data-importer.yml
+kubectl wait --for=condition=complete job/data-importer -n city-navigator --timeout=120s
 kubectl apply -f master-data-service.yml
 kubectl apply -f query-service.yml
 ```
 
 The `data-importer` is a Kubernetes Job that populates the PostgreSQL database with the city plan data. It uses an init container to wait until PostgreSQL is ready before running. The master data service and query service should only be started after the Job has completed successfully:
 
-```
-kubectl wait --for=condition=complete job/data-importer -n city-navigator --timeout=120s
-```
 
 **Verify the deployment:**
 ```

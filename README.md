@@ -14,6 +14,24 @@ The application is instrumented with [Prometheus client for Python](https://pypi
 In addition, the query service also collects the number of notifications from master data whose processing within the query service has failed (Prometheus counter).
 
 
+## Repository Structure
+
+```
+City-Navigator/
+├── application/                 # Application source code
+│   ├── data-importer/           # Imports city plan data into PostgreSQL on startup
+│   ├── http-service-discovery/  # HTTP service discovery for Prometheus (Docker Compose; both services)
+│   ├── master-data-service/     # REST API for managing master data (CRUD)
+│   ├── postgres/                # Custom PostgreSQL image with DB init scripts
+│   └── query-service/           # REST API for passenger queries and journey planning
+├── dev-ops/                     # DevOps assets
+│   ├── docker-compose/          # Docker Compose deployment
+│   └── minikube/                # Minikube-specific deployment and configuration
+├── diagrams/                    # Diagram source files (draw.io)
+└── test-automation/             # Test automation assets (functional API tests, load test)
+```
+
+
 ## Quick Start
 
 The Docker Compose deployment is the easiest way to run the application locally. The only prerequisite is Docker with the Compose plugin.
