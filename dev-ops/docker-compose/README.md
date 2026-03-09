@@ -65,6 +65,8 @@ Nginx serves as the single entry point for all REST API requests. The configurat
 | `/city-navigator/api/master-data/` | `master-data-service:8000` |
 | `/city-navigator/api/query/` | `query-service:8000` |
 
+The configuration includes a `resolver 127.0.0.11 valid=30s` directive pointing at Docker's embedded DNS server. For the query service location, the upstream address is passed via a variable rather than as a literal hostname. This forces Nginx to re-resolve the hostname through Docker's DNS on each request (subject to the 30-second TTL), rather than caching a single IP at startup. As a result, traffic is distributed across all running query service replicas, which matters when scaling the query service to more than one instance.
+
 
 ## Redis Pub/Sub
 
