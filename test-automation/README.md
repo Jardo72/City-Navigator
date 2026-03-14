@@ -89,6 +89,16 @@ python main.py docker-compose-load-test-cfg.json -s results.html
 
 The `-s` option saves the summary as an HTML file in addition to printing it to stdout. The HTML file preserves the colours and table formatting from the terminal output.
 
+### Example output
+
+During the test run the terminal shows the test configuration, the test data summary (station and line counts fetched from the Query Service), and a progress indicator with percentage complete and time remaining:
+
+![load-test-config-and-progress](./screenshots/load-test-config-and-progress.png)
+
+Once the run finishes, the summary is printed. It contains overall request counts and error rates, followed by a per-endpoint breakdown of throughput and response times:
+
+![load-test-summary](./screenshots/load-test-summary.png)
+
 ### Configuration file format
 
 The configuration is a JSON file. Example (`docker-compose-load-test-cfg.json`):
