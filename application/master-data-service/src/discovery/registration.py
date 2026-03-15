@@ -40,7 +40,7 @@ class DiscoveryServiceClient:
             "hostname": f"{gethostname()}:{Config.get_app_port()}",
             "service": "master-data-service"
         }
-        _logger.debug("Registering service instance with Prometheus discovery: %s", request)
+        _logger.info("Registering service instance with Prometheus discovery: %s", request)
         with self._session:
             response = self._session.post(f"{self._base_url}/target", data=dumps(request))
             _logger.debug("Registration - status code = %s", response.status_code)
