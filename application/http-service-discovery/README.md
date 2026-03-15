@@ -6,7 +6,7 @@ The Prometheus HTTP Discovery Service is a lightweight helper used in the Docker
 
 On startup, each Master Data Service and Query Service instance registers itself by posting its hostname to this service. Each instance then continues to re-register periodically as a heartbeat. Prometheus periodically polls the `/targets` endpoint and receives the current list of registered instances, grouped by service name, in the format Prometheus expects.
 
-Entries that have not been refreshed within 75 seconds are considered stale and are automatically removed from the registry. This ensures that instances which have stopped or crashed are eventually dropped from the Prometheus scrape targets without requiring a manual intervention or a service restart.
+Entries that have not been refreshed within the configurable stale threshold (default: 75 seconds, controlled by `STALE_TARGET_THRESHOLD_SECONDS`) are considered stale and are automatically removed from the registry. This ensures that instances which have stopped or crashed are eventually dropped from the Prometheus scrape targets without requiring a manual intervention or a service restart.
 
 The service is implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and runs under Gunicorn with uvicorn workers. All registered targets are held in memory only and are lost on container restart.
 
@@ -15,6 +15,7 @@ The service is implemented in Python using [FastAPI](https://fastapi.tiangolo.co
 
 | Variable | Required | Default | Description |
 |---|---|---|---|
+| `STALE_TARGET_THRESHOLD_SECONDS` | no | `75` | Number of seconds without a heartbeat after which a registered target is considered stale and removed from the registry. |
 | `ACCESS_LOG` | no | `/proc/1/fd/1` | Path for the Gunicorn HTTP access log file. Defaults to stdout. |
 
 

@@ -19,6 +19,7 @@
 
 from datetime import datetime
 from logging import getLogger
+from os import environ
 from socket import gethostname
 from sys import version as python_version
 from threading import Lock
@@ -33,6 +34,9 @@ _logger = getLogger("main")
 
 APPLICATION_NAME = "City Navigator - Prometheus HTTP Service Discovery"
 APPLICATION_VERSION = "0.1.0"
+
+STALE_TARGET_THRESHOLD_SECONDS = int(environ.get("STALE_TARGET_THRESHOLD_SECONDS", "75"))
+_logger.info("Stale target threshold: %d seconds", STALE_TARGET_THRESHOLD_SECONDS)
 
 
 app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, openapi_url=None, redoc_url=None)
@@ -75,7 +79,7 @@ class TargetRegistry:
             for service, hosts in self._entries.items():
                 stale_hostnames = [
                     hostname for hostname, last_update in hosts.items()
-                    if (current_time - last_update).total_seconds() > 75
+                    if (current_time - last_update).total_seconds() > STALE_TARGET_THRESHOLD_SECONDS
                 ]
                 for hostname in stale_hostnames:
                     _logger.debug("Hostname %s for service %s is stale and will be removed from the registry", hostname, service)
