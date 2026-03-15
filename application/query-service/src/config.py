@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+from functools import cache
 from logging import getLogger
 from os import environ
 from typing import Optional
@@ -73,6 +74,7 @@ class Config:
         return int(value)
 
     @staticmethod
+    @cache
     def _get_environment_variable(name: str, default_value: Optional[str] = None) -> str:
         result = environ.get(name, None)
         default_used = False
