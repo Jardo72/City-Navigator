@@ -23,6 +23,8 @@ from socket import gethostname
 
 import requests
 
+from config import Config
+
 
 _logger = getLogger("discovery")
 
@@ -34,11 +36,11 @@ class DiscoveryServiceClient:
         self._base_url = base_url
 
     def register(self) -> None:
-        # TODO: hardcoded port
         request = {
-            "hostname": f"{gethostname()}:8000",
+            "hostname": f"{gethostname()}:{Config.get_app_port()}",
             "service": "query-service"
         }
+        _logger.debug("Registering service instance with Prometheus discovery: %s", request)
         with self._session:
             response = self._session.post(f"{self._base_url}/target", data=dumps(request))
             _logger.debug("Registration - status code = %s", response.status_code)

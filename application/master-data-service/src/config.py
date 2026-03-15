@@ -53,6 +53,11 @@ class Config:
         return Config._get_environment_variable("REDIS_CHANNEL", default_value="city-navigator")
 
     @staticmethod
+    def get_app_port() -> int:
+        value = Config._get_environment_variable("APP_PORT", default_value="8000")
+        return int(value)
+
+    @staticmethod
     def get_prometheus_discovery_base_url() -> str:
         return Config._get_environment_variable("PROMETHEUS_DISCOVERY_BASE_URL")
 
