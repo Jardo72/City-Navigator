@@ -24,7 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -108,8 +108,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (instance, path) (rate(query_service_http_requests_total[1m]))",
-          "legendFormat": "{{instance}} {{path}}",
+          "expr": "sum by (path) (rate(query_service_http_requests_total[1m]))",
+          "legendFormat": "{{path}}",
           "range": true,
           "refId": "A"
         }
@@ -197,8 +197,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "100 * sum by (instance, path) (rate(query_service_http_errors_total[1m])) / sum by (instance, path) (rate(query_service_http_requests_total[1m]))",
-          "legendFormat": "{{instance}} {{path}}",
+          "expr": "100 * sum by (path) (rate(query_service_http_errors_total[1m])) / sum by (path) (rate(query_service_http_requests_total[1m]))",
+          "legendFormat": "{{path}}",
           "range": true,
           "refId": "A"
         }
@@ -286,8 +286,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (instance, le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
-          "legendFormat": "{{instance}} {{path}}",
+          "expr": "histogram_quantile(0.50, sum by (le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "{{path}}",
           "range": true,
           "refId": "A"
         }
@@ -375,8 +375,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (instance, le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
-          "legendFormat": "{{instance}} {{path}}",
+          "expr": "histogram_quantile(0.95, sum by (le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "{{path}}",
           "range": true,
           "refId": "A"
         }
@@ -464,8 +464,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (instance, path, status_code) (rate(query_service_http_errors_total[1m]))",
-          "legendFormat": "{{instance}} {{path}} ({{status_code}})",
+          "expr": "sum by (path, status_code) (rate(query_service_http_errors_total[1m]))",
+          "legendFormat": "{{path}} ({{status_code}})",
           "range": true,
           "refId": "A"
         }
@@ -553,8 +553,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (instance, event_type, entity) (rate(query_service_notification_errors_total[1m]))",
-          "legendFormat": "{{instance}} {{event_type}} / {{entity}}",
+          "expr": "sum by (event_type, entity) (rate(query_service_notification_errors_total[1m]))",
+          "legendFormat": "{{event_type}} / {{entity}}",
           "range": true,
           "refId": "A"
         }
@@ -577,8 +577,8 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "City Navigator - Query Service (per instance)",
-  "uid": "CN-query-svc-per-instance",
+  "title": "City Navigator - Query Service (aggregated)",
+  "uid": "CN-query-svc-agg",
   "version": 1,
   "weekStart": ""
 }

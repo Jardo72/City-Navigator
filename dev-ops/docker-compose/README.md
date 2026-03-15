@@ -85,15 +85,19 @@ A lightweight FastAPI service that maintains a registry of running microservice 
 
 ## Grafana
 
-Grafana is pre-provisioned with a Prometheus data source and two dashboards. The provisioning configuration is in [./grafana](./grafana). Default credentials: `admin` / `GrafanaSecret#37`.
+Grafana is pre-provisioned with a Prometheus data source and three dashboards. The provisioning configuration is in [./grafana](./grafana). Default credentials: `admin` / `GrafanaSecret#37`.
 
-**City Navigator - Overview** provides a high-level health view across both microservices: service availability, request rate, and HTTP error rate for each service side by side.
+**City Navigator - Overview** provides a high-level health view across both microservices: service availability (gauge), request rate, and HTTP error rate for each service side by side.
 
 ![grafana-overview-dashboard](./screenshots/grafana-overview-dashboard.png)
 
-**City Navigator - Query Service** provides a detailed per-endpoint breakdown intended for use during load tests: throughput, error rate percentage, P50 and P95 response times, HTTP errors broken down by path and status code, and notification errors from the Redis pub/sub channel.
+**City Navigator - Query Service (per instance)** provides a detailed per-endpoint, per-instance breakdown intended for use during load tests: throughput, error rate, P50 and P95 response times, HTTP errors broken down by endpoint and status code, and notification errors from the Redis pub/sub channel.
 
-![grafana-query-service-dashboard](./screenshots/grafana-query-service-dashboard.png)
+![grafana-query-service-per-instance-dashboard](./screenshots/grafana-query-service-per-instance-dashboard.png)
+
+**City Navigator - Query Service (aggregated)** shows the same panels as the per-instance dashboard but with metrics aggregated across all running query service instances. This is the primary view for monitoring overall query service health when running with multiple replicas.
+
+![grafana-query-service-aggregated-dashboard](./screenshots/grafana-query-service-aggregated-dashboard.png)
 
 
 ## HTTP Access Logs
