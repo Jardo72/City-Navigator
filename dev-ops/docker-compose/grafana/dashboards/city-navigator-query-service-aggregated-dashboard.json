@@ -108,8 +108,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (path) (rate(query_service_http_requests_total[1m]))",
-          "legendFormat": "{{path}}",
+          "expr": "sum by (method, path) (rate(query_service_http_requests_total[1m]))",
+          "legendFormat": "{{method}} {{path}}",
           "range": true,
           "refId": "A"
         }
@@ -197,8 +197,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "100 * sum by (path) (rate(query_service_http_errors_total[1m])) / sum by (path) (rate(query_service_http_requests_total[1m]))",
-          "legendFormat": "{{path}}",
+          "expr": "100 * sum by (method, path) (rate(query_service_http_errors_total[1m])) / sum by (method, path) (rate(query_service_http_requests_total[1m]))",
+          "legendFormat": "{{method}} {{path}}",
           "range": true,
           "refId": "A"
         }
@@ -286,8 +286,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
-          "legendFormat": "{{path}}",
+          "expr": "histogram_quantile(0.50, sum by (le, method, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "{{method}} {{path}}",
           "range": true,
           "refId": "A"
         }
@@ -375,8 +375,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
-          "legendFormat": "{{path}}",
+          "expr": "histogram_quantile(0.95, sum by (le, method, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "{{method}} {{path}}",
           "range": true,
           "refId": "A"
         }
@@ -464,8 +464,8 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (path, status_code) (rate(query_service_http_errors_total[1m]))",
-          "legendFormat": "{{path}} ({{status_code}})",
+          "expr": "sum by (method, path, status_code) (rate(query_service_http_errors_total[1m]))",
+          "legendFormat": "{{method}} {{path}} ({{status_code}})",
           "range": true,
           "refId": "A"
         }

@@ -81,7 +81,8 @@ http_error_counter = Counter(
 
 @app.exception_handler(HTTPException)
 async def custom_http_exception_handler(request: Request, exc: HTTPException) -> Response:
-    path = request.url.path
+    route = request.scope.get("route")
+    path = route.path if route else request.url.path
     method = request.method
     status_code = exc.status_code
     _logger.error("HTTP exception - path = %s, method = %s, status code = %s", path, method, status_code)
