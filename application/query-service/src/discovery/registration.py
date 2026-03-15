@@ -20,6 +20,8 @@
 from json import dumps
 from logging import getLogger
 from socket import gethostname
+from threading import Thread
+from time import sleep
 
 import requests
 
@@ -40,7 +42,19 @@ class DiscoveryServiceClient:
             "hostname": f"{gethostname()}:{Config.get_app_port()}",
             "service": "query-service"
         }
-        _logger.info("Registering service instance with Prometheus discovery: %s", request)
-        with self._session:
-            response = self._session.post(f"{self._base_url}/target", data=dumps(request))
-            _logger.debug("Registration - status code = %s", response.status_code)
+        _logger.debug("Registering service instance with Prometheus discovery: %s", request)
+        response = self._session.post(f"{self._base_url}/target", data=dumps(request))
+        _logger.debug("Registration - status code = %s", response.status_code)
+
+    def start_heartbeat(self, interval_seconds) -> None:
+        thread = Thread(target=self._heartbeat_loop, args=(interval_seconds,), daemon=True)
+        thread.start()
+
+    def _heartbeat_loop(self, interval_seconds: int) -> None:
+        _logger.info("Starting heartbeat loop with interval %s seconds", interval_seconds)
+        while True:
+            sleep(interval_seconds)
+            try:
+                self.register()
+            except Exception:
+                _logger.exception("Failed to re-register with Prometheus discovery service")

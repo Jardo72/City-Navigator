@@ -41,6 +41,7 @@ async def lifespan(app: FastAPI) -> None:
     _logger.debug("Going to register service instance with Prometheus discovery")
     client = DiscoveryServiceClient(Config.get_prometheus_discovery_base_url())
     client.register()
+    client.start_heartbeat(Config.get_heartbeat_interval_seconds())
 
     yield
     ...

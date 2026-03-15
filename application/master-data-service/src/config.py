@@ -19,9 +19,15 @@
 
 from logging import getLogger
 from os import environ
+from typing import Optional
 
 
 _logger = getLogger("config")
+
+
+class UndefinedMandatoryEnvironmentVariableError(Exception):
+    def __init__(self, variable_name: str) -> None:
+        super().__init__(f"Mandatory environment variable '{variable_name}' is not defined")
 
 
 class Config:
@@ -62,9 +68,17 @@ class Config:
         return Config._get_environment_variable("PROMETHEUS_DISCOVERY_BASE_URL")
 
     @staticmethod
-    def _get_environment_variable(name: str, default_value: str = None) -> str:
+    def get_heartbeat_interval_seconds() -> int:
+        value = Config._get_environment_variable("HEARTBEAT_INTERVAL_SECONDS", default_value="15")
+        return int(value)
+
+    @staticmethod
+    def _get_environment_variable(name: str, default_value: Optional[str] = None) -> str:
         result = environ.get(name, None)
         default_used = False
+        if result is None and default_value is None:
+            _logger.error("Mandatory environment variable '%s' is not defined and no default value is provided", name)
+            raise UndefinedMandatoryEnvironmentVariableError(name)
         if result is None:
             default_used = True
             result = default_value
