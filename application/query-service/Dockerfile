@@ -36,12 +36,13 @@ RUN chmod -R u+rwx ${PROMETHEUS_MULTIPROC_DIR}
 
 USER 1000:1000
 
-EXPOSE 8000
+ENV APP_PORT=8000
+EXPOSE ${APP_PORT}
 
 ENV ACCESS_LOG=${ACCESS_LOG:-/proc/1/fd/1}
 
 ENTRYPOINT /usr/local/bin/gunicorn \
-    -b 0.0.0.0:8000 \
+    -b 0.0.0.0:${APP_PORT} \
     -w 6 \
     -k uvicorn.workers.UvicornWorker main:app \
     --log-config logging.ini \

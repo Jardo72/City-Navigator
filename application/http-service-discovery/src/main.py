@@ -17,9 +17,9 @@
 # limitations under the License.
 #
 
-from dataclasses import dataclass
 from datetime import datetime
 from logging import getLogger
+from os import environ
 from socket import gethostname
 from sys import version as python_version
 from threading import Lock
@@ -34,6 +34,9 @@ _logger = getLogger("main")
 
 APPLICATION_NAME = "City Navigator - Prometheus HTTP Service Discovery"
 APPLICATION_VERSION = "0.1.0"
+
+STALE_TARGET_THRESHOLD_SECONDS = int(environ.get("STALE_TARGET_THRESHOLD_SECONDS", "75"))
+_logger.info("Stale target threshold: %d seconds", STALE_TARGET_THRESHOLD_SECONDS)
 
 
 app = FastAPI(title=APPLICATION_NAME, version=APPLICATION_VERSION, openapi_url=None, redoc_url=None)
@@ -56,33 +59,33 @@ class TargetInfo(BaseModel):
     service: str
 
 
-@dataclass(frozen=True, slots=True)
-class TargetRegistryEntry:
-    hostname: str
-    timestamp: datetime
-
-
 class TargetRegistry:
 
     def __init__(self) -> None:
         self._lock = Lock()
-        self._entries = {}
+        self._entries: Dict[str, Dict[str, datetime]] = {}
 
     def add(self, hostname: str, service: str) -> None:
         with self._lock:
             _logger.debug("Hostname %s added to or updated in the registry (service = %s)", hostname, service)
             if service not in self._entries:
-                self._entries[service] = set()
-            entry = TargetRegistryEntry(hostname=hostname, timestamp=datetime.now())
-            self._entries[service].add(entry)
+                self._entries[service] = {}
+            self._entries[service][hostname] = datetime.now()
 
     def get_targets_grouped_by_service(self) -> Dict[str, List[str]]:
+        current_time = datetime.now()
         with self._lock:
             result = {}
-            for service, entries in self._entries.items():
-                hostnames = list(map(lambda host: host.hostname, entries))
-                distinct_hostnames = set(hostnames)
-                result[service] = list(distinct_hostnames)
+            for service, hosts in self._entries.items():
+                stale_hostnames = [
+                    hostname for hostname, last_update in hosts.items()
+                    if (current_time - last_update).total_seconds() > STALE_TARGET_THRESHOLD_SECONDS
+                ]
+                for hostname in stale_hostnames:
+                    _logger.debug("Hostname %s for service %s is stale and will be removed from the registry", hostname, service)
+                    del hosts[hostname]
+                result[service] = list(hosts.keys())
+            _logger.debug("Returning targets grouped by service: %s", result)
             return result
 
 

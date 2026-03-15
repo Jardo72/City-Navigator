@@ -17,49 +17,78 @@
 # limitations under the License.
 #
 
+from functools import cache
 from logging import getLogger
 from os import environ
+from typing import Optional
 
 
 _logger = getLogger("config")
 
 
+class UndefinedMandatoryEnvironmentVariableError(Exception):
+    def __init__(self, variable_name: str) -> None:
+        super().__init__(f"Mandatory environment variable '{variable_name}' is not defined")
+
+
 class Config:
 
     @staticmethod
+    @cache
     def is_api_doc_enabled() -> bool:
         value = Config._get_environment_variable("API_DOC_ENABLED", default_value="NO")
         return value.upper() in {"YES", "TRUE", "1"}
 
     @staticmethod
+    @cache
     def get_root_path() -> str:
         return Config._get_environment_variable("ROOT_PATH", default_value="")
 
     @staticmethod
+    @cache
     def get_database_url() -> str:
         return Config._get_environment_variable("DATABASE_URL")
 
     @staticmethod
+    @cache
     def get_redis_host() -> str:
         return Config._get_environment_variable("REDIS_HOST")
 
     @staticmethod
+    @cache
     def get_redis_port() -> int:
         value = Config._get_environment_variable("REDIS_PORT", default_value="6379")
         return int(value)
 
     @staticmethod
+    @cache
     def get_redis_channel() -> str:
         return Config._get_environment_variable("REDIS_CHANNEL", default_value="city-navigator")
 
     @staticmethod
+    @cache
+    def get_app_port() -> int:
+        value = Config._get_environment_variable("APP_PORT", default_value="8000")
+        return int(value)
+
+    @staticmethod
+    @cache
     def get_prometheus_discovery_base_url() -> str:
         return Config._get_environment_variable("PROMETHEUS_DISCOVERY_BASE_URL")
 
     @staticmethod
-    def _get_environment_variable(name: str, default_value: str = None) -> str:
+    @cache
+    def get_heartbeat_interval_seconds() -> int:
+        value = Config._get_environment_variable("HEARTBEAT_INTERVAL_SECONDS", default_value="15")
+        return int(value)
+
+    @staticmethod
+    def _get_environment_variable(name: str, default_value: Optional[str] = None) -> str:
         result = environ.get(name, None)
         default_used = False
+        if result is None and default_value is None:
+            _logger.error("Mandatory environment variable '%s' is not defined and no default value is provided", name)
+            raise UndefinedMandatoryEnvironmentVariableError(name)
         if result is None:
             default_used = True
             result = default_value
