@@ -147,7 +147,7 @@ async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError) -
     http_error_counter.labels(method=method, path=path, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR).inc()
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "Internal Server Error"}
+        content={"detail": "Internal Server Error (database error)"}
     )
 
 
