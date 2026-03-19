@@ -20,6 +20,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from logging import getLogger
+from time import sleep
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -42,24 +43,47 @@ class RetrievalResult:
     lines: List[LineDetailsMaster]
 
 
+def _invoke_with_retries(func, retries: int = 5, delay_sec: int = 5):
+    for attempt in range(1, retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            _logger.warning(f"Attempt {attempt}/{retries} failed for {func.__name__} with error: {str(e)}")
+            if attempt < retries:
+                _logger.info(f"Will retry {func.__name__} after {delay_sec} seconds...")
+                sleep(delay_sec)
+                delay_sec *= 2  # exponential backoff
+            else:
+                _logger.error(f"All {retries} attempts failed for {func.__name__}. Giving up.")
+                raise e
+            
+
 def _retrieve_means_of_transport() -> List[MeansOfTransportMaster]:
-    client = MasterDataClient(Config.get_master_data_service_base_url())
-    return client.get_means_of_transport_list()
+    def repeatable_func() -> List[MeansOfTransportMaster]:
+        client = MasterDataClient(Config.get_master_data_service_base_url())
+        return client.get_means_of_transport_list()
+    return repeatable_func()
 
 
 def _retrieve_stations() -> List[StationMaster]:
-    client = MasterDataClient(Config.get_master_data_service_base_url())
-    return client.get_station_list()
+    def repeatable_func() -> List[StationMaster]:
+        client = MasterDataClient(Config.get_master_data_service_base_url())
+        return client.get_station_list()
+    return repeatable_func()
 
 
 def _retrieve_lines() -> List[LineMaster]:
-    client = MasterDataClient(Config.get_master_data_service_base_url())
-    return client.get_line_list()
+    def repeatable_func() -> List[LineMaster]:
+        client = MasterDataClient(Config.get_master_data_service_base_url())
+        return client.get_line_list()
+    return repeatable_func()
 
 
 def _retrieve_line_details(uuid: str) -> LineDetailsMaster:
-    client = MasterDataClient(Config.get_master_data_service_base_url())
-    return client.get_line(uuid)
+    def repeatable_func() -> LineDetailsMaster:
+        client = MasterDataClient(Config.get_master_data_service_base_url())
+        return client.get_line(uuid)
+    return repeatable_func()
 
 
 def _retrieve_from_master_data_service() -> RetrievalResult:
