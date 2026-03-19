@@ -22,11 +22,13 @@ from logging import getLogger
 from socket import gethostname
 from sys import version as python_version
 
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.exception_handlers import http_exception_handler
+from fastapi.responses import JSONResponse
 from prometheus_client import CollectorRegistry, Counter
 from prometheus_client import make_asgi_app, multiprocess
 from pydantic import BaseModel
+from sqlalchemy.exc import SQLAlchemyError
 
 from config import Config
 from discovery import DiscoveryServiceClient
@@ -79,6 +81,21 @@ async def custom_http_exception_handler(request: Request, exc: HTTPException) ->
     _logger.error("HTTP exception - path = %s, method = %s, status code = %s", path, method, status_code)
     http_error_counter.labels(method=method, path=path, status_code=status_code).inc()
     return await http_exception_handler(request, exc)
+
+
+@app.exception_handler(SQLAlchemyError)
+async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError) -> Response:
+    route = request.scope.get("route")
+    path = route.path if route else request.url.path
+    method = request.method
+    # use exc_info to ensure the full traceback is logged even if FastAPI calls this handler
+    # outside of an active exception handling context
+    _logger.error("Database exception - path = %s, method = %s", path, method, exc_info=exc)
+    http_error_counter.labels(method=method, path=path, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR).inc()
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": "Internal Server Error"}
+    )
 
 
 class VersionInfo(BaseModel):
