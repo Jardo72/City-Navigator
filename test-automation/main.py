@@ -32,6 +32,12 @@ from rest import QueryServiceClient
 from util import DataCollections
 
 
+class ReadMasterDataError(Exception):
+
+    def __init__(self, object_type: str, http_status: int) -> None:
+        super().__init__(f"Failed to retrieve {object_type} list from master data service (HTTP status = {http_status}).")
+
+
 def epilog() -> str:
     return """
 This tool runs a multi-threaded load test against the City Navigator query service. It sends
@@ -93,15 +99,18 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
     client = QueryServiceClient(config.query_service_base_url)
 
     response = client.get_means_of_transport_list()
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise ReadMasterDataError("means of transport", response.status_code)
     means_of_transport = map(lambda d: d["identifier"], response.json_data)
 
     response = client.get_station_list()
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise ReadMasterDataError("stations", response.status_code)
     stations = map(lambda d: d["name"], response.json_data)
 
     response = client.get_line_list()
-    assert response.status_code == 200
+    if response.status_code != 200:
+        raise ReadMasterDataError("lines", response.status_code)
     lines = map(lambda d: d["label"], response.json_data)
 
     return DataCollections(
@@ -217,16 +226,22 @@ def print_test_run_summary(summary: TestRunSummary, console: Console) -> None:
 
 def main() -> None:
     command_line_arguments = parse_command_line_arguments()
-    config = read_from_file(command_line_arguments.config_file)
-    data_collections = read_lists_from_master_data(config)
-    print_test_run_preview(config, data_collections)
-    test_run = TestRun(config, data_collections)
-    summary = test_run.run()
-    console = Console(record=bool(command_line_arguments.summary_file))
-    print_test_run_summary(summary, console)
-    if command_line_arguments.summary_file:
-        with open(command_line_arguments.summary_file, mode="w") as f:
-            f.write(console.export_html())
+    try:
+        config = read_from_file(command_line_arguments.config_file)
+        data_collections = read_lists_from_master_data(config)
+        print_test_run_preview(config, data_collections)
+        test_run = TestRun(config, data_collections)
+        summary = test_run.run()
+        console = Console(record=bool(command_line_arguments.summary_file))
+        print_test_run_summary(summary, console)
+        if command_line_arguments.summary_file:
+            with open(command_line_arguments.summary_file, mode="w") as f:
+                f.write(console.export_html())
+    except Exception as e:
+        console = Console(record=False)
+        console.print()
+        console.print("[red]An error occurred during the test run:[/red]")
+        console.print(str(e))
 
 
 if __name__ == "__main__":
