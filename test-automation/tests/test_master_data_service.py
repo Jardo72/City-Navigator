@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+from pytest import mark
+
+
 NON_EXISTENT_UUID = "00000000-0000-0000-0000-000000000000"
 
 
@@ -50,6 +53,18 @@ class TestStationCrud:
             master_data_client.delete_station(uuid)
             raise
 
+    @mark.repeat(10)
+    def test_create_duplicate_station_returns_409(self, master_data_client):
+        resp = master_data_client.create_station("Duplicate Station")
+        assert resp.status_code == 201
+        uuid = resp.json_data["uuid"]
+        try:
+            resp2 = master_data_client.create_station("Duplicate Station")
+            assert resp2.status_code == 409
+        finally:
+            master_data_client.delete_station(uuid)
+
+    @mark.repeat(10)
     def test_get_nonexistent_returns_404(self, master_data_client):
         resp = master_data_client.get_station(NON_EXISTENT_UUID)
         assert resp.status_code == 404
@@ -85,6 +100,18 @@ class TestMeansOfTransportCrud:
             master_data_client.delete_means_of_transport(uuid)
             raise
 
+    @mark.repeat(10)
+    def test_create_duplicate_means_of_transport_returns_409(self, master_data_client):
+        resp = master_data_client.create_means_of_transport("DuplicateMoT")
+        assert resp.status_code == 201
+        uuid = resp.json_data["uuid"]
+        try:
+            resp2 = master_data_client.create_means_of_transport("DuplicateMoT")
+            assert resp2.status_code == 409
+        finally:
+            master_data_client.delete_means_of_transport(uuid)
+
+    @mark.repeat(10)
     def test_get_nonexistent_returns_404(self, master_data_client):
         resp = master_data_client.get_means_of_transport(NON_EXISTENT_UUID)
         assert resp.status_code == 404
@@ -154,6 +181,7 @@ class TestLineCrud:
             if mot_uuid:
                 master_data_client.delete_means_of_transport(mot_uuid)
 
+    @mark.repeat(10)
     def test_get_nonexistent_returns_404(self, master_data_client):
         resp = master_data_client.get_line(NON_EXISTENT_UUID)
         assert resp.status_code == 404
