@@ -239,6 +239,7 @@ def main() -> None:
                 f.write(console.export_html())
     except Exception as e:
         console = Console(record=False)
+        console.print()
         console.print("[red]An error occurred during the test run:[/red]")
         console.print(str(e))
 
