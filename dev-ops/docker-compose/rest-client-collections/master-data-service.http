@@ -1,0 +1,170 @@
+# City Navigator - Master Data Service
+# VS Code REST Client extension (humao.rest-client)
+#
+# Usage:
+#   - Click "Send Request" above any ### block to execute it
+#   - Variables defined with @name can be updated and are used with {{name}}
+#   - Capture response values with @varname = {{response.body.$.field}} after a request
+#   - Run POST/PUT requests first to capture UUIDs for subsequent requests
+
+###############################################################################
+# Variables
+###############################################################################
+
+@base = http://localhost/city-navigator/api/master-data
+
+# Fill in after running POST /means-of-transport
+@mot_uuid = replace-with-uuid-from-post-response
+
+# Fill in after running POST /station
+@station_uuid = replace-with-uuid-from-post-response
+
+# Fill in after running POST /line
+@line_uuid = replace-with-uuid-from-post-response
+
+
+###############################################################################
+# Means of Transport
+###############################################################################
+
+### Get all means of transport
+GET {{base}}/means-of-transport
+
+###
+
+### Get one means of transport by UUID
+GET {{base}}/means-of-transport/{{mot_uuid}}
+
+###
+
+### Create a means of transport
+# @name createMoT
+POST {{base}}/means-of-transport
+Content-Type: application/json
+
+{
+  "identifier": "Monorail",
+  "presentation_color": "#FF6600"
+}
+
+###
+
+### Update a means of transport
+PUT {{base}}/means-of-transport/{{mot_uuid}}
+Content-Type: application/json
+
+{
+  "identifier": "Monorail Express",
+  "presentation_color": "#FF8800"
+}
+
+###
+
+### Delete a means of transport
+DELETE {{base}}/means-of-transport/{{mot_uuid}}
+
+
+###############################################################################
+# Stations
+###############################################################################
+
+### Get all stations
+GET {{base}}/stations
+
+###
+
+### Get one station by UUID
+GET {{base}}/station/{{station_uuid}}
+
+###
+
+### Create a station
+# @name createStation
+POST {{base}}/station
+Content-Type: application/json
+
+{
+  "name": "Testbahnhof"
+}
+
+###
+
+### Update a station
+PUT {{base}}/station/{{station_uuid}}
+Content-Type: application/json
+
+{
+  "name": "Testbahnhof Nord"
+}
+
+###
+
+### Delete a station
+DELETE {{base}}/station/{{station_uuid}}
+
+
+###############################################################################
+# Lines
+###############################################################################
+
+### Get all lines
+GET {{base}}/lines
+
+###
+
+### Get one line by UUID
+GET {{base}}/line/{{line_uuid}}
+
+###
+
+### Create a line
+# Requires valid UUIDs for means_of_transport and stations.
+# Run GET /means-of-transport and GET /stations first, then substitute below.
+# @name createLine
+POST {{base}}/line
+Content-Type: application/json
+
+{
+  "label": "TX",
+  "means_of_transport_uuid": "replace-with-mot-uuid",
+  "terminal_stop_one_uuid": "replace-with-station-a-uuid",
+  "terminal_stop_two_uuid": "replace-with-station-c-uuid",
+  "direction_one_itinerary": [
+    { "station_uuid": "replace-with-station-a-uuid", "point_in_time_minutes": 0 },
+    { "station_uuid": "replace-with-station-b-uuid", "point_in_time_minutes": 5 },
+    { "station_uuid": "replace-with-station-c-uuid", "point_in_time_minutes": 10 }
+  ],
+  "direction_two_itinerary": [
+    { "station_uuid": "replace-with-station-c-uuid", "point_in_time_minutes": 0 },
+    { "station_uuid": "replace-with-station-b-uuid", "point_in_time_minutes": 5 },
+    { "station_uuid": "replace-with-station-a-uuid", "point_in_time_minutes": 10 }
+  ]
+}
+
+###
+
+### Update a line (same structure as POST)
+PUT {{base}}/line/{{line_uuid}}
+Content-Type: application/json
+
+{
+  "label": "TX",
+  "means_of_transport_uuid": "replace-with-mot-uuid",
+  "terminal_stop_one_uuid": "replace-with-station-a-uuid",
+  "terminal_stop_two_uuid": "replace-with-station-c-uuid",
+  "direction_one_itinerary": [
+    { "station_uuid": "replace-with-station-a-uuid", "point_in_time_minutes": 0 },
+    { "station_uuid": "replace-with-station-b-uuid", "point_in_time_minutes": 6 },
+    { "station_uuid": "replace-with-station-c-uuid", "point_in_time_minutes": 12 }
+  ],
+  "direction_two_itinerary": [
+    { "station_uuid": "replace-with-station-c-uuid", "point_in_time_minutes": 0 },
+    { "station_uuid": "replace-with-station-b-uuid", "point_in_time_minutes": 6 },
+    { "station_uuid": "replace-with-station-a-uuid", "point_in_time_minutes": 12 }
+  ]
+}
+
+###
+
+### Delete a line
+DELETE {{base}}/line/{{line_uuid}}

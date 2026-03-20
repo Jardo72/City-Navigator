@@ -1,0 +1,133 @@
+# City Navigator - Query Service
+# VS Code REST Client extension (humao.rest-client)
+#
+# Usage:
+#   - Click "Send Request" above any ### block to execute it
+
+###############################################################################
+# Variables
+###############################################################################
+
+@base = http://localhost/city-navigator/api/query
+
+
+###############################################################################
+# Means of Transport
+###############################################################################
+
+### Get all means of transport (with their lines)
+GET {{base}}/means-of-transport
+
+
+###############################################################################
+# Stations
+###############################################################################
+
+### Get all stations (with lines served)
+GET {{base}}/stations
+
+###
+
+### Get stations with wildcard filter
+GET {{base}}/stations?filter=Karl*
+
+###
+
+### Get stations with wildcard filter
+GET {{base}}/stations?filter=West*
+
+###
+
+### Get stations with wildcard filter (mid-word)
+GET {{base}}/stations?filter=*platz*
+
+###
+
+### Get one station by name
+GET {{base}}/station?name=Karlsplatz
+
+###
+
+### Get one station by name
+GET {{base}}/station?name=Westbahnhof
+
+
+###############################################################################
+# Lines
+###############################################################################
+
+### Get all lines
+GET {{base}}/lines
+
+###
+
+### Get lines filtered by means of transport
+GET {{base}}/lines?means_of_transport=U-Bahn
+
+###
+
+### Get lines filtered by means of transport (S-Bahn)
+GET {{base}}/lines?means_of_transport=S-Bahn
+
+###
+
+### Get lines filtered by means of transport (Tram)
+GET {{base}}/lines?means_of_transport=Tram
+
+###
+
+### Get lines filtered by means of transport (Bus)
+GET {{base}}/lines?means_of_transport=Bus
+
+###
+
+### Get one line by label (with full itinerary and transfer info)
+GET {{base}}/line?label=U1
+
+###
+
+### Get one line by label
+GET {{base}}/line?label=U3
+
+
+###############################################################################
+# Journey Planner
+###############################################################################
+
+### Journey from Karlsplatz to Stephansplatz (single line, single stop)
+GET {{base}}/journey-plan?start=Karlsplatz&destination=Stephansplatz
+
+###
+
+### Journey from Westbahnhof to Simmering (single line, multiple stops)
+GET {{base}}/journey-plan?start=Westbahnhof&destination=Simmering
+
+###
+
+### Journey from Taborstrasse to Oberlaa (requires transfers)
+GET {{base}}/journey-plan?start=Taborstrasse&destination=Oberlaa
+
+###
+
+### Journey from Reumannplatz to Stadlau (requires transfers)
+GET {{base}}/journey-plan?start=Reumannplatz&destination=Stadlau
+
+###
+
+### Journey from Aspernstrasse to Rennweg (requires transfers)
+GET {{base}}/journey-plan?start=Aspernstrasse&destination=Rennweg
+
+###
+
+### Journey from Traisengasse to Nordwestbahnstrasse (requires transfers)
+GET {{base}}/journey-plan?start=Traisengasse&destination=Nordwestbahnstrasse
+
+###
+
+### Journey - unknown start (expect 404)
+GET {{base}}/journey-plan?start=Atlantis&destination=Karlsplatz
+
+###
+
+### Journey - unknown destination (expect 404)
+GET {{base}}/journey-plan?start=Praterstern&destination=Aardwarkstrasse
