@@ -81,10 +81,10 @@ pip install -r requirements.txt
 python main.py <config-file> [-s <summary-output-file>]
 ```
 
-Example using the provided Docker Compose configuration:
+Example using the provided test configurations for Docker Compose deployment:
 ```bash
-python main.py docker-compose-load-test-cfg.json
-python main.py docker-compose-load-test-cfg.json -s results.html
+python main.py docker-compose-test-cfg/load-test-cfg.json
+python main.py docker-compose-test-cfg/load-test-cfg.json -s results.html
 ```
 
 The `-s` option saves the summary as an HTML file in addition to printing it to stdout. The HTML file preserves the colours and table formatting from the terminal output.
@@ -130,3 +130,14 @@ The configuration is a JSON file. Example (`docker-compose-load-test-cfg.json`):
 | `station_filter_threads` | yes | Number of threads calling `/stations` with a random wildcard filter |
 
 Set any thread count to `0` to skip that endpoint entirely.
+
+### Test configurations for Docker Compose deployment
+
+The `docker-compose-test-cfg/` directory contains four ready-to-use test configurations, all targeting `http://localhost/city-navigator/api/query` with a 20-minute test duration:
+
+| File | Description |
+|---|---|
+| `load-test-cfg.json` | Heavy mixed load — 4 journey-plan threads, 2 station-query threads, 1 line-query thread, 1 station-filter thread; 2% error rate on journey-plan, line-query, and station-query |
+| `moderate-load-with-errors-cfg.json` | Moderate mixed load — 1 thread per endpoint; 1% error rate on journey-plan, line-query, and station-query |
+| `moderate-load-without-errors-cfg.json` | Moderate mixed load — 1 thread per endpoint; no intentional errors (clean traffic only) |
+| `pure-journey-plan-search-load-test-cfg.json` | Journey-plan stress test — 8 journey-plan threads only, all other endpoints disabled, no errors |
