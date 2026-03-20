@@ -20,7 +20,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from logging import getLogger
-from time import sleep
+from time import perf_counter, sleep
 from typing import Callable, List, TypeVar
 
 from sqlalchemy.orm import Session
@@ -50,7 +50,7 @@ def _invoke_with_retries(func: Callable[[], T], retries: int = 5, delay_sec: int
         try:
             return func()
         except Exception as e:
-            _logger.warning(f"Attempt {attempt}/{retries} failed for {func.__name__} with error: {str(e)}")
+            _logger.warning(f"Attempt {attempt}/{retries} failed ({func.__name__}): {str(e)}")
             if attempt < retries:
                 _logger.info(f"Will retry {func.__name__} after {delay_sec} seconds...")
                 sleep(delay_sec)
@@ -61,35 +61,35 @@ def _invoke_with_retries(func: Callable[[], T], retries: int = 5, delay_sec: int
             
 
 def _retrieve_means_of_transport() -> List[MeansOfTransportMaster]:
-    def repeatable_func() -> List[MeansOfTransportMaster]:
+    def repeatable_retrieve_means_of_transport() -> List[MeansOfTransportMaster]:
         client = MasterDataClient(Config.get_master_data_service_base_url())
         return client.get_means_of_transport_list()
-    return _invoke_with_retries(repeatable_func)
+    return _invoke_with_retries(repeatable_retrieve_means_of_transport)
 
 
 def _retrieve_stations() -> List[StationMaster]:
-    def repeatable_func() -> List[StationMaster]:
+    def repeatable_retrieve_stations() -> List[StationMaster]:
         client = MasterDataClient(Config.get_master_data_service_base_url())
         return client.get_station_list()
-    return _invoke_with_retries(repeatable_func)
+    return _invoke_with_retries(repeatable_retrieve_stations)
 
 
 def _retrieve_lines() -> List[LineMaster]:
-    def repeatable_func() -> List[LineMaster]:
+    def repeatable_retrieve_lines() -> List[LineMaster]:
         client = MasterDataClient(Config.get_master_data_service_base_url())
         return client.get_line_list()
-    return _invoke_with_retries(repeatable_func)
+    return _invoke_with_retries(repeatable_retrieve_lines)
 
 
 def _retrieve_line_details(uuid: str) -> LineDetailsMaster:
-    def repeatable_func() -> LineDetailsMaster:
+    def repeatable_retrieve_line_details() -> LineDetailsMaster:
         client = MasterDataClient(Config.get_master_data_service_base_url())
         return client.get_line(uuid)
-    return _invoke_with_retries(repeatable_func)
+    return _invoke_with_retries(repeatable_retrieve_line_details)
 
 
 def _retrieve_from_master_data_service() -> RetrievalResult:
-    TIMEOUT_SEC = 15
+    TIMEOUT_SEC = 150
     with ThreadPoolExecutor(max_workers=6) as executor:
         lines_future = executor.submit(_retrieve_lines)
         means_of_transport_future = executor.submit(_retrieve_means_of_transport)
@@ -129,12 +129,14 @@ def _import_lines(db: Session, line_list: List[LineDetailsMaster]) -> None:
 
 
 def init_db_from_master_data(db: Session) -> None:
+    start = perf_counter()
     try:
         retrieval_result = _retrieve_from_master_data_service()
         _logger.info("All data retrieved from master data service")
         _import_means_of_transport(db, retrieval_result.means_of_transport)
         _import_stations(db, retrieval_result.stations)
         _import_lines(db, retrieval_result.lines)
+        _logger.info("Initialization completed in %.1f seconds", perf_counter() - start)
     except Exception as e:
-        _logger.exception("Failed to initialize in-memory database with data from master data service")
+        _logger.exception("Initialization failed after %.1f seconds", perf_counter() - start)
         raise e
