@@ -20,7 +20,7 @@
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from logging import getLogger
-from time import sleep
+from time import perf_counter, sleep
 from typing import Callable, List, TypeVar
 
 from sqlalchemy.orm import Session
@@ -129,12 +129,14 @@ def _import_lines(db: Session, line_list: List[LineDetailsMaster]) -> None:
 
 
 def init_db_from_master_data(db: Session) -> None:
+    start = perf_counter()
     try:
         retrieval_result = _retrieve_from_master_data_service()
         _logger.info("All data retrieved from master data service")
         _import_means_of_transport(db, retrieval_result.means_of_transport)
         _import_stations(db, retrieval_result.stations)
         _import_lines(db, retrieval_result.lines)
+        _logger.info("Initialization completed in %.1f seconds", perf_counter() - start)
     except Exception as e:
-        _logger.exception("Failed to initialize in-memory database with data from master data service")
+        _logger.exception("Initialization failed after %.1f seconds", perf_counter() - start)
         raise e
