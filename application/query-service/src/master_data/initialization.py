@@ -89,7 +89,7 @@ def _retrieve_line_details(uuid: str) -> LineDetailsMaster:
 
 
 def _retrieve_from_master_data_service() -> RetrievalResult:
-    TIMEOUT_SEC = 15
+    TIMEOUT_SEC = 150
     with ThreadPoolExecutor(max_workers=6) as executor:
         lines_future = executor.submit(_retrieve_lines)
         means_of_transport_future = executor.submit(_retrieve_means_of_transport)
