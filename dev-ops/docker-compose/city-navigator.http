@@ -11,8 +11,8 @@
 # Variables
 ###############################################################################
 
-@master_data_base = http://localhost:8000
-@query_base       = http://localhost:8001
+@master_data_base = http://localhost/city-navigator/api/master-data
+@query_base       = http://localhost/city-navigator/api/query
 
 # Fill in after running POST /means-of-transport
 @mot_uuid = replace-with-uuid-from-post-response
