@@ -1,13 +1,13 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" version="29.6.1" pages="5">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36 Edg/146.0.0.0" version="29.6.4" pages="5">
   <diagram name="Intro" id="td90Jc71w7WoLc1_VMvt">
     <mxGraphModel dx="1418" dy="826" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="jS8inF2OW49c97-KV4zA-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="query-service&lt;br&gt;(Python + FastAPI + SQLAlchemy)" vertex="1">
+        <mxCell id="jS8inF2OW49c97-KV4zA-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" value="query-service&lt;br&gt;(Python + FastAPI + SQLAlchemy)" vertex="1">
           <mxGeometry height="120" width="220" x="990" y="200" as="geometry" />
         </mxCell>
-        <mxCell id="jS8inF2OW49c97-KV4zA-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="master-data-service&lt;br&gt;(Python + FastAPI + SQLAlchemy)" vertex="1">
+        <mxCell id="jS8inF2OW49c97-KV4zA-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" value="master-data-service&lt;br&gt;(Python + FastAPI + SQLAlchemy)" vertex="1">
           <mxGeometry height="120" width="230" x="310" y="320" as="geometry" />
         </mxCell>
         <mxCell id="jS8inF2OW49c97-KV4zA-4" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="RDBMS (PostgreSQL)" vertex="1">
@@ -16,7 +16,7 @@
         <mxCell id="jS8inF2OW49c97-KV4zA-5" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="in-memory DB (SQLite)" vertex="1">
           <mxGeometry height="69" width="140" x="1030" y="241" as="geometry" />
         </mxCell>
-        <mxCell id="jS8inF2OW49c97-KV4zA-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Pub/sub (Redis)" vertex="1">
+        <mxCell id="jS8inF2OW49c97-KV4zA-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;shadow=1;" value="Pub/sub (Redis)" vertex="1">
           <mxGeometry height="120" width="160" x="710" y="320" as="geometry" />
         </mxCell>
         <mxCell id="jS8inF2OW49c97-KV4zA-7" edge="1" parent="1" source="jS8inF2OW49c97-KV4zA-3" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontStyle=1" target="jS8inF2OW49c97-KV4zA-6" value="&amp;nbsp;update notifications&amp;nbsp;">
@@ -25,7 +25,7 @@
             <mxPoint x="840" y="520" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="jS8inF2OW49c97-KV4zA-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="query-service&lt;br&gt;(Python + FastAPI + SQLAlchemy)" vertex="1">
+        <mxCell id="jS8inF2OW49c97-KV4zA-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" value="query-service&lt;br&gt;(Python + FastAPI + SQLAlchemy)" vertex="1">
           <mxGeometry height="120" width="220" x="990" y="440" as="geometry" />
         </mxCell>
         <mxCell id="jS8inF2OW49c97-KV4zA-9" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fontStyle=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="in-memory DB (SQLite)" vertex="1">
@@ -48,7 +48,7 @@
             <mxGeometry height="40" width="80" x="1060" y="350" as="geometry" />
           </mxCell>
         </UserObject>
-        <mxCell id="OrpNTJkF6eCwfLd71Gzl-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="data-importer&lt;br&gt;(Python + SQLAlchemy)" vertex="1">
+        <mxCell id="OrpNTJkF6eCwfLd71Gzl-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;shadow=1;" value="data-importer&lt;br&gt;(Python + SQLAlchemy)" vertex="1">
           <mxGeometry height="120" width="160" x="130" y="540" as="geometry" />
         </mxCell>
         <mxCell id="OrpNTJkF6eCwfLd71Gzl-2" edge="1" parent="1" source="OrpNTJkF6eCwfLd71Gzl-1" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" target="jS8inF2OW49c97-KV4zA-4" value="">
@@ -60,7 +60,7 @@
         <mxCell id="OrpNTJkF6eCwfLd71Gzl-4" parent="1" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="city plan&lt;br&gt;(JSON)" vertex="1">
           <mxGeometry height="100" width="80" x="170" y="330" as="geometry" />
         </mxCell>
-        <mxCell id="OrpNTJkF6eCwfLd71Gzl-5" edge="1" parent="1" source="OrpNTJkF6eCwfLd71Gzl-4" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" target="OrpNTJkF6eCwfLd71Gzl-1" value="import master data">
+        <mxCell id="OrpNTJkF6eCwfLd71Gzl-5" edge="1" parent="1" source="OrpNTJkF6eCwfLd71Gzl-4" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;fontStyle=1" target="OrpNTJkF6eCwfLd71Gzl-1" value="import master data">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <Array as="points">
               <mxPoint x="210" y="490" />
@@ -69,7 +69,7 @@
             <mxPoint x="80" y="430" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="BZu6NJo4itVXI9sW3Jyy-1" edge="1" parent="1" source="jS8inF2OW49c97-KV4zA-4" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="jS8inF2OW49c97-KV4zA-3" value="read/write master data">
+        <mxCell id="BZu6NJo4itVXI9sW3Jyy-1" edge="1" parent="1" source="jS8inF2OW49c97-KV4zA-4" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontStyle=1" target="jS8inF2OW49c97-KV4zA-3" value="read/write master data">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
             <mxPoint x="600" y="670" as="sourcePoint" />
             <mxPoint x="650" y="620" as="targetPoint" />
@@ -91,6 +91,30 @@
             </Array>
             <mxPoint x="540" y="520" as="sourcePoint" />
             <mxPoint x="760" y="550" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gx9fHzlO5r9Bo7i79Te2-1" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontStyle=1" value="Admin" vertex="1">
+          <mxGeometry height="60" width="30" x="220" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="gx9fHzlO5r9Bo7i79Te2-2" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontStyle=1" value="Passenger" vertex="1">
+          <mxGeometry height="60" width="30" x="1380" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="gx9fHzlO5r9Bo7i79Te2-3" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;entryX=0.291;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;fontStyle=1" target="jS8inF2OW49c97-KV4zA-3" value="manage master data">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="260" y="180" as="sourcePoint" />
+            <mxPoint x="310" y="191" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gx9fHzlO5r9Bo7i79Te2-4" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontStyle=1" target="jS8inF2OW49c97-KV4zA-2" value="query stations, lines&lt;div&gt;and journey plans&lt;/div&gt;">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1370" y="360" as="sourcePoint" />
+            <mxPoint x="1320" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gx9fHzlO5r9Bo7i79Te2-5" edge="1" parent="1" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" target="jS8inF2OW49c97-KV4zA-8" value="&lt;span style=&quot;font-weight: 700;&quot;&gt;query stations, lines&lt;/span&gt;&lt;div style=&quot;font-weight: 700;&quot;&gt;and journey plans&lt;/div&gt;">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1370" y="380" as="sourcePoint" />
+            <mxPoint x="1300" y="610" as="targetPoint" />
           </mxGeometry>
         </mxCell>
       </root>
