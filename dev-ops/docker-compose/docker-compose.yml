@@ -92,6 +92,10 @@ services:
         source: ./access-logs
         target: /access-logs
         read_only: false
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
+        read_only: false
     deploy:
       resources:
         reservations:
@@ -131,6 +135,10 @@ services:
       - type: bind
         source: ./access-logs
         target: /access-logs
+        read_only: false
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
         read_only: false
     deploy:
       mode: replicated
@@ -207,6 +215,10 @@ services:
       - type: bind
         source: ./access-logs
         target: /access-logs
+        read_only: false
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
         read_only: false
     ports:
       - 9099:8000
