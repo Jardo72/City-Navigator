@@ -238,6 +238,51 @@ services:
     ports:
       - 3000:3000
 
+  loki:
+    image: grafana/loki
+    profiles:
+      - logging
+    networks:
+      - monitoring-network
+    volumes:
+      - type: bind
+        source: ./loki
+        target: /etc/loki
+        read_only: true
+    command: -config.file=/etc/loki/loki-config.yml
+    ports:
+      - 3100:3100
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
+  promtail:
+    image: grafana/promtail
+    profiles:
+      - logging
+    depends_on:
+      loki:
+        condition: service_started
+    networks:
+      - monitoring-network
+    volumes:
+      - type: bind
+        source: ./promtail
+        target: /etc/promtail
+        read_only: true
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
+        read_only: true
+    command: -config.file=/etc/promtail/promtail-config.yml
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
 networks:
   service-network:
     driver: bridge
