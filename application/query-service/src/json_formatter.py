@@ -22,7 +22,7 @@ from pythonjsonlogger.json import JsonFormatter as _JsonFormatter
 
 class JsonFormatter(_JsonFormatter):
 
-    def __init__(self):
+    def __init__(self, fmt=None, datefmt=None, style="%", validate=True, **kwargs):
         super().__init__(
             fmt="%(asctime)s %(levelname)s %(name)s %(message)s",
             rename_fields={
