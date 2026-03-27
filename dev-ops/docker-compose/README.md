@@ -9,7 +9,11 @@ This deployment involves a single instance of each of the two microservices comp
 - Redis serving as pub/sub messaging used to deliver notifications from the master data service to all query service instances.
 - Prometheus server configured to scrape metrics from both microservices.
 - Prometheus HTTP discovery service allowing Prometheus to discover all instances of the microservices, even in deployments with two or more instances of any of the service.
-- Grafana configured to use the Prometheus server as a data source.
+- Grafana configured to use Prometheus and (optionally) Loki as data sources.
+
+The following containers are optional and only started when the `logging` profile is activated:
+- Loki — log aggregation backend.
+- Promtail — log collector that reads structured application logs from a shared volume and forwards them to Loki.
 
 
 ## Prerequisites
@@ -19,9 +23,14 @@ This deployment involves a single instance of each of the two microservices comp
 
 ## Starting and Stopping
 
-Start all services:
+Start all services (without the logging stack):
 ```bash
 docker compose up -d --wait
+```
+
+Start all services including the Loki + Promtail logging stack:
+```bash
+docker compose --profile logging up -d --wait
 ```
 
 Docker Compose handles the startup ordering automatically: PostgreSQL starts first and becomes healthy, then the data importer runs and populates the database, and only then the master data service starts. The `--wait` flag makes the command block until all services have started successfully.
@@ -52,8 +61,9 @@ The most notable aspects of the startup ordering:
 | Prometheus | 9090 | Metrics scraping and query UI |
 | Grafana | 3000 | Dashboards (admin / GrafanaSecret#37) |
 | HTTP Service Discovery | 9099 | Prometheus HTTP SD endpoint |
+| Loki *(logging profile)* | 3100 | Log aggregation backend |
 
-PostgreSQL, Redis, the data importer, the two microservices, and Nginx are on an internal `service-network` and are not directly exposed to the host (except Nginx on port 80). Prometheus and Grafana share a separate `monitoring-network`.
+PostgreSQL, Redis, the data importer, the two microservices, and Nginx are on an internal `service-network` and are not directly exposed to the host (except Nginx on port 80). Prometheus, Grafana, Loki, and Promtail share a separate `monitoring-network`.
 
 
 ## Nginx HTTP Router
@@ -100,6 +110,21 @@ Grafana is pre-provisioned with a Prometheus data source and three dashboards. T
 ![grafana-query-service-aggregated-dashboard](./screenshots/grafana-query-service-aggregated-dashboard.png)
 
 
+## Structured Application Logging (Loki + Promtail)
+
+The three Python services (master-data-service, query-service, http-service-discovery) write structured JSON application logs to the [./app-logs](./app-logs) directory via a `RotatingFileHandler` (10 MB per file, 5 backups). Each service produces its own log file:
+
+| Service | Log file |
+|---|---|
+| master-data-service | `app-logs/master-data-service.log` |
+| query-service | `app-logs/query-service.log` |
+| http-service-discovery | `app-logs/http-service-discovery.log` |
+
+Each log entry is a JSON object with `timestamp`, `level`, `logger`, and `message` fields (plus `exception` when an exception is logged).
+
+When the `logging` profile is active, Promtail collects these files and forwards them to Loki. Grafana is pre-provisioned with Loki as a second data source alongside Prometheus, so logs can be explored in the Explore view or correlated with metrics in dashboards. Log files are gitignored; see [./app-logs/README.md](./app-logs/README.md).
+
+
 ## HTTP Access Logs
 
-HTTP access logs for all three services (master-data-service, query-service, http-service-discovery) are written to the [./access-logs](./access-logs) directory, which is bind-mounted into each container. Log files are gitignored; see [./access-logs/README.md](./access-logs/README.md).
+HTTP access logs for all three services (master-data-service, query-service, http-service-discovery) are written to the [./access-logs](./access-logs) directory, which is bind-mounted into each container. These are separate from the structured application logs described above. Log files are gitignored; see [./access-logs/README.md](./access-logs/README.md).
