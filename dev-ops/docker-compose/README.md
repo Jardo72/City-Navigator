@@ -35,10 +35,17 @@ docker compose --profile logging up -d --wait
 
 Docker Compose handles the startup ordering automatically: PostgreSQL starts first and becomes healthy, then the data importer runs and populates the database, and only then the master data service starts. The `--wait` flag makes the command block until all services have started successfully.
 
-Stop all services:
+Stop all services (without the logging stack):
 ```bash
 docker compose down
 ```
+
+Stop all services including the Loki + Promtail logging stack:
+```bash
+docker compose --profile logging down
+```
+
+The profile must match what was used during `up` — omitting it will leave Loki and Promtail containers running.
 
 
 ## Service Dependencies
