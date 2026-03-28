@@ -17,7 +17,12 @@
 # limitations under the License.
 #
 
+from socket import gethostname
+
 from pythonjsonlogger.json import JsonFormatter as _JsonFormatter
+
+
+_HOSTNAME = gethostname()
 
 
 class JsonFormatter(_JsonFormatter):
@@ -34,6 +39,7 @@ class JsonFormatter(_JsonFormatter):
 
     def add_fields(self, log_record, record, message_dict):
         super().add_fields(log_record, record, message_dict)
+        log_record["instance"] = _HOSTNAME
         if record.exc_info:
             exc_type, exc_value, _ = record.exc_info
             log_record["exception"] = {
