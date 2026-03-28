@@ -116,14 +116,14 @@ def _consume_master_data_notifications(redis: Redis) -> None:
 
     while True:
         message = pubsub.get_message(timeout=15)
-        _logger.info("Message received: %s", message)
+        _logger.debug("Message received: %s", message)
         if _is_irrelevant(message):
             _logger.debug("Ignoring irrelevant message")
             continue
         event = _extract_event_details(message)
-        _logger.debug("Event = %s", event)
         if event is None:
             continue
+        _logger.info("Event = %s", event)
         _process_event(event)
 
 

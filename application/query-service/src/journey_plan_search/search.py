@@ -59,6 +59,6 @@ def _build_distance_table(start: Station) -> DistanceTable:
 
 
 def find_shortest_path(start: Station, destination: Station) -> ShortestPathSearchResult:
-    _logger.info("Going to search path from %s to %s", start.name, destination.name)
+    _logger.debug("Going to search path from %s to %s", start.name, destination.name)
     distance_table = _build_distance_table(start)
     return distance_table.backtrack_shortest_path(destination)
