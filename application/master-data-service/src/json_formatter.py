@@ -31,3 +31,15 @@ class JsonFormatter(_JsonFormatter):
                 "name": "logger",
             },
         )
+
+    def add_fields(self, log_record, record, message_dict):
+        super().add_fields(log_record, record, message_dict)
+        if record.exc_info:
+            exc_type, exc_value, _ = record.exc_info
+            log_record["exception"] = {
+                "class": exc_type.__name__,
+                "message": str(exc_value),
+                "traceback": self.formatException(record.exc_info),
+            }
+            record.exc_info = None
+            record.exc_text = None
