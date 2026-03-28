@@ -20,6 +20,7 @@ In addition, the query service also collects the number of notifications from ma
 City-Navigator/
 ├── application/                 # Application source code
 │   ├── data-importer/           # Imports city plan data into PostgreSQL on startup
+│   ├── foundation/              # Shared library copied into each service image at build time
 │   ├── http-service-discovery/  # HTTP service discovery for Prometheus (Docker Compose; both services)
 │   ├── master-data-service/     # REST API for managing master data (CRUD)
 │   ├── postgres/                # Custom PostgreSQL image with DB init scripts
@@ -87,20 +88,20 @@ The Docker Compose and Minikube deployments use pre-built images published to Do
 If you want to build the images yourself — for example after modifying the source code — run the following commands from the `application/` directory. Each service has its own `Dockerfile`:
 
 ```bash
-# data-importer
-docker build -t jardo72/city-navigator-data-importer:latest application/data-importer
+# data-importer (build context: application/data-importer)
+docker build -f application/data-importer/Dockerfile -t jardo72/city-navigator-data-importer:latest application/data-importer
 
-# master-data-service
-docker build -t jardo72/city-navigator-master-data-service:latest application/master-data-service
+# master-data-service (build context: application/ — foundation/ is included)
+docker build -f application/master-data-service/Dockerfile -t jardo72/city-navigator-master-data-service:latest application
 
-# query-service
-docker build -t jardo72/city-navigator-query-service:latest application/query-service
+# query-service (build context: application/ — foundation/ is included)
+docker build -f application/query-service/Dockerfile -t jardo72/city-navigator-query-service:latest application
 
-# http-service-discovery
-docker build -t jardo72/city-navigator-http-service-discovery:latest application/http-service-discovery
+# http-service-discovery (build context: application/ — foundation/ is included)
+docker build -f application/http-service-discovery/Dockerfile -t jardo72/city-navigator-http-service-discovery:latest application
 
-# postgres (custom image with init scripts)
-docker build -t jardo72/city-navigator-postgres:latest application/postgres
+# postgres (build context: application/postgres)
+docker build -f application/postgres/Dockerfile -t jardo72/city-navigator-postgres:latest application/postgres
 ```
 
 On Windows, the [build-and-push-images.cmd](./application/build-and-push-images.cmd) script builds and pushes all images in one step.
