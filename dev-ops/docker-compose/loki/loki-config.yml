@@ -1,5 +1,5 @@
 #
-# Copyright 2023 Jaroslav Chmurny
+# Copyright 2026 Jaroslav Chmurny
 #
 # This file is part of City Navigator.
 #
@@ -17,27 +17,30 @@
 # limitations under the License.
 #
 
-FROM python:3.13-slim-bookworm
+auth_enabled: false
 
-WORKDIR /usr/src/app
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9096
 
-COPY requirements.txt ./
-COPY src ./
+common:
+  instance_addr: 127.0.0.1
+  path_prefix: /tmp/loki
+  storage:
+    filesystem:
+      chunks_directory: /tmp/loki/chunks
+      rules_directory: /tmp/loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
 
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir gunicorn uvloop
-RUN rm requirements.txt
-
-USER 1000:1000
-
-EXPOSE 8000
-
-ENV ACCESS_LOG=${ACCESS_LOG:-/proc/1/fd/1}
-ENV LOG_CONFIG=/usr/src/app/logging.ini
-
-ENTRYPOINT /usr/local/bin/gunicorn \
-    -b 0.0.0.0:8000 \
-    -w 1 \
-    -k uvicorn.workers.UvicornWorker main:app \
-    --log-config ${LOG_CONFIG} \
-    --access-logfile ${ACCESS_LOG}
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h

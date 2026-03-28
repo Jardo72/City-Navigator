@@ -140,4 +140,5 @@ The `docker-compose-test-cfg/` directory contains four ready-to-use test configu
 | `load-test-cfg.json` | Heavy mixed load — 4 journey-plan threads, 2 station-query threads, 1 line-query thread, 1 station-filter thread; 2% error rate on journey-plan, line-query, and station-query |
 | `moderate-load-with-errors-cfg.json` | Moderate mixed load — 1 thread per endpoint; 1% error rate on journey-plan, line-query, and station-query |
 | `moderate-load-without-errors-cfg.json` | Moderate mixed load — 1 thread per endpoint; no intentional errors (clean traffic only) |
+| `short-moderate-load-without-errors-cfg.json` | Short moderate mixed load — 1 thread per endpoint; no intentional errors; 2-minute duration (quick smoke/regression check) |
 | `pure-journey-plan-search-load-test-cfg.json` | Journey-plan stress test — 8 journey-plan threads only, all other endpoints disabled, no errors |

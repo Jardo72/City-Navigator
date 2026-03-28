@@ -79,6 +79,7 @@ services:
       - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/master-data
       - ACCESS_LOG=/access-logs/master-data-service-access.log
+      - LOG_CONFIG=/usr/src/app/logging.ini
       - DATABASE_URL=postgresql://master_data_svc_tu:T0pS3cr3tP8ssw0rd@postgres-db:5432/city_navigator
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
@@ -89,8 +90,16 @@ services:
       - service-network
     volumes:
       - type: bind
+        source: ./master-data-service/logging.ini
+        target: /usr/src/app/logging.ini
+        read_only: true
+      - type: bind
         source: ./access-logs
         target: /access-logs
+        read_only: false
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
         read_only: false
     deploy:
       resources:
@@ -119,6 +128,7 @@ services:
       - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/query
       - ACCESS_LOG=/access-logs/query-service-access.log
+      - LOG_CONFIG=/usr/src/app/logging.ini
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
@@ -129,8 +139,16 @@ services:
       - service-network
     volumes:
       - type: bind
+        source: ./query-service/logging.ini
+        target: /usr/src/app/logging.ini
+        read_only: true
+      - type: bind
         source: ./access-logs
         target: /access-logs
+        read_only: false
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
         read_only: false
     deploy:
       mode: replicated
@@ -198,6 +216,7 @@ services:
     image: jardo72/city-navigator-http-service-discovery:latest
     environment:
       - ACCESS_LOG=/access-logs/http-service-discovery-access.log
+      - LOG_CONFIG=/usr/src/app/logging.ini
     expose:
       - 8000
     networks:
@@ -205,8 +224,16 @@ services:
       - monitoring-network
     volumes:
       - type: bind
+        source: ./http-service-discovery/logging.ini
+        target: /usr/src/app/logging.ini
+        read_only: true
+      - type: bind
         source: ./access-logs
         target: /access-logs
+        read_only: false
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
         read_only: false
     ports:
       - 9099:8000
@@ -237,6 +264,51 @@ services:
         read_only: true
     ports:
       - 3000:3000
+
+  loki:
+    image: grafana/loki
+    profiles:
+      - logging
+    networks:
+      - monitoring-network
+    volumes:
+      - type: bind
+        source: ./loki
+        target: /etc/loki
+        read_only: true
+    command: -config.file=/etc/loki/loki-config.yml
+    ports:
+      - 3100:3100
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
+
+  promtail:
+    image: grafana/promtail
+    profiles:
+      - logging
+    depends_on:
+      loki:
+        condition: service_started
+    networks:
+      - monitoring-network
+    volumes:
+      - type: bind
+        source: ./promtail
+        target: /etc/promtail
+        read_only: true
+      - type: bind
+        source: ./app-logs
+        target: /app-logs
+        read_only: true
+    command: -config.file=/etc/promtail/promtail-config.yml
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        delay: 5s
 
 networks:
   service-network:
