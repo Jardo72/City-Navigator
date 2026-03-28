@@ -21,8 +21,9 @@ FROM python:3.13-slim-bookworm
 
 WORKDIR /usr/src/app
 
-COPY requirements.txt ./
-COPY src ./
+COPY http-service-discovery/requirements.txt ./
+COPY http-service-discovery/src ./
+COPY foundation ./foundation
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir gunicorn uvloop
