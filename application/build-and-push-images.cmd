@@ -5,35 +5,25 @@
 @echo "**************************************************"
 @time /T
 
-@pushd data-importer
 @echo "Going to build data-importer"
-docker build -t jardo72/city-navigator-data-importer:latest .
+docker build -f data-importer/Dockerfile -t jardo72/city-navigator-data-importer:latest data-importer
 docker push jardo72/city-navigator-data-importer:latest
-@popd
 
-@pushd master-data-service
 @echo "Going to build master-data-service"
-docker build -t jardo72/city-navigator-master-data-service:latest .
+docker build -f master-data-service/Dockerfile -t jardo72/city-navigator-master-data-service:latest .
 docker push jardo72/city-navigator-master-data-service:latest
-@popd
 
-@pushd query-service
 @echo "Going to build query-service"
-docker build -t jardo72/city-navigator-query-service:latest .
+docker build -f query-service/Dockerfile -t jardo72/city-navigator-query-service:latest .
 docker push jardo72/city-navigator-query-service:latest
-@popd
 
-@pushd http-service-discovery
 @echo "Going to build HTTP service discovery"
-docker build -t jardo72/city-navigator-http-service-discovery:latest .
+docker build -f http-service-discovery/Dockerfile -t jardo72/city-navigator-http-service-discovery:latest .
 docker push jardo72/city-navigator-http-service-discovery:latest
-@popd
 
-@pushd postgres
 @echo "Going to build PostgreSQL"
-docker build -t jardo72/city-navigator-postgres:latest .
+docker build -f postgres/Dockerfile -t jardo72/city-navigator-postgres:latest postgres
 docker push jardo72/city-navigator-postgres:latest
-@popd
 
 @echo ""
 @echo "**************************************************"

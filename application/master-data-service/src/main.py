@@ -31,7 +31,7 @@ from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from config import Config
-from discovery import DiscoveryServiceClient
+from foundation.discovery import DiscoveryServiceClient
 from rest import router
 
 
@@ -41,7 +41,7 @@ _logger = getLogger("main")
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> None:
     _logger.debug("Going to register service instance with Prometheus discovery")
-    client = DiscoveryServiceClient(Config.get_prometheus_discovery_base_url())
+    client = DiscoveryServiceClient(Config.get_prometheus_discovery_base_url(), "master-data-service")
     client.register()
     client.start_heartbeat(Config.get_heartbeat_interval_seconds())
 

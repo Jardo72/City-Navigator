@@ -1,5 +1,5 @@
 #
-# Copyright 2023 Jaroslav Chmurny
+# Copyright 2026 Jaroslav Chmurny
 #
 # This file is part of City Navigator.
 #
@@ -25,7 +25,7 @@ from time import sleep
 
 import requests
 
-from config import Config
+from ..config import BaseConfig
 
 
 _logger = getLogger("discovery")
@@ -33,14 +33,15 @@ _logger = getLogger("discovery")
 
 class DiscoveryServiceClient:
 
-    def __init__(self, base_url: str) -> None:
+    def __init__(self, base_url: str, service_name: str) -> None:
         self._session = requests.Session()
         self._base_url = base_url
+        self._service_name = service_name
 
     def register(self) -> None:
         request = {
-            "hostname": f"{gethostname()}:{Config.get_app_port()}",
-            "service": "master-data-service"
+            "hostname": f"{gethostname()}:{BaseConfig.get_app_port()}",
+            "service": self._service_name
         }
         _logger.debug("Registering service instance with Prometheus discovery: %s", request)
         response = self._session.post(f"{self._base_url}/target", data=dumps(request))
