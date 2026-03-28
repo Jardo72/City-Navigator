@@ -33,10 +33,11 @@ USER 1000:1000
 EXPOSE 8000
 
 ENV ACCESS_LOG=${ACCESS_LOG:-/proc/1/fd/1}
+ENV LOG_CONFIG=/usr/src/app/logging.ini
 
 ENTRYPOINT /usr/local/bin/gunicorn \
     -b 0.0.0.0:8000 \
     -w 1 \
     -k uvicorn.workers.UvicornWorker main:app \
-    --log-config logging.ini \
+    --log-config ${LOG_CONFIG} \
     --access-logfile ${ACCESS_LOG}
