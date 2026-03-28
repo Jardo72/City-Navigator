@@ -17,9 +17,13 @@
 # limitations under the License.
 #
 
+from os import environ
+
+from foundation.logging_setup import configure_logging
+configure_logging(environ.get("LOG_CONFIG", "/usr/src/app/logging.yaml"))
+
 from datetime import datetime
 from logging import getLogger
-from os import environ
 from socket import gethostname
 from sys import version as python_version
 from threading import Lock

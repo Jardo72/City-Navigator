@@ -80,7 +80,7 @@ services:
       - ROOT_PATH=/city-navigator/api/master-data
       - WORKER_COUNT=4
       - ACCESS_LOG=/access-logs/master-data-service-access.log
-      - LOG_CONFIG=/usr/src/app/logging.ini
+      - LOG_CONFIG=/usr/src/app/logging.yaml
       - DATABASE_URL=postgresql://master_data_svc_tu:T0pS3cr3tP8ssw0rd@postgres-db:5432/city_navigator
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
@@ -91,8 +91,8 @@ services:
       - service-network
     volumes:
       - type: bind
-        source: ./master-data-service/logging.ini
-        target: /usr/src/app/logging.ini
+        source: ./master-data-service/logging.yaml
+        target: /usr/src/app/logging.yaml
         read_only: true
       - type: bind
         source: ./access-logs
@@ -130,7 +130,7 @@ services:
       - ROOT_PATH=/city-navigator/api/query
       - WORKER_COUNT=8
       - ACCESS_LOG=/access-logs/query-service-access.log
-      - LOG_CONFIG=/usr/src/app/logging.ini
+      - LOG_CONFIG=/usr/src/app/logging.yaml
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
@@ -141,8 +141,8 @@ services:
       - service-network
     volumes:
       - type: bind
-        source: ./query-service/logging.ini
-        target: /usr/src/app/logging.ini
+        source: ./query-service/logging.yaml
+        target: /usr/src/app/logging.yaml
         read_only: true
       - type: bind
         source: ./access-logs
@@ -218,7 +218,7 @@ services:
     image: jardo72/city-navigator-http-service-discovery:latest
     environment:
       - ACCESS_LOG=/access-logs/http-service-discovery-access.log
-      - LOG_CONFIG=/usr/src/app/logging.ini
+      - LOG_CONFIG=/usr/src/app/logging.yaml
     expose:
       - 8000
     networks:
@@ -226,8 +226,8 @@ services:
       - monitoring-network
     volumes:
       - type: bind
-        source: ./http-service-discovery/logging.ini
-        target: /usr/src/app/logging.ini
+        source: ./http-service-discovery/logging.yaml
+        target: /usr/src/app/logging.yaml
         read_only: true
       - type: bind
         source: ./access-logs

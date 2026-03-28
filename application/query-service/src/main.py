@@ -17,6 +17,11 @@
 # limitations under the License.
 #
 
+from os import environ
+
+from foundation.logging_setup import configure_logging
+configure_logging(environ.get("LOG_CONFIG", "/usr/src/app/logging.yaml"))
+
 from contextlib import asynccontextmanager
 from logging import getLogger
 from socket import gethostname
