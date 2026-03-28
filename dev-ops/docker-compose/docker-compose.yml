@@ -78,6 +78,7 @@ services:
       # if API doc is enabled, metrics scraping does not work
       - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/master-data
+      - WORKER_COUNT=4
       - ACCESS_LOG=/access-logs/master-data-service-access.log
       - LOG_CONFIG=/usr/src/app/logging.ini
       - DATABASE_URL=postgresql://master_data_svc_tu:T0pS3cr3tP8ssw0rd@postgres-db:5432/city_navigator
@@ -127,6 +128,7 @@ services:
       # if API doc is enabled, metrics scraping does not work
       - API_DOC_ENABLED=no
       - ROOT_PATH=/city-navigator/api/query
+      - WORKER_COUNT=8
       - ACCESS_LOG=/access-logs/query-service-access.log
       - LOG_CONFIG=/usr/src/app/logging.ini
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000

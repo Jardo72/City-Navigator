@@ -40,10 +40,11 @@ EXPOSE ${APP_PORT}
 
 ENV ACCESS_LOG=${ACCESS_LOG:-/proc/1/fd/1}
 ENV LOG_CONFIG=/usr/src/app/logging.ini
+ENV WORKER_COUNT=6
 
 ENTRYPOINT /usr/local/bin/gunicorn \
     -b 0.0.0.0:${APP_PORT} \
-    -w 6 \
+    -w ${WORKER_COUNT} \
     -k uvicorn.workers.UvicornWorker main:app \
     --log-config ${LOG_CONFIG} \
     --access-logfile ${ACCESS_LOG} \
