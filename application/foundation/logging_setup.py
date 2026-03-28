@@ -24,7 +24,8 @@ from string import Template
 import yaml
 
 
-def configure_logging(config_file_path: str) -> None:
+def configure_logging() -> None:
+    config_file_path = environ.get("LOG_CONFIG", "/usr/src/app/logging.yaml")
     with open(config_file_path, "r") as f:
         raw = f.read()
     substituted = Template(raw).safe_substitute(environ)
