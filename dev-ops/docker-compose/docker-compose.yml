@@ -89,6 +89,10 @@ services:
       - service-network
     volumes:
       - type: bind
+        source: ./master-data-service/logging.ini
+        target: /usr/src/app/logging.ini
+        read_only: true
+      - type: bind
         source: ./access-logs
         target: /access-logs
         read_only: false
@@ -132,6 +136,10 @@ services:
     networks:
       - service-network
     volumes:
+      - type: bind
+        source: ./query-service/logging.ini
+        target: /usr/src/app/logging.ini
+        read_only: true
       - type: bind
         source: ./access-logs
         target: /access-logs
@@ -212,6 +220,10 @@ services:
       - service-network
       - monitoring-network
     volumes:
+      - type: bind
+        source: ./http-service-discovery/logging.ini
+        target: /usr/src/app/logging.ini
+        read_only: true
       - type: bind
         source: ./access-logs
         target: /access-logs

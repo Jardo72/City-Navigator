@@ -22,7 +22,6 @@ FROM python:3.13-slim-bookworm
 WORKDIR /usr/src/app
 
 COPY requirements.txt ./
-COPY logging.ini ./
 COPY src ./
 
 RUN pip install --no-cache-dir -r requirements.txt
