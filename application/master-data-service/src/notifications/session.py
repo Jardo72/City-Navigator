@@ -30,9 +30,12 @@ from .dto import Event, EventType
 _logger = getLogger("notifications")
 
 
+_redis_username, _redis_password = Config.get_redis_credentials()
 _pool = ConnectionPool(
     host=Config.get_redis_host(),
     port=Config.get_redis_port(),
+    username=_redis_username,
+    password=_redis_password,
     db=0,
     decode_responses=True,
     max_connections=10

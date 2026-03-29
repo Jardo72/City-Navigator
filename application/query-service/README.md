@@ -18,6 +18,8 @@ The service is configured entirely via environment variables.
 | `MASTER_DATA_SERVICE_BASE_URL` | yes | — | Base URL of the Master Data Service, e.g. `http://master-data-service:8000` |
 | `REDIS_HOST` | yes | — | Hostname of the Redis server used for pub/sub notifications |
 | `REDIS_PORT` | no | `6379` | Port of the Redis server |
+| `REDIS_USERNAME` | no | — | Username for Redis authentication; must be set together with `REDIS_PASSWORD` |
+| `REDIS_PASSWORD` | no | — | Password for Redis authentication; must be set together with `REDIS_USERNAME` |
 | `REDIS_CHANNEL` | no | `city-navigator` | Redis pub/sub channel name (must match the Master Data Service) |
 | `PROMETHEUS_DISCOVERY_BASE_URL` | yes | — | Base URL of the HTTP Service Discovery service, e.g. `http://prometheus-http-discovery:8000` |
 | `ROOT_PATH` | no | _(empty)_ | FastAPI root path; set when the service is behind a reverse proxy, e.g. `/city-navigator/api/query` |
