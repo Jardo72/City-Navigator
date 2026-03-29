@@ -35,25 +35,27 @@ scrape_configs:
         labels:
           job: city-navigator
           service: master-data-service
-          __path__: /app-logs/master-data-service.log
+          __path__: /app-logs/master-data-service-*.log
       - targets:
           - localhost
         labels:
           job: city-navigator
           service: query-service
-          __path__: /app-logs/query-service.log
+          __path__: /app-logs/query-service-*.log
       - targets:
           - localhost
         labels:
           job: city-navigator
           service: http-service-discovery
-          __path__: /app-logs/http-service-discovery.log
+          __path__: /app-logs/http-service-discovery-*.log
     pipeline_stages:
       - json:
           expressions:
             level: level
             logger: logger
             message: message
+            hostname: hostname
       - labels:
           level:
           logger:
+          hostname:
