@@ -27,4 +27,4 @@ class Config(BaseConfig):
     @staticmethod
     @cache
     def get_database_url() -> str:
-        return Config._get_environment_variable("DATABASE_URL")
+        return Config._get_mandatory_env_var("DATABASE_URL")

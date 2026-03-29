@@ -36,49 +36,59 @@ class BaseConfig:
     @staticmethod
     @cache
     def is_api_doc_enabled() -> bool:
-        value = BaseConfig._get_environment_variable("API_DOC_ENABLED", default_value="NO")
+        value = BaseConfig._get_mandatory_env_var("API_DOC_ENABLED", default_value="NO")
         return value.upper() in {"YES", "TRUE", "1"}
 
     @staticmethod
     @cache
     def get_root_path() -> str:
-        return BaseConfig._get_environment_variable("ROOT_PATH", default_value="")
+        return BaseConfig._get_mandatory_env_var("ROOT_PATH", default_value="")
 
     @staticmethod
     @cache
     def get_redis_host() -> str:
-        return BaseConfig._get_environment_variable("REDIS_HOST")
+        return BaseConfig._get_mandatory_env_var("REDIS_HOST")
 
     @staticmethod
     @cache
     def get_redis_port() -> int:
-        value = BaseConfig._get_environment_variable("REDIS_PORT", default_value="6379")
+        value = BaseConfig._get_mandatory_env_var("REDIS_PORT", default_value="6379")
         return int(value)
 
     @staticmethod
     @cache
+    def get_redis_username() -> Optional[str]:
+        return BaseConfig._get_optional_env_var("REDIS_USERNAME")
+
+    @staticmethod
+    @cache
+    def get_redis_password() -> Optional[str]:
+        return BaseConfig._get_optional_env_var("REDIS_PASSWORD")
+
+    @staticmethod
+    @cache
     def get_redis_channel() -> str:
-        return BaseConfig._get_environment_variable("REDIS_CHANNEL", default_value="city-navigator")
+        return BaseConfig._get_mandatory_env_var("REDIS_CHANNEL", default_value="city-navigator")
 
     @staticmethod
     @cache
     def get_app_port() -> int:
-        value = BaseConfig._get_environment_variable("APP_PORT", default_value="8000")
+        value = BaseConfig._get_mandatory_env_var("APP_PORT", default_value="8000")
         return int(value)
 
     @staticmethod
     @cache
     def get_prometheus_discovery_base_url() -> str:
-        return BaseConfig._get_environment_variable("PROMETHEUS_DISCOVERY_BASE_URL")
+        return BaseConfig._get_mandatory_env_var("PROMETHEUS_DISCOVERY_BASE_URL")
 
     @staticmethod
     @cache
     def get_heartbeat_interval_seconds() -> int:
-        value = BaseConfig._get_environment_variable("HEARTBEAT_INTERVAL_SECONDS", default_value="15")
+        value = BaseConfig._get_mandatory_env_var("HEARTBEAT_INTERVAL_SECONDS", default_value="15")
         return int(value)
 
     @staticmethod
-    def _get_environment_variable(name: str, default_value: Optional[str] = None) -> str:
+    def _get_mandatory_env_var(name: str, default_value: Optional[str] = None) -> str:
         result = environ.get(name, None)
         default_used = False
         if result is None and default_value is None:
@@ -88,4 +98,10 @@ class BaseConfig:
             default_used = True
             result = default_value
         _logger.info("Config - env. var = '%s', result = '%s', default used = %s", name, result, default_used)
+        return result
+
+    @staticmethod
+    def _get_optional_env_var(name: str) -> Optional[str]:
+        result = environ.get(name, None)
+        _logger.info("Config - env. var = '%s', defined = %s", name, result is not None)
         return result

@@ -27,4 +27,4 @@ class Config(BaseConfig):
     @staticmethod
     @cache
     def get_master_data_service_base_url() -> str:
-        return Config._get_environment_variable("MASTER_DATA_SERVICE_BASE_URL")
+        return Config._get_mandatory_env_var("MASTER_DATA_SERVICE_BASE_URL")
