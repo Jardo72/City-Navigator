@@ -55,6 +55,7 @@ services:
 
   redis-pubsub:
     image: redis:7-alpine
+    command: redis-server --requirepass R3d1sS3cr3t
     expose:
       - 6379
     networks:
@@ -84,6 +85,8 @@ services:
       - DATABASE_URL=postgresql://master_data_svc_tu:T0pS3cr3tP8ssw0rd@postgres-db:5432/city_navigator
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
+      - REDIS_USERNAME=default
+      - REDIS_PASSWORD=R3d1sS3cr3t
       - PROMETHEUS_DISCOVERY_BASE_URL=http://prometheus-http-discovery:8000
     expose:
       - 8000
@@ -134,6 +137,8 @@ services:
       - MASTER_DATA_SERVICE_BASE_URL=http://master-data-service:8000
       - REDIS_HOST=redis-pubsub
       - REDIS_PORT=6379
+      - REDIS_USERNAME=default
+      - REDIS_PASSWORD=R3d1sS3cr3t
       - PROMETHEUS_DISCOVERY_BASE_URL=http://prometheus-http-discovery:8000
     expose:
       - 8000
