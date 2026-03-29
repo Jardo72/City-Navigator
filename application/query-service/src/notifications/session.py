@@ -128,9 +128,12 @@ def _consume_master_data_notifications(redis: Redis) -> None:
 
 
 def subscribe_master_data_notifications() -> None:
+    username, password = Config.get_redis_credentials()
     redis_client = Redis(
         host=Config.get_redis_host(),
         port=Config.get_redis_port(),
+        username=username,
+        password=password,
         charset="utf-8",
         decode_responses=True
     )

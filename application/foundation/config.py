@@ -20,7 +20,7 @@
 from functools import cache
 from logging import getLogger
 from os import environ
-from typing import Optional
+from typing import Optional, Tuple
 
 
 _logger = getLogger("config")
@@ -29,6 +29,11 @@ _logger = getLogger("config")
 class UndefinedMandatoryEnvironmentVariableError(Exception):
     def __init__(self, variable_name: str) -> None:
         super().__init__(f"Mandatory environment variable '{variable_name}' is not defined")
+
+
+class IncompleteRedisCredentialsError(Exception):
+    def __init__(self) -> None:
+        super().__init__("Incomplete Redis credentials: either both REDIS_USERNAME and REDIS_PASSWORD must be defined, or neither of them")
 
 
 class BaseConfig:
@@ -57,13 +62,12 @@ class BaseConfig:
 
     @staticmethod
     @cache
-    def get_redis_username() -> Optional[str]:
-        return BaseConfig._get_optional_env_var("REDIS_USERNAME")
-
-    @staticmethod
-    @cache
-    def get_redis_password() -> Optional[str]:
-        return BaseConfig._get_optional_env_var("REDIS_PASSWORD")
+    def get_redis_credentials() -> Tuple[Optional[str], Optional[str]]:
+        username = BaseConfig._get_optional_env_var("REDIS_USERNAME")
+        password = BaseConfig._get_optional_env_var("REDIS_PASSWORD")
+        if (username is None) != (password is None):
+            raise IncompleteRedisCredentialsError()
+        return username, password
 
     @staticmethod
     @cache
