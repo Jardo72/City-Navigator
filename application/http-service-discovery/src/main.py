@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+from foundation.logging_setup import configure_logging
+configure_logging()
+
 from datetime import datetime
 from logging import getLogger
 from os import environ

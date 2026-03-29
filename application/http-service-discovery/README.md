@@ -8,7 +8,7 @@ On startup, each Master Data Service and Query Service instance registers itself
 
 Entries that have not been refreshed within the configurable stale threshold (default: 75 seconds, controlled by `STALE_TARGET_THRESHOLD_SECONDS`) are considered stale and are automatically removed from the registry. This ensures that instances which have stopped or crashed are eventually dropped from the Prometheus scrape targets without requiring a manual intervention or a service restart.
 
-The service is implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and runs under Gunicorn with uvicorn workers. All registered targets are held in memory only and are lost on container restart.
+The service is implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and runs under Gunicorn with uvicorn workers. All registered targets are held in memory only and are lost on container restart. Structured JSON logging is provided by [python-json-logger](https://github.com/madzak/python-json-logger); the logging configuration is loaded from a YAML file (see `LOG_CONFIG` below), with support for `${HOSTNAME}` substitution to produce per-instance log files.
 
 
 ## Configuration
@@ -16,6 +16,7 @@ The service is implemented in Python using [FastAPI](https://fastapi.tiangolo.co
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `STALE_TARGET_THRESHOLD_SECONDS` | no | `75` | Number of seconds without a heartbeat after which a registered target is considered stale and removed from the registry. |
+| `LOG_CONFIG` | no | `/usr/src/app/logging.yaml` | Path to the YAML logging configuration file. Supports `${HOSTNAME}` and other environment-variable substitution (via `string.Template.safe_substitute`). |
 | `ACCESS_LOG` | no | `/proc/1/fd/1` | Path for the Gunicorn HTTP access log file. Defaults to stdout. |
 
 

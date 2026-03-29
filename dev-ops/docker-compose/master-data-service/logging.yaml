@@ -1,0 +1,27 @@
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  default:
+    format: "[%(asctime)s.%(msecs)03d] %(levelname)s [%(thread)d] - %(message)s"
+  json:
+    (): foundation.json_formatter.JsonFormatter
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: default
+    stream: ext://sys.stdout
+  logfile:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    filename: /app-logs/master-data-service-${HOSTNAME}.log
+    maxBytes: 10485760
+    backupCount: 5
+    encoding: utf-8
+
+root:
+  level: INFO
+  handlers: [console, logfile]

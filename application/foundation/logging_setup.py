@@ -1,5 +1,5 @@
 #
-# Copyright 2023 Jaroslav Chmurny
+# Copyright 2026 Jaroslav Chmurny
 #
 # This file is part of City Navigator.
 #
@@ -17,27 +17,17 @@
 # limitations under the License.
 #
 
-FROM python:3.13-slim-bookworm
+import logging.config
+from os import environ
+from string import Template
 
-WORKDIR /usr/src/app
+import yaml
 
-COPY http-service-discovery/requirements.txt ./
-COPY http-service-discovery/src ./
-COPY foundation ./foundation
 
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir gunicorn uvloop
-RUN rm requirements.txt
-
-USER 1000:1000
-
-EXPOSE 8000
-
-ENV ACCESS_LOG=${ACCESS_LOG:-/proc/1/fd/1}
-ENV LOG_CONFIG=/usr/src/app/logging.yaml
-
-ENTRYPOINT /usr/local/bin/gunicorn \
-    -b 0.0.0.0:8000 \
-    -w 1 \
-    -k uvicorn.workers.UvicornWorker main:app \
-    --access-logfile ${ACCESS_LOG}
+def configure_logging() -> None:
+    config_file_path = environ.get("LOG_CONFIG", "/usr/src/app/logging.yaml")
+    with open(config_file_path, "r") as f:
+        raw = f.read()
+    substituted = Template(raw).safe_substitute(environ)
+    config = yaml.safe_load(substituted)
+    logging.config.dictConfig(config)
