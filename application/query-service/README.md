@@ -6,7 +6,7 @@ The Query Service is a read-only REST API for passengers. It allows querying mea
 
 Each instance of the service maintains its own in-memory SQLite database. On startup it fetches all data from the Master Data Service in parallel. A background thread then subscribes to a Redis pub/sub channel and applies incremental updates as the master data changes.
 
-The service is implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and [SQLAlchemy](https://www.sqlalchemy.org/), and runs under Gunicorn with uvicorn workers. It is instrumented with the Prometheus Python client and registers itself with an HTTP Service Discovery service on startup.
+The service is implemented in Python using [FastAPI](https://fastapi.tiangolo.com/) and [SQLAlchemy](https://www.sqlalchemy.org/), and runs under Gunicorn with uvicorn workers. It is instrumented with the Prometheus Python client and registers itself with an HTTP Service Discovery service on startup. Structured JSON logging is provided by [python-json-logger](https://github.com/madzak/python-json-logger); the logging configuration is loaded from a YAML file (see `LOG_CONFIG` below), with support for `${HOSTNAME}` substitution to produce per-instance log files.
 
 
 ## Configuration
@@ -22,6 +22,8 @@ The service is configured entirely via environment variables.
 | `PROMETHEUS_DISCOVERY_BASE_URL` | yes | — | Base URL of the HTTP Service Discovery service, e.g. `http://prometheus-http-discovery:8000` |
 | `ROOT_PATH` | no | _(empty)_ | FastAPI root path; set when the service is behind a reverse proxy, e.g. `/city-navigator/api/query` |
 | `API_DOC_ENABLED` | no | `NO` | Set to `YES`, `TRUE`, or `1` to enable the OpenAPI (`/docs`) and ReDoc (`/redoc`) endpoints. **Note:** enabling this disables Prometheus metrics scraping. |
+| `LOG_CONFIG` | no | `/usr/src/app/logging.yaml` | Path to the YAML logging configuration file. Supports `${HOSTNAME}` and other environment-variable substitution (via `string.Template.safe_substitute`). |
+| `WORKER_COUNT` | no | `6` | Number of Gunicorn worker processes. |
 | `ACCESS_LOG` | no | `/proc/1/fd/1` | Path for the Gunicorn HTTP access log file. Defaults to stdout. |
 
 
