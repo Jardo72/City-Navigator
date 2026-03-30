@@ -70,7 +70,7 @@ The most notable aspects of the startup ordering:
 | HTTP Service Discovery | 9099 | Prometheus HTTP SD endpoint |
 | Loki *(logging profile)* | 3100 | Log aggregation backend |
 
-PostgreSQL, Redis, the data importer, the two microservices, and Nginx are on an internal `service-network` and are not directly exposed to the host (except Nginx on port 80). Prometheus, Grafana, Loki, and Promtail share a separate `monitoring-network`.
+PostgreSQL, Redis, the data importer, the two microservices, Nginx, and all monitoring components share a single internal `city-navigator-network`. Only Nginx (port 80), Prometheus (port 9090), Grafana (port 3000), HTTP Service Discovery (port 9099), and Loki (port 3100) are exposed to the host.
 
 
 ## Nginx HTTP Router
