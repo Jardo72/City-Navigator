@@ -10,5 +10,7 @@ deployment order:
 - redis.yml
 - postgres.yml
 - data-importer.yml
-- master-data-service.yml (Mandatory environment variable 'PROMETHEUS_DISCOVERY_BASE_URL' is not defined)
+- master-data-service.yml
 - query-service.yml
+- ingress.yml
+- servicemonitor.yml (unknown CRD - monitoring not installed)
