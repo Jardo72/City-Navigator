@@ -14,3 +14,12 @@ deployment order:
 - query-service.yml
 - ingress.yml
 - servicemonitor.yml (unknown CRD - monitoring not installed)
+
+ingress testing:
+- execute `kubectl get ingress -n city-navigator` to get the IP address(es)
+- map the IP address(es) to the hostname `city-navigator.jch` in your /etc/hosts (or its Windows equivalent)
+- try the following queries
+  - http://city-navigator.jch/api/query/means-of-transport
+  - http://city-navigator.jch/api/query/stations
+  - http://city-navigator.jch/api/query/lines
+  - http://city-navigator.jch/api/query/journey-plan?start=Traisengasse&destination=Nordwestbahnstrasse
