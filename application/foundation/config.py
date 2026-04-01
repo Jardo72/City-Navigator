@@ -82,8 +82,8 @@ class BaseConfig:
 
     @staticmethod
     @cache
-    def get_prometheus_discovery_base_url() -> str:
-        return BaseConfig._get_mandatory_env_var("PROMETHEUS_DISCOVERY_BASE_URL")
+    def get_prometheus_discovery_base_url() -> Optional[str]:
+        return BaseConfig._get_optional_env_var("PROMETHEUS_DISCOVERY_BASE_URL")
 
     @staticmethod
     @cache
