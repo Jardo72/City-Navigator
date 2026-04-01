@@ -48,6 +48,17 @@ spec:
         - name: data-importer
           image: jardo72/city-navigator-data-importer:latest
           imagePullPolicy: Always
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
           args:
             - city-plan.json
-            - postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator:5432/city-navigator
+            - postgresql+psycopg2://$(DB_USERNAME):$(DB_PASSWORD)@postgres-service.city-navigator:5432/city-navigator

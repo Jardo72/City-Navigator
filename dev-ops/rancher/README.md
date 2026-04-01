@@ -15,11 +15,20 @@ Compared to the Docker Compose and Minikube deployments, this deployment has the
 - Rancher Monitoring (kube-prometheus-stack) installed — required for `servicemonitor.yml` and `grafana-dashboards.yml`
 
 
-## Known Limitations
+## Secrets
 
-The PostgreSQL and Redis credentials are currently stored as plaintext in the YAML manifests and in the data importer Job arguments. Kubernetes Secrets should be used instead, but the Secret manifests must **not** be committed to Git. Until this is addressed, create the Secrets manually in the cluster before deploying:
-- Secret for PostgreSQL credentials
-- Secret for Redis credentials
+Credentials are not stored in the YAML manifests in this repository. Instead, a Kubernetes Secret must be created manually in the cluster before deploying. The commands below show the required structure — **replace the placeholder values with real credentials before running**:
+
+```
+kubectl create secret generic postgres-credentials \
+  --namespace city-navigator \
+  --from-literal=username=dbuser \
+  --from-literal=password=changeme
+```
+
+The `postgres-credentials` Secret is referenced by `postgres.yml`, `data-importer.yml`, and `master-data-service.yml`. All three must be deployed after the Secret exists.
+
+> **Note:** Redis does not require authentication in the current deployment — the Redis container runs without a password and the application connects without credentials.
 
 
 ## Local Hostname Setup
@@ -45,6 +54,8 @@ The manifests must be applied in the following order. Later resources depend on 
 ```
 kubectl apply -f namespace.yml
 ```
+
+**Create the Secret** (see [Secrets](#secrets) for the required command — use real credentials, not the placeholders shown there).
 
 **Then apply the remaining manifests in order:**
 ```

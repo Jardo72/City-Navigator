@@ -49,8 +49,18 @@ spec:
               value: "no"
             - name: ROOT_PATH
               value: /city-navigator/api/master-data
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: password
             - name: DATABASE_URL
-              value: postgresql+psycopg2://jardo:heslo@postgres-service.city-navigator:5432/city-navigator
+              value: postgresql+psycopg2://$(DB_USERNAME):$(DB_PASSWORD)@postgres-service.city-navigator:5432/city-navigator
             - name: REDIS_HOST
               value: redis-service.city-navigator
             - name: REDIS_PORT
