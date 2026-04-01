@@ -44,6 +44,8 @@ spec:
             - containerPort: 5432
               protocol: TCP
           env:
+            # TODO:
+            # plaintext credentials - change to secret
             - name: POSTGRES_DB
               value: city-navigator
             - name: POSTGRES_USER
