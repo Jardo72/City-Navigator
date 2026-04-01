@@ -55,6 +55,14 @@ spec:
               value: redis-service.city-navigator
             - name: REDIS_PORT
               value: "6379"
+          volumeMounts:
+            - name: logging-config
+              mountPath: /usr/src/app/logging.yaml
+              subPath: logging.yaml
+      volumes:
+        - name: logging-config
+          configMap:
+            name: master-data-svc-logging-config
   selector:
     matchLabels:
       application: city-navigator
