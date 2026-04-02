@@ -19,10 +19,10 @@
 
 # ConfigMaps that provision dashboards into Rancher's built-in Grafana.
 # The label "grafana_dashboard: '1'" causes the Grafana sidecar to pick them up automatically.
-# These must be deployed to the cattle-monitoring-system namespace where Rancher Monitoring
-# runs its Grafana instance.
+# These must be deployed to the cattle-dashboards namespace — the Grafana sidecar in Rancher
+# Monitoring watches that namespace, not cattle-monitoring-system.
 #
-# Note: the dashboard JSON embeds a Prometheus datasource UID ("PBFA97CFB590B2093").
+# Note: the dashboard JSON embeds a Prometheus datasource UID ("prometheus").
 # If the UID does not match the datasource registered in Rancher's Grafana, open each
 # dashboard after deployment, re-select the Prometheus datasource, and save.
 
@@ -30,7 +30,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: city-navigator-dashboard-overview
-  namespace: cattle-monitoring-system
+  namespace: cattle-dashboards
   labels:
     grafana_dashboard: "1"
 data:
@@ -68,7 +68,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -128,7 +128,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "builder",
               "exemplar": false,
@@ -145,7 +145,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -219,7 +219,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "rate(query_service_http_requests_total[1m])",
@@ -234,7 +234,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -308,7 +308,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "rate(master_data_service_http_requests_total[1m])",
@@ -323,7 +323,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -397,7 +397,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "rate(query_service_http_errors_total[1m])",
@@ -412,7 +412,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -486,7 +486,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "rate(master_data_service_http_errors_total[1m])",
@@ -524,7 +524,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: city-navigator-dashboard-query-service
-  namespace: cattle-monitoring-system
+  namespace: cattle-dashboards
   labels:
     grafana_dashboard: "1"
 data:
@@ -562,7 +562,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -636,7 +636,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "rate(query_service_http_requests_total[1m])",
@@ -651,7 +651,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -725,7 +725,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "100 * sum by (path) (rate(query_service_http_errors_total[1m])) / sum by (path) (rate(query_service_http_requests_total[1m]))",
@@ -740,7 +740,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -814,7 +814,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "histogram_quantile(0.50, sum by (le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
@@ -829,7 +829,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -903,7 +903,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "histogram_quantile(0.95, sum by (le, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
@@ -918,7 +918,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -992,7 +992,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "rate(query_service_http_errors_total[1m])",
@@ -1007,7 +1007,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1081,7 +1081,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "rate(query_service_notification_errors_total[1m])",
@@ -1119,7 +1119,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: city-navigator-dashboard-query-service-aggregated
-  namespace: cattle-monitoring-system
+  namespace: cattle-dashboards
   labels:
     grafana_dashboard: "1"
 data:
@@ -1157,7 +1157,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1231,7 +1231,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "sum by (method, path) (rate(query_service_http_requests_total[1m]))",
@@ -1246,7 +1246,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1320,7 +1320,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "100 * sum by (method, path) (rate(query_service_http_errors_total[1m])) / sum by (method, path) (rate(query_service_http_requests_total[1m]))",
@@ -1335,7 +1335,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1409,7 +1409,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "histogram_quantile(0.50, sum by (le, method, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
@@ -1424,7 +1424,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1498,7 +1498,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "histogram_quantile(0.95, sum by (le, method, path) (rate(query_service_http_request_duration_seconds_bucket[1m])))",
@@ -1513,7 +1513,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1587,7 +1587,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "sum by (method, path, status_code) (rate(query_service_http_errors_total[1m]))",
@@ -1602,7 +1602,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "PBFA97CFB590B2093"
+            "uid": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1676,7 +1676,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "PBFA97CFB590B2093"
+                "uid": "prometheus"
               },
               "editorMode": "code",
               "expr": "sum by (event_type, entity) (rate(query_service_notification_errors_total[1m]))",

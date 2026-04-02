@@ -84,7 +84,7 @@ kubectl apply -f servicemonitor.yml
 kubectl apply -f grafana-dashboards.yml
 ```
 
-Note: `grafana-dashboards.yml` deploys ConfigMaps to the `cattle-monitoring-system` namespace where Rancher's Grafana instance runs. If Rancher Monitoring is not installed, that namespace does not exist and this manifest will fail. `servicemonitor.yml` requires the `monitoring.coreos.com/v1` CRD, which is also provided by Rancher Monitoring.
+Note: `grafana-dashboards.yml` deploys ConfigMaps to the `cattle-dashboards` namespace, which is where the Grafana sidecar in Rancher Monitoring watches for custom dashboards. If Rancher Monitoring is not installed, that namespace does not exist and this manifest will fail. `servicemonitor.yml` requires the `monitoring.coreos.com/v1` CRD, which is also provided by Rancher Monitoring.
 
 
 ## Verification
@@ -119,7 +119,7 @@ In this deployment, logging is configured for console output only (stdout). Kube
 
 ## Grafana Dashboards
 
-When Rancher Monitoring is available, the `grafana-dashboards.yml` manifest deploys three dashboards as ConfigMaps labeled `grafana_dashboard: '1'`. The Grafana sidecar running in the `cattle-monitoring-system` namespace picks them up automatically:
+When Rancher Monitoring is available, the `grafana-dashboards.yml` manifest deploys three dashboards as ConfigMaps labeled `grafana_dashboard: '1'` to the `cattle-dashboards` namespace. The Grafana sidecar watches that namespace and picks them up automatically:
 
 - **City Navigator - Overview** — high-level health across both services (availability, request rate, latency, error rate)
 - **City Navigator - Query Service (per instance)** — per-endpoint, per-instance breakdown for use during load tests
