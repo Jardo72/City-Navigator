@@ -1,5 +1,5 @@
 #
-# Copyright 2023 Jaroslav Chmurny
+# Copyright 2026 Jaroslav Chmurny
 #
 # This file is part of City Navigator.
 #
