@@ -71,6 +71,13 @@ kubectl apply -f ingress.yml
 
 The `data-importer` is a Kubernetes Job that populates the PostgreSQL database with the city plan data. It uses an init container to wait until PostgreSQL is ready before running. The master data service and query service must only be started after the Job has completed successfully.
 
+> **Re-running the data importer:** If the database loses its data (e.g. after a PostgreSQL pod restart), you need to re-run the data-importer Job. Kubernetes Jobs have immutable fields, so `kubectl apply` on an existing Job will fail with an immutable field error. Delete the completed Job first, then re-apply:
+> ```
+> kubectl delete job data-importer -n city-navigator
+> kubectl apply -f data-importer.yml
+> kubectl wait --for=condition=complete job/data-importer -n city-navigator --timeout=120s
+> ```
+
 **Monitoring and dashboards** require Rancher Monitoring to be installed. If it is available, apply the remaining manifests:
 ```
 kubectl apply -f servicemonitor.yml
