@@ -52,10 +52,14 @@ async def lifespan(app: FastAPI) -> None:
     _logger.info("Going to subscribe Redis notifications")
     subscribe_master_data_notifications()
 
-    _logger.debug("Going to register service instance with Prometheus discovery")
-    client = DiscoveryServiceClient(Config.get_prometheus_discovery_base_url(), "query-service")
-    client.register()
-    client.start_heartbeat(Config.get_heartbeat_interval_seconds())
+    discovery_base_url = Config.get_prometheus_discovery_base_url()
+    if discovery_base_url is not None:
+        _logger.info(f"Going to register service instance with Prometheus discovery (base URL = {discovery_base_url })")
+        client = DiscoveryServiceClient(discovery_base_url, "query-service")
+        client.register()
+        client.start_heartbeat(Config.get_heartbeat_interval_seconds())
+    else:
+        _logger.info("PROMETHEUS_DISCOVERY_BASE_URL not set, skipping service discovery registration")
 
     yield
     ...
