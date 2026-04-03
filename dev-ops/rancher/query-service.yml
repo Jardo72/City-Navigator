@@ -57,6 +57,21 @@ spec:
               value: "6379"
             - name: WORKER_COUNT
               value: "10"
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: 8000
+            # there is exponential backoff in case of failure when retrieving the master data,
+            # so we need to set higher values here
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 15
           resources:
             requests:
               cpu: "1500m"
