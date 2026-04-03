@@ -36,10 +36,15 @@ spec:
         component: master-data-service
         environment: sandbox
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: master-data-service
           image: jardo72/city-navigator-master-data-service:latest
           imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           ports:
             - name: http
               containerPort: 8000
