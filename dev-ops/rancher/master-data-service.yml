@@ -70,6 +70,13 @@ spec:
               value: redis-service.city-navigator
             - name: REDIS_PORT
               value: "6379"
+            - name: REDIS_USERNAME
+              value: default
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: password
           readinessProbe:
             httpGet:
               path: /version
