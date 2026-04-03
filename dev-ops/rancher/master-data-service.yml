@@ -65,6 +65,13 @@ spec:
               value: redis-service.city-navigator
             - name: REDIS_PORT
               value: "6379"
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "750M"
+            limits:
+              cpu: "1000m"
+              memory: "1.5G"
           volumeMounts:
             - name: logging-config
               mountPath: /usr/src/app/logging.yaml
