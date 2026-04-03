@@ -64,6 +64,13 @@ spec:
                 secretKeyRef:
                   name: postgres-credentials
                   key: password
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "750M"
+            limits:
+              cpu: "1000m"
+              memory: "1.5G"
           args:
             - city-plan.json
             - postgresql+psycopg2://$(DB_USERNAME):$(DB_PASSWORD)@postgres-service.city-navigator:5432/city-navigator
