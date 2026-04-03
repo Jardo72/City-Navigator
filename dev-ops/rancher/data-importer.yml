@@ -36,6 +36,7 @@ spec:
         environment: sandbox
     spec:
       restartPolicy: OnFailure
+      automountServiceAccountToken: false
       initContainers:
         - name: wait-for-postgres
           image: jardo72/city-navigator-postgres:latest
@@ -48,6 +49,10 @@ spec:
         - name: data-importer
           image: jardo72/city-navigator-data-importer:latest
           imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           env:
             - name: DB_USERNAME
               valueFrom:
