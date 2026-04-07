@@ -36,10 +36,14 @@ spec:
         component: query-service
         environment: sandbox
     spec:
+      automountServiceAccountToken: false
       containers:
         - name: query-service
           image: jardo72/city-navigator-query-service:latest
           imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
           ports:
             - name: http
               containerPort: 8000
@@ -55,6 +59,37 @@ spec:
               value: redis-service.city-navigator
             - name: REDIS_PORT
               value: "6379"
+            - name: REDIS_USERNAME
+              value: default
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: password
+            - name: WORKER_COUNT
+              value: "10"
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: 8000
+            # there is exponential backoff in case of failure when retrieving the master data,
+            # so we need to set higher values here
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          resources:
+            requests:
+              cpu: "1500m"
+              memory: "1G"
+            limits:
+              cpu: "3500m"
+              memory: "3G"
           volumeMounts:
             - name: logging-config
               mountPath: /usr/src/app/logging.yaml

@@ -28,7 +28,13 @@ kubectl create secret generic postgres-credentials \
 
 The `postgres-credentials` Secret is referenced by `postgres.yml`, `data-importer.yml`, and `master-data-service.yml`. All three must be deployed after the Secret exists.
 
-> **Note:** Redis does not require authentication in the current deployment — the Redis container runs without a password and the application connects without credentials.
+```
+kubectl create secret generic redis-credentials \
+  --namespace city-navigator \
+  --from-literal=password=changeme
+```
+
+The `redis-credentials` Secret is referenced by `redis.yml`, `master-data-service.yml`, and `query-service.yml`. All three must be deployed after the Secret exists.
 
 
 ## Local Hostname Setup

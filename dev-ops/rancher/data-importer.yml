@@ -36,6 +36,7 @@ spec:
         environment: sandbox
     spec:
       restartPolicy: OnFailure
+      automountServiceAccountToken: false
       initContainers:
         - name: wait-for-postgres
           image: jardo72/city-navigator-postgres:latest
@@ -48,6 +49,10 @@ spec:
         - name: data-importer
           image: jardo72/city-navigator-data-importer:latest
           imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           env:
             - name: DB_USERNAME
               valueFrom:
@@ -59,6 +64,13 @@ spec:
                 secretKeyRef:
                   name: postgres-credentials
                   key: password
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "750M"
+            limits:
+              cpu: "1000m"
+              memory: "1.5G"
           args:
             - city-plan.json
             - postgresql+psycopg2://$(DB_USERNAME):$(DB_PASSWORD)@postgres-service.city-navigator:5432/city-navigator
