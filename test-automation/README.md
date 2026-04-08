@@ -120,7 +120,7 @@ The configuration is a JSON file. Example (`docker-compose-load-test-cfg.json`):
 | Field | Required | Description |
 |---|---|---|
 | `query_service_base_url` | yes | Base URL of the Query Service (without trailing slash) |
-| `test_duration_minutes` | yes | How long to run the test |
+| `test_duration_minutes` | yes | How long each thread runs after it has been started |
 | `journey_plan_search_threads` | yes | Number of threads calling `/journey-plan` |
 | `journey_plan_error_percentage` | no | % of journey plan requests that intentionally use a non-existent station (to generate 4xx errors) |
 | `line_query_threads` | yes | Number of threads calling `/line` |
@@ -128,8 +128,27 @@ The configuration is a JSON file. Example (`docker-compose-load-test-cfg.json`):
 | `station_query_threads` | yes | Number of threads calling `/station` |
 | `station_query_error_percentage` | no | % of station requests that use a non-existent name |
 | `station_filter_threads` | yes | Number of threads calling `/stations` with a random wildcard filter |
+| `gradual_load_increase` | no | When present, threads are started gradually instead of all at once (see below) |
 
 Set any thread count to `0` to skip that endpoint entirely.
+
+#### Gradual load increase
+
+The optional `gradual_load_increase` object enables a ramp-up phase before the steady-state load:
+
+```json
+"gradual_load_increase": {
+    "duration_minutes": 5,
+    "steps": 12
+}
+```
+
+| Field | Required | Description |
+|---|---|---|
+| `duration_minutes` | yes | Total ramp-up duration; threads are spread evenly across this window |
+| `steps` | no | Number of batches to split the threads into (defaults to the total thread count, i.e. one thread per step) |
+
+Each thread runs for the full `test_duration_minutes` from its own start, so total wall time equals ramp-up duration plus test duration.
 
 ### Test configurations for Docker Compose deployment
 
@@ -142,3 +161,15 @@ The `docker-compose-test-cfg/` directory contains four ready-to-use test configu
 | `moderate-load-without-errors-cfg.json` | Moderate mixed load — 1 thread per endpoint; no intentional errors (clean traffic only) |
 | `short-moderate-load-without-errors-cfg.json` | Short moderate mixed load — 1 thread per endpoint; no intentional errors; 2-minute duration (quick smoke/regression check) |
 | `pure-journey-plan-search-load-test-cfg.json` | Journey-plan stress test — 8 journey-plan threads only, all other endpoints disabled, no errors |
+
+### Test configurations for Rancher deployment
+
+The `rancher-test-cfg/` directory contains ready-to-use test configurations targeting `http://city-navigator.jch/api/query` (the Rancher ingress hostname):
+
+| File | Description |
+|---|---|
+| `load-test-cfg.json` | Heavy mixed load — 9 journey-plan threads, 1 station-query thread, 1 line-query thread, 1 station-filter thread; 1% error rate on journey-plan, line-query, and station-query; 20-minute duration |
+| `moderate-load-without-errors-cfg.json` | Moderate mixed load — 1 thread per endpoint; no intentional errors; 30-minute duration |
+| `short-moderate-load-without-errors-cfg.json` | Short moderate mixed load — 1 thread per endpoint; no intentional errors; 2-minute duration (quick smoke/regression check) |
+| `pure-journey-plan-search-load-test-cfg.json` | Journey-plan stress test — 12 journey-plan threads only, all other endpoints disabled, no errors; 20-minute duration |
+| `gradual-load-peak-cfg.json` | Peak mixed load with gradual ramp-up — 9 journey-plan threads, 1 station-query thread, 1 line-query thread, 1 station-filter thread; no intentional errors; 12-minute test duration preceded by a 5-minute ramp-up (one thread started every 25 seconds) |
