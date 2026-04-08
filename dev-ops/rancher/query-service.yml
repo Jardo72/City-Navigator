@@ -67,7 +67,7 @@ spec:
                   name: redis-credentials
                   key: password
             - name: WORKER_COUNT
-              value: "10"
+              value: "8"
           readinessProbe:
             httpGet:
               path: /version
@@ -88,7 +88,7 @@ spec:
               cpu: "1500m"
               memory: "1G"
             limits:
-              cpu: "3500m"
+              cpu: "4750m"
               memory: "3G"
           volumeMounts:
             - name: logging-config
