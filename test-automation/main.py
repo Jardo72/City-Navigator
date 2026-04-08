@@ -55,13 +55,22 @@ Configuration file structure (JSON):
       "station_query_error_percentage":<percentage of intentionally invalid requests>,
       "station_filter_threads":        <number of worker threads>,
       "line_query_threads":            <number of worker threads>,
-      "line_query_error_percentage":   <percentage of intentionally invalid requests>
+      "line_query_error_percentage":   <percentage of intentionally invalid requests>,
+      "gradual_load_increase": {
+          "duration_minutes":          <ramp-up duration in minutes>,
+          "steps":                     <number of steps (optional, defaults to total thread count)>
+      }
   }
 
 Notes:
   - Setting a thread count to 0 disables testing of that endpoint.
   - The error percentage controls how many requests use invalid parameters to verify
     that the service returns the expected 4xx responses.
+  - gradual_load_increase is optional. When omitted, all threads start simultaneously.
+    When present, threads are started in equally-sized batches spread over the ramp-up
+    duration. Each thread then runs for the full test_duration_minutes from its own
+    start, so total wall time is ramp-up duration plus test_duration_minutes.
+    The steps value defaults to the total thread count (one thread per step).
 """
 
 
@@ -125,6 +134,9 @@ def print_test_run_preview(config: Config, data_collections: DataCollections) ->
     print("Test configuration")
     print(f"Duration:             {config.test_duration_minutes} minutes")
     print(f"Overall thread count: {config.overall_thread_count}")
+    if config.gradual_load_increase:
+        gli = config.gradual_load_increase
+        print(f"Gradual load increase: {gli.duration_minutes} minute(s), {gli.steps} step(s)")
     print()
     print("Test data summary")
     print(f"Overall number of stations: {len(data_collections.stations)}")

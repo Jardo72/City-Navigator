@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+from math import ceil
 from time import sleep
 from typing import List
 
@@ -75,8 +76,12 @@ class TestRun:
             self._station_filter_threads +
             self._line_query_threads
         )
-        for single_thread in all_threads:
-            single_thread.start()
+
+        if self._config.gradual_load_increase:
+            self._start_threads_gradually(all_threads)
+        else:
+            for single_thread in all_threads:
+                single_thread.start()
 
         self._display_progress()
 
@@ -95,6 +100,24 @@ class TestRun:
             station_filter_summary=station_filter_summary,
             line_query_summary=line_query_summary,
         )
+
+    def _start_threads_gradually(self, all_threads: List[AbstractTestThread]) -> None:
+        gli = self._config.gradual_load_increase
+        total = len(all_threads)
+        steps = min(gli.steps, total)
+        interval_seconds = gli.duration_minutes * 60 / steps
+        threads_per_step = ceil(total / steps)
+
+        print(f"Gradual load increase: {steps} step(s) over {gli.duration_minutes} minute(s)")
+        for step in range(steps):
+            batch_start = step * threads_per_step
+            batch_end = min(batch_start + threads_per_step, total)
+            batch = all_threads[batch_start:batch_end]
+            print(f"  Step {step + 1}/{steps}: starting {len(batch)} thread(s) ({batch_end}/{total} active)")
+            for single_thread in batch:
+                single_thread.start()
+            if batch_end < total:
+                sleep(interval_seconds)
 
     def _display_progress(self) -> None:
         print()
