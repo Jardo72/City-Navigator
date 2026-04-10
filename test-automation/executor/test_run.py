@@ -109,7 +109,7 @@ class TestRun:
         print(f"Gradual load increase: starting {total} worker(s) with {interval} sec interval between each")
         for i, thread in enumerate(threads):
             thread.start()
-            print(f"  Started worker {i + 1}/{total}")
+            print(f"  Started {type(thread).__name__} ({i + 1}/{total})")
             if i < total - 1:
                 sleep(interval)
 
