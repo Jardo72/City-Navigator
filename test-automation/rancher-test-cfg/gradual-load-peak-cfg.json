@@ -9,7 +9,6 @@
     "station_query_error_percentage": 0,
     "station_filter_threads": 2,
     "gradual_load_increase": {
-        "duration_minutes": 5,
-        "steps": 12
+        "worker_start_interval_seconds": 25
     }
 }

@@ -24,8 +24,7 @@ from typing import Optional
 
 @dataclass(frozen=True, slots=True)
 class GradualLoadIncrease:
-    duration_minutes: int
-    steps: int
+    worker_start_interval_seconds: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -56,17 +55,12 @@ def read_from_file(filename: str) -> Config:
         line_query_threads = json_data["line_query_threads"]
         station_query_threads = json_data["station_query_threads"]
         station_filter_threads = json_data["station_filter_threads"]
-        overall_thread_count = (
-            journey_plan_search_threads + line_query_threads +
-            station_query_threads + station_filter_threads
-        )
 
         gradual_load_increase = None
         if "gradual_load_increase" in json_data:
             gli = json_data["gradual_load_increase"]
             gradual_load_increase = GradualLoadIncrease(
-                duration_minutes=gli["duration_minutes"],
-                steps=gli.get("steps", overall_thread_count),
+                worker_start_interval_seconds=gli["worker_start_interval_seconds"],
             )
 
         return Config(
