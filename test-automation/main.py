@@ -131,7 +131,7 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
 def print_test_run_preview(config: Config, data_collections: DataCollections) -> None:
     print()
     print("Test configuration")
-    print(f"Duration:             {config.test_duration_minutes} minutes")
+    print(f"Main phae duration:   {config.test_duration_minutes} minutes")
     print(f"Overall thread count: {config.overall_thread_count}")
     if config.gradual_load_increase:
         gli = config.gradual_load_increase
