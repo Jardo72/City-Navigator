@@ -26,7 +26,7 @@ from rich.progress import track
 
 
 from config import Config
-from util import DataCollections
+from util import DataCollections, Timeout
 
 from .abstract_test_thread import AbstractTestThread
 from .api_enpoint_summary import APIEndpointSummary
@@ -42,9 +42,11 @@ class TestRun:
     def __init__(self, config: Config, data_collections: DataCollections) -> None:
         self._data_collections = data_collections
         self._config = config
+        self._timeout = Timeout(config.test_duration_minutes)
         self._journey_plan_search_threads = [
             JourneyPlanSearchThread(
                 config,
+                self._timeout,
                 data_collections.stations,
                 config.journey_plan_error_percentage
             ) for _ in range(config.journey_plan_search_threads)
@@ -52,18 +54,21 @@ class TestRun:
         self._station_query_threads = [
             StationQueryThread(
                 config,
+                self._timeout,
                 data_collections.stations,
                 config.station_query_error_percentage
             ) for _ in range(config.station_query_threads)
         ]
         self._station_filter_threads = [
             StationFilterThread(
-                config
+                config,
+                self._timeout,
             ) for _ in range(config.station_filter_threads)
         ]
         self._line_query_threads = [
             LineQueryThread(
                 config,
+                self._timeout,
                 data_collections.lines,
                 config.line_query_error_percentage
             ) for _ in range(config.line_query_threads)
@@ -83,6 +88,7 @@ class TestRun:
             for single_thread in all_threads:
                 single_thread.start()
 
+        self._timeout.start()
         self._display_progress()
 
         for single_thread in all_threads:
