@@ -17,6 +17,7 @@
 # limitations under the License.
 #
 
+from datetime import datetime
 from random import shuffle
 from time import sleep
 from typing import List
@@ -88,6 +89,7 @@ class TestRun:
             for single_thread in all_threads:
                 single_thread.start()
 
+        main_phase_start_time = datetime.now()
         self._timeout.start()
         self._display_progress()
 
@@ -101,6 +103,7 @@ class TestRun:
 
         return TestRunSummary(
             config=self._config,
+            main_phase_start_time=main_phase_start_time,
             journey_plan_search_summary=journey_plan_search_summary,
             station_query_summary=station_query_summary,
             station_filter_summary=station_filter_summary,

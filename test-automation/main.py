@@ -152,14 +152,15 @@ def format_duration(duration_sec: float) -> str:
 
 def _overall_summary_table(summary: TestRunSummary) -> Table:
     FORMAT = "%Y-%m-%d %H:%M:%S"
-    duration_sec = summary.duration.total_seconds()
     table = Table(box=box.ROUNDED, show_header=False, title="[cyan]Test Run Summary[/cyan]")
     table.add_column("Parameter", style="bold")
     table.add_column("Value")
     table.add_row("Query service base URL", summary.config.query_service_base_url)
-    table.add_row("Start time", summary.start_time.strftime(FORMAT))
+    table.add_row("Ramp-up start", summary.ramp_up_start_time.strftime(FORMAT))
+    table.add_row("Main phase start", summary.main_phase_start_time.strftime(FORMAT))
     table.add_row("End time", summary.end_time.strftime(FORMAT))
-    table.add_row("Duration", format_duration(duration_sec))
+    table.add_row("Total duration", format_duration(summary.total_duration.total_seconds()))
+    table.add_row("Main phase duration", format_duration(summary.main_phase_duration.total_seconds()))
     table.add_row("Thread count", str(summary.config.overall_thread_count))
     table.add_row("Overall requests", str(summary.overall_request_count))
     table.add_row("Successful", f"{summary.overall_success_count} ({summary.overall_success_percentage} %)")
@@ -170,7 +171,7 @@ def _overall_summary_table(summary: TestRunSummary) -> Table:
 
 
 def _endpoint_details_table(summary: TestRunSummary) -> Table:
-    duration_sec = summary.duration.total_seconds()
+    duration_sec = summary.total_duration.total_seconds()
 
     table = Table(box=box.ROUNDED, title="[cyan]Endpoint Details[/cyan]")
     table.add_column("Metric", style="bold")

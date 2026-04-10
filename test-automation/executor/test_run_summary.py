@@ -29,18 +29,23 @@ from .api_enpoint_summary import APIEndpointSummary
 @dataclass(frozen=True, slots=True)
 class TestRunSummary:
     config: Config
+    main_phase_start_time: datetime
     journey_plan_search_summary: APIEndpointSummary
     station_query_summary: APIEndpointSummary
     station_filter_summary: APIEndpointSummary
     line_query_summary: APIEndpointSummary
 
     @property
-    def duration(self) -> timedelta:
-        return self.end_time - self.start_time
+    def ramp_up_start_time(self) -> datetime:
+        return min(map(lambda s: s.start_time, self._endpoint_summaries))
 
     @property
-    def start_time(self) -> datetime:
-        return min(map(lambda s: s.start_time, self._endpoint_summaries))
+    def total_duration(self) -> timedelta:
+        return self.end_time - self.ramp_up_start_time
+
+    @property
+    def main_phase_duration(self) -> timedelta:
+        return self.end_time - self.main_phase_start_time
 
     @property
     def end_time(self) -> datetime:
