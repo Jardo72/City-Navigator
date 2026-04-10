@@ -57,8 +57,7 @@ Configuration file structure (JSON):
       "line_query_threads":            <number of worker threads>,
       "line_query_error_percentage":   <percentage of intentionally invalid requests>,
       "gradual_load_increase": {
-          "duration_minutes":          <ramp-up duration in minutes>,
-          "steps":                     <number of steps (optional, defaults to total thread count)>
+          "worker_start_interval_seconds": <seconds between starting each worker>
       }
   }
 
@@ -67,10 +66,10 @@ Notes:
   - The error percentage controls how many requests use invalid parameters to verify
     that the service returns the expected 4xx responses.
   - gradual_load_increase is optional. When omitted, all threads start simultaneously.
-    When present, threads are started in equally-sized batches spread over the ramp-up
-    duration. Each thread then runs for the full test_duration_minutes from its own
-    start, so total wall time is ramp-up duration plus test_duration_minutes.
-    The steps value defaults to the total thread count (one thread per step).
+    When present, workers are shuffled (mixing thread types) and started one by one
+    with the configured interval between each. Each thread runs for the full
+    test_duration_minutes from its own start, so total wall time is roughly
+    (total_threads - 1) * worker_start_interval_seconds plus test_duration_minutes.
 """
 
 
@@ -136,7 +135,7 @@ def print_test_run_preview(config: Config, data_collections: DataCollections) ->
     print(f"Overall thread count: {config.overall_thread_count}")
     if config.gradual_load_increase:
         gli = config.gradual_load_increase
-        print(f"Gradual load increase: {gli.duration_minutes} minute(s), {gli.steps} step(s)")
+        print(f"Gradual load increase: {gli.worker_start_interval_seconds} sec interval between workers")
     print()
     print("Test data summary")
     print(f"Overall number of stations: {len(data_collections.stations)}")
