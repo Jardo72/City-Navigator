@@ -19,6 +19,12 @@
 
 from dataclasses import dataclass
 from json import load
+from typing import Optional
+
+
+@dataclass(frozen=True, slots=True)
+class GradualLoadIncrease:
+    worker_start_interval_seconds: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,6 +38,7 @@ class Config:
     station_query_threads: int
     station_query_error_percentage: int
     station_filter_threads: int
+    gradual_load_increase: Optional[GradualLoadIncrease] = None
 
     @property
     def overall_thread_count(self) -> int:
@@ -44,14 +51,27 @@ class Config:
 def read_from_file(filename: str) -> Config:
     with open(filename, "r") as json_file:
         json_data = load(json_file)
+        journey_plan_search_threads = json_data["journey_plan_search_threads"]
+        line_query_threads = json_data["line_query_threads"]
+        station_query_threads = json_data["station_query_threads"]
+        station_filter_threads = json_data["station_filter_threads"]
+
+        gradual_load_increase = None
+        if "gradual_load_increase" in json_data:
+            gli = json_data["gradual_load_increase"]
+            gradual_load_increase = GradualLoadIncrease(
+                worker_start_interval_seconds=gli["worker_start_interval_seconds"],
+            )
+
         return Config(
             query_service_base_url=json_data["query_service_base_url"],
             test_duration_minutes=json_data["test_duration_minutes"],
-            journey_plan_search_threads=json_data["journey_plan_search_threads"],
+            journey_plan_search_threads=journey_plan_search_threads,
             journey_plan_error_percentage=json_data.get("journey_plan_error_percentage", 0),
-            line_query_threads=json_data["line_query_threads"],
+            line_query_threads=line_query_threads,
             line_query_error_percentage=json_data.get("line_query_error_percentage", 0),
-            station_query_threads=json_data["station_query_threads"],
+            station_query_threads=station_query_threads,
             station_query_error_percentage=json_data.get("station_query_error_percentage", 0),
-            station_filter_threads=json_data["station_filter_threads"]
+            station_filter_threads=station_filter_threads,
+            gradual_load_increase=gradual_load_increase,
         )

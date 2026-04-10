@@ -21,15 +21,15 @@ from typing import Tuple
 
 from config import Config
 from rest import QueryServiceClient, Response
-from util import RandomSelector
+from util import RandomSelector, Timeout
 
 from .abstract_test_thread import AbstractTestThread
 
 
 class StationQueryThread(AbstractTestThread):
 
-    def __init__(self, config: Config, stations: Tuple[str], error_percentage: int) -> None:
-        super().__init__(config)
+    def __init__(self, config: Config, timeout: Timeout, stations: Tuple[str], error_percentage: int) -> None:
+        super().__init__(config, timeout)
         self._stations = RandomSelector(stations, error_percentage)
 
     def send_single_request(self, client: QueryServiceClient) -> Response:

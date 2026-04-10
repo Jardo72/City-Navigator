@@ -17,6 +17,8 @@
 # limitations under the License.
 #
 
+from datetime import datetime
+from random import shuffle
 from time import sleep
 from typing import List
 
@@ -25,7 +27,7 @@ from rich.progress import track
 
 
 from config import Config
-from util import DataCollections
+from util import DataCollections, Timeout
 
 from .abstract_test_thread import AbstractTestThread
 from .api_enpoint_summary import APIEndpointSummary
@@ -41,9 +43,11 @@ class TestRun:
     def __init__(self, config: Config, data_collections: DataCollections) -> None:
         self._data_collections = data_collections
         self._config = config
+        self._timeout = Timeout(config.test_duration_minutes)
         self._journey_plan_search_threads = [
             JourneyPlanSearchThread(
                 config,
+                self._timeout,
                 data_collections.stations,
                 config.journey_plan_error_percentage
             ) for _ in range(config.journey_plan_search_threads)
@@ -51,18 +55,21 @@ class TestRun:
         self._station_query_threads = [
             StationQueryThread(
                 config,
+                self._timeout,
                 data_collections.stations,
                 config.station_query_error_percentage
             ) for _ in range(config.station_query_threads)
         ]
         self._station_filter_threads = [
             StationFilterThread(
-                config
+                config,
+                self._timeout,
             ) for _ in range(config.station_filter_threads)
         ]
         self._line_query_threads = [
             LineQueryThread(
                 config,
+                self._timeout,
                 data_collections.lines,
                 config.line_query_error_percentage
             ) for _ in range(config.line_query_threads)
@@ -75,9 +82,15 @@ class TestRun:
             self._station_filter_threads +
             self._line_query_threads
         )
-        for single_thread in all_threads:
-            single_thread.start()
 
+        if self._config.gradual_load_increase:
+            self._start_threads_gradually(all_threads)
+        else:
+            for single_thread in all_threads:
+                single_thread.start()
+
+        main_phase_start_time = datetime.now()
+        self._timeout.start()
         self._display_progress()
 
         for single_thread in all_threads:
@@ -90,11 +103,24 @@ class TestRun:
 
         return TestRunSummary(
             config=self._config,
+            main_phase_start_time=main_phase_start_time,
             journey_plan_search_summary=journey_plan_search_summary,
             station_query_summary=station_query_summary,
             station_filter_summary=station_filter_summary,
             line_query_summary=line_query_summary,
         )
+
+    def _start_threads_gradually(self, all_threads: List[AbstractTestThread]) -> None:
+        interval = self._config.gradual_load_increase.worker_start_interval_seconds
+        threads = all_threads.copy()
+        shuffle(threads)
+        total = len(threads)
+        print(f"Gradual load increase: starting {total} worker(s) with {interval} sec interval between each")
+        for i, thread in enumerate(threads):
+            thread.start()
+            print(f"  Started {type(thread).__name__} ({i + 1}/{total})")
+            if i < total - 1:
+                sleep(interval)
 
     def _display_progress(self) -> None:
         print()

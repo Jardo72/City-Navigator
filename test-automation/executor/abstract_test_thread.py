@@ -30,16 +30,16 @@ from .statistics_collector import StatisticsCollector
 
 class AbstractTestThread(Thread, ABC):
 
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, timeout: Timeout) -> None:
         super().__init__(daemon=False)
         self._summary_collector = StatisticsCollector()
         self._config = config
+        self._timeout = timeout
 
     def run(self) -> None:
         client = QueryServiceClient(self._config.query_service_base_url)
-        timeout = Timeout(self._config.test_duration_minutes)
         self._summary_collector.test_thread_started()
-        while timeout.has_not_expired_yet():
+        while self._timeout.has_not_expired_yet():
             for _ in range(4):
                 try:
                     response = self.send_single_request(client)

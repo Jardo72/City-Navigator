@@ -55,13 +55,21 @@ Configuration file structure (JSON):
       "station_query_error_percentage":<percentage of intentionally invalid requests>,
       "station_filter_threads":        <number of worker threads>,
       "line_query_threads":            <number of worker threads>,
-      "line_query_error_percentage":   <percentage of intentionally invalid requests>
+      "line_query_error_percentage":   <percentage of intentionally invalid requests>,
+      "gradual_load_increase": {
+          "worker_start_interval_seconds": <seconds between starting each worker>
+      }
   }
 
 Notes:
   - Setting a thread count to 0 disables testing of that endpoint.
   - The error percentage controls how many requests use invalid parameters to verify
     that the service returns the expected 4xx responses.
+  - gradual_load_increase is optional. When omitted, all threads start simultaneously.
+    When present, workers are shuffled (mixing thread types) and started one by one
+    with the configured interval between each. Each thread runs for the full
+    test_duration_minutes from its own start, so total wall time is roughly
+    (total_threads - 1) * worker_start_interval_seconds plus test_duration_minutes.
 """
 
 
@@ -123,8 +131,11 @@ def read_lists_from_master_data(config: Config) -> DataCollections:
 def print_test_run_preview(config: Config, data_collections: DataCollections) -> None:
     print()
     print("Test configuration")
-    print(f"Duration:             {config.test_duration_minutes} minutes")
+    print(f"Main phae duration:   {config.test_duration_minutes} minutes")
     print(f"Overall thread count: {config.overall_thread_count}")
+    if config.gradual_load_increase:
+        gli = config.gradual_load_increase
+        print(f"Gradual load increase: {gli.worker_start_interval_seconds} sec interval between workers")
     print()
     print("Test data summary")
     print(f"Overall number of stations: {len(data_collections.stations)}")
@@ -141,14 +152,15 @@ def format_duration(duration_sec: float) -> str:
 
 def _overall_summary_table(summary: TestRunSummary) -> Table:
     FORMAT = "%Y-%m-%d %H:%M:%S"
-    duration_sec = summary.duration.total_seconds()
     table = Table(box=box.ROUNDED, show_header=False, title="[cyan]Test Run Summary[/cyan]")
     table.add_column("Parameter", style="bold")
     table.add_column("Value")
     table.add_row("Query service base URL", summary.config.query_service_base_url)
-    table.add_row("Start time", summary.start_time.strftime(FORMAT))
+    table.add_row("Ramp-up start", summary.ramp_up_start_time.strftime(FORMAT))
+    table.add_row("Main phase start", summary.main_phase_start_time.strftime(FORMAT))
     table.add_row("End time", summary.end_time.strftime(FORMAT))
-    table.add_row("Duration", format_duration(duration_sec))
+    table.add_row("Total duration", format_duration(summary.total_duration.total_seconds()))
+    table.add_row("Main phase duration", format_duration(summary.main_phase_duration.total_seconds()))
     table.add_row("Thread count", str(summary.config.overall_thread_count))
     table.add_row("Overall requests", str(summary.overall_request_count))
     table.add_row("Successful", f"{summary.overall_success_count} ({summary.overall_success_percentage} %)")
@@ -159,7 +171,7 @@ def _overall_summary_table(summary: TestRunSummary) -> Table:
 
 
 def _endpoint_details_table(summary: TestRunSummary) -> Table:
-    duration_sec = summary.duration.total_seconds()
+    duration_sec = summary.total_duration.total_seconds()
 
     table = Table(box=box.ROUNDED, title="[cyan]Endpoint Details[/cyan]")
     table.add_column("Metric", style="bold")

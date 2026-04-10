@@ -23,9 +23,14 @@ from time import perf_counter
 class Timeout:
 
     def __init__(self, timeout_min: int) -> None:
-        self._start_time = perf_counter()
+        self._start_time = None
         self._timeout_millis = 60 * 1000 * timeout_min
 
+    def start(self) -> None:
+        self._start_time = perf_counter()
+
     def has_not_expired_yet(self) -> bool:
+        if self._start_time is None:
+            return True
         current_time = perf_counter()
         return (1000 * (current_time - self._start_time)) < self._timeout_millis

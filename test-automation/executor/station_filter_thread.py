@@ -21,15 +21,15 @@ from string import ascii_uppercase
 
 from config import Config
 from rest import QueryServiceClient, Response
-from util import RandomSelector
+from util import RandomSelector, Timeout
 
 from .abstract_test_thread import AbstractTestThread
 
 
 class StationFilterThread(AbstractTestThread):
 
-    def __init__(self, config: Config) -> None:
-        super().__init__(config)
+    def __init__(self, config: Config, timeout: Timeout) -> None:
+        super().__init__(config, timeout)
         filters = tuple([char + "*" for char in ascii_uppercase])
         self._filters = RandomSelector(filters)
 
