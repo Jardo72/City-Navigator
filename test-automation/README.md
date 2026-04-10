@@ -120,7 +120,7 @@ The configuration is a JSON file. Example (`docker-compose-load-test-cfg.json`):
 | Field | Required | Description |
 |---|---|---|
 | `query_service_base_url` | yes | Base URL of the Query Service (without trailing slash) |
-| `test_duration_minutes` | yes | How long each thread runs after it has been started |
+| `test_duration_minutes` | yes | Duration of the main phase — the period when all workers are running simultaneously |
 | `journey_plan_search_threads` | yes | Number of threads calling `/journey-plan` |
 | `journey_plan_error_percentage` | no | % of journey plan requests that intentionally use a non-existent station (to generate 4xx errors) |
 | `line_query_threads` | yes | Number of threads calling `/line` |
@@ -134,21 +134,19 @@ Set any thread count to `0` to skip that endpoint entirely.
 
 #### Gradual load increase
 
-The optional `gradual_load_increase` object enables a ramp-up phase before the steady-state load:
+The optional `gradual_load_increase` object enables a ramp-up phase before the main phase:
 
 ```json
 "gradual_load_increase": {
-    "duration_minutes": 5,
-    "steps": 12
+    "worker_start_interval_seconds": 15
 }
 ```
 
 | Field | Required | Description |
 |---|---|---|
-| `duration_minutes` | yes | Total ramp-up duration; threads are spread evenly across this window |
-| `steps` | no | Number of batches to split the threads into (defaults to the total thread count, i.e. one thread per step) |
+| `worker_start_interval_seconds` | yes | Pause between starting consecutive workers during the ramp-up phase |
 
-Each thread runs for the full `test_duration_minutes` from its own start, so total wall time equals ramp-up duration plus test duration.
+Workers are shuffled before the ramp-up begins, so threads of different types are interleaved rather than started in blocks. The `test_duration_minutes` countdown starts only after the last worker has been started, so it always reflects the duration of the main phase with full load. Total wall time equals `(total_threads - 1) × worker_start_interval_seconds` plus `test_duration_minutes`.
 
 ### Test configurations for Docker Compose deployment
 
@@ -172,4 +170,4 @@ The `rancher-test-cfg/` directory contains ready-to-use test configurations targ
 | `moderate-load-without-errors-cfg.json` | Moderate mixed load — 1 thread per endpoint; no intentional errors; 30-minute duration |
 | `short-moderate-load-without-errors-cfg.json` | Short moderate mixed load — 1 thread per endpoint; no intentional errors; 2-minute duration (quick smoke/regression check) |
 | `pure-journey-plan-search-load-test-cfg.json` | Journey-plan stress test — 12 journey-plan threads only, all other endpoints disabled, no errors; 20-minute duration |
-| `gradual-load-peak-cfg.json` | Peak mixed load with gradual ramp-up — 9 journey-plan threads, 1 station-query thread, 1 line-query thread, 1 station-filter thread; no intentional errors; 12-minute test duration preceded by a 5-minute ramp-up (one thread started every 25 seconds) |
+| `gradual-load-peak-cfg.json` | Peak mixed load with gradual ramp-up — 9 journey-plan threads, 2 station-query threads, 2 line-query threads, 2 station-filter threads; no intentional errors; 20-minute main phase preceded by a ramp-up of 15 seconds between each of the 15 workers |
