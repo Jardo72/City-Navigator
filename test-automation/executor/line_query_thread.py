@@ -30,7 +30,7 @@ class LineQueryThread(AbstractTestThread):
 
     def __init__(self, config: Config, timeout: Timeout, lines: Tuple[str], error_percentage: int) -> None:
         super().__init__(config, timeout)
-        self._lines = RandomSelector(lines, error_percentage)
+        self._lines = RandomSelector(lines, error_percentage, "U13")
 
     def send_single_request(self, client: QueryServiceClient) -> Response:
         label = self._lines.random_value()

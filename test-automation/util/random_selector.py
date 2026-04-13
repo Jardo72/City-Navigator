@@ -31,11 +31,12 @@ class _SelectionMode(IntEnum):
 
 class RandomSelector:
 
-    def __init__(self, values: Tuple[str], error_percentage: int = 0) -> None:
+    def __init__(self, values: Tuple[str], error_percentage: int = 0, no_such_value: str = "NoSuchValue") -> None:
         self._values = values
         self._max_index = len(values) - 1
         self._error_period = 100 / error_percentage if error_percentage > 0 else None
         self._counter = 0
+        self._no_such_value = no_such_value
 
     def _get_current_selection_mode(self) -> _SelectionMode:
         self._counter += 1
@@ -49,7 +50,7 @@ class RandomSelector:
         if selection_mode is _SelectionMode.VALID:
             random_index = randint(0, self._max_index)
             return self._values[random_index]
-        return "NoSuchValue"
+        return self._no_such_value
 
     def random_value(self) -> str:
         selection_mode = self._get_current_selection_mode()
