@@ -30,7 +30,7 @@ class JourneyPlanSearchThread(AbstractTestThread):
 
     def __init__(self, config: Config, timeout: Timeout, stations: Tuple[str], error_percentage: int) -> None:
         super().__init__(config, timeout)
-        self._stations = RandomSelector(stations, error_percentage)
+        self._stations = RandomSelector(stations, error_percentage, "Invalidenstrasse")
 
     def send_single_request(self, client: QueryServiceClient) -> Response:
         start, destination = self._stations.random_pair()
