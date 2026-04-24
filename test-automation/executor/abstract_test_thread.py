@@ -19,6 +19,7 @@
 
 from abc import ABC, abstractmethod
 from threading import Thread
+from time import sleep
 
 from config import Config
 from rest import QueryServiceClient, Response
@@ -39,6 +40,9 @@ class AbstractTestThread(Thread, ABC):
     def run(self) -> None:
         client = QueryServiceClient(self._config.query_service_base_url)
         self._summary_collector.test_thread_started()
+        gli = self._config.gradual_load_increase
+        break_seconds = gli.initial_break_between_requests_seconds if gli else 0.0
+        step_seconds = gli.break_between_requests_step_seconds if gli else 0.0
         while self._timeout.has_not_expired_yet():
             for _ in range(4):
                 try:
@@ -46,6 +50,9 @@ class AbstractTestThread(Thread, ABC):
                     self._summary_collector.add(response)
                 except Exception:
                     self._summary_collector.exception_caught()
+                if break_seconds > 0:
+                    sleep(break_seconds)
+                    break_seconds = max(0.0, break_seconds - step_seconds)
         self._summary_collector.test_thread_completed()
 
     @abstractmethod
