@@ -1,6 +1,6 @@
 {
     "query_service_base_url": "http://city-navigator.jch/api/query",
-    "test_duration_minutes": 40,
+    "test_duration_minutes": 50,
     "journey_plan_search_threads": 9,
     "journey_plan_error_percentage": 0,
     "line_query_threads": 2,
@@ -11,6 +11,6 @@
     "gradual_load_increase": {
         "worker_start_interval_seconds": 15,
         "initial_break_between_requests_seconds": 0.3,
-        "break_between_requests_step_seconds":    0.002
+        "break_between_requests_step_seconds":    0.001
     }
 }
