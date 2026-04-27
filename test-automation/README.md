@@ -138,15 +138,21 @@ The optional `gradual_load_increase` object enables a ramp-up phase before the m
 
 ```json
 "gradual_load_increase": {
-    "worker_start_interval_seconds": 15
+    "worker_start_interval_seconds": 15,
+    "initial_break_between_requests_seconds": 0.3,
+    "break_between_requests_step_seconds": 0.001
 }
 ```
 
 | Field | Required | Description |
 |---|---|---|
 | `worker_start_interval_seconds` | yes | Pause between starting consecutive workers during the ramp-up phase |
+| `initial_break_between_requests_seconds` | no | Initial sleep each worker inserts between consecutive requests at the start of its run (default: `0.0`) |
+| `break_between_requests_step_seconds` | no | Amount subtracted from the per-request sleep after each request, until the sleep reaches zero (default: `0.0`) |
 
 Workers are shuffled before the ramp-up begins, so threads of different types are interleaved rather than started in blocks. The `test_duration_minutes` countdown starts only after the last worker has been started, so it always reflects the duration of the main phase with full load. Total wall time equals `(total_threads - 1) × worker_start_interval_seconds` plus `test_duration_minutes`.
+
+The two optional per-request sleep fields add a second dimension to the ramp-up: each individual worker thread starts slowly (sleeping `initial_break_between_requests_seconds` between requests) and speeds up on its own by reducing that sleep by `break_between_requests_step_seconds` after every request, until the sleep reaches zero and the thread runs at full speed. This produces a smoother load curve than staggering thread starts alone — for example, with an initial break of `0.3` s and a step of `0.001` s, each thread reaches full speed after 300 requests.
 
 ### Test configurations for Docker Compose deployment
 

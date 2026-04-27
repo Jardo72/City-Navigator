@@ -57,7 +57,9 @@ Configuration file structure (JSON):
       "line_query_threads":            <number of worker threads>,
       "line_query_error_percentage":   <percentage of intentionally invalid requests>,
       "gradual_load_increase": {
-          "worker_start_interval_seconds": <seconds between starting each worker>
+          "worker_start_interval_seconds":          <seconds between starting each worker>,
+          "initial_break_between_requests_seconds": <initial sleep between consecutive requests>,
+          "break_between_requests_step_seconds":    <decrement applied to the sleep after each request>
       }
   }
 
@@ -70,6 +72,10 @@ Notes:
     with the configured interval between each. Each thread runs for the full
     test_duration_minutes from its own start, so total wall time is roughly
     (total_threads - 1) * worker_start_interval_seconds plus test_duration_minutes.
+  - initial_break_between_requests_seconds and break_between_requests_step_seconds are
+    optional (default 0.0). When set, each worker thread sleeps between consecutive
+    requests, starting at initial_break_between_requests_seconds and decreasing by
+    break_between_requests_step_seconds after each request until the sleep reaches 0.
 """
 
 
@@ -136,6 +142,8 @@ def print_test_run_preview(config: Config, data_collections: DataCollections) ->
     if config.gradual_load_increase:
         gli = config.gradual_load_increase
         print(f"Gradual load increase: {gli.worker_start_interval_seconds} sec interval between workers")
+        if gli.initial_break_between_requests_seconds > 0:
+            print(f"  Initial break between requests: {gli.initial_break_between_requests_seconds} sec, step: {gli.break_between_requests_step_seconds} sec")
     print()
     print("Test data summary")
     print(f"Overall number of stations: {len(data_collections.stations)}")

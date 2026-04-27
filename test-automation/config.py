@@ -25,6 +25,8 @@ from typing import Optional
 @dataclass(frozen=True, slots=True)
 class GradualLoadIncrease:
     worker_start_interval_seconds: float
+    initial_break_between_requests_seconds: float = 0.0
+    break_between_requests_step_seconds: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -61,6 +63,8 @@ def read_from_file(filename: str) -> Config:
             gli = json_data["gradual_load_increase"]
             gradual_load_increase = GradualLoadIncrease(
                 worker_start_interval_seconds=gli["worker_start_interval_seconds"],
+                initial_break_between_requests_seconds=gli.get("initial_break_between_requests_seconds", 0.0),
+                break_between_requests_step_seconds=gli.get("break_between_requests_step_seconds", 0.0),
             )
 
         return Config(
